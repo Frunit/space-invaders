@@ -1,0 +1,12 @@
+body {
+	background-color: grey;
+}
+
+canvas {
+	margin: 10px;
+	border: 1px solid blue;
+}
+
+input {
+	border: 1px solid grey;
+}
