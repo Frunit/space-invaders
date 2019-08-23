@@ -32,7 +32,8 @@ function Game() {
 
 	// TODO: The options and the version may be externalized using json or the like.
 	this.options = {
-		optimal_size: {w: 900, h: 600},
+		total_size: {w: 900, h: 600},
+		border: 20,
 	};
 
 	this.version = 'pre-alpha';
@@ -107,10 +108,10 @@ Game.prototype.update = function(dt) {
  * creates the gui, and starts the game loop.
  */
 Game.prototype.start = function() {
-	this.engine = new Engine();
+	this.engine = new Engine(this.options.total_size, this.options.border);
 	this.engine.setup();
 
-	this.gui = new GUI(document.getElementById('game'), this.options.optimal_size);
+	this.gui = new GUI(document.getElementById('game'), this.options.total_size);
 
 	this.last_time = Date.now();
 	this.loop();

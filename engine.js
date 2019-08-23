@@ -5,8 +5,12 @@
  * `Engine` is the actual game engine. It *should* work without any gui, making
  * it more easily testable.
  * @constructor
+ * @param {Object} window_size - The window size
+ * @param {number} window_size.w - Width in pixels
+ * @param {number} window_size.h - Height in pixels
+ * @param {number} window_border - The border width in pixels
  */
-function Engine() {
+function Engine(window_size, border) {
 	// These variables store all objects in the game.
 	this.enemies = [];
 	this.enemy_bullets = [];
@@ -18,6 +22,20 @@ function Engine() {
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1;
+
+	this.outer_bounds = {
+		left: 0,
+		right: window_size.w,
+		top: 0,
+		bottom: window_size.h,
+	};
+
+	this.inner_bounds = {
+		left: border,
+		right: window_size.w - border,
+		top: border,
+		bottom: window_size.h - border,
+	};
 }
 
 
@@ -28,7 +46,7 @@ Engine.prototype.setup = function() {
 	// TODO: Consider, whether this could be part of the constructor.
 	this.enemies = [];
 	this.enemy_bullets = [];
-	this.player = new Player(450, 300);
+	this.player = new Player(this.outer_bounds.right/2, this.inner_bounds.bottom);
 	this.player_bullets = [];
 
 	this.enemy_direction = -1;
@@ -51,12 +69,10 @@ Engine.prototype.setup = function() {
  */
 Engine.prototype.handle_input = function(dt) {
 	if(input.is_down('LEFT')) {
-		// TODO: These borders are really ugly and should be defined elsewhere.
-		// Also, they are constant...
-		this.player.move(dt * -1, 20, 880);
+		this.player.move(dt * -1, this.inner_bounds);
 	}
 	else if(input.is_down('RIGHT')) {
-		this.player.move(dt, 20, 880);
+		this.player.move(dt, this.inner_bounds);
 	}
 
 	if(input.is_down('SPACE')) {
@@ -77,7 +93,7 @@ Engine.prototype.update = function(dt) {
 
 	if(this.enemy_moves_down) {
 		for(let enemy of this.enemies) {
-			enemy.update(0, dt, 20, 880, 500);
+			enemy.update(0, dt, this.inner_bounds);
 		}
 		this.enemy_moves_down--;
 	}
@@ -86,7 +102,7 @@ Engine.prototype.update = function(dt) {
 		const dir = this.enemy_direction * dt * this.enemy_speed_factor;
 
 		for(let enemy of this.enemies) {
-			reached_boundary = enemy.update(dir, 0, 20, 880, 500) || reached_boundary;
+			reached_boundary = enemy.update(dir, 0, this.inner_bounds) || reached_boundary;
 		}
 
 		if(reached_boundary) {
@@ -96,14 +112,16 @@ Engine.prototype.update = function(dt) {
 		}
 	}
 
-	// TODO: Bullets (of both types) should be removed when out of bounds.
 	for(let bullet of this.enemy_bullets) {
-		bullet.update(dt);
+		bullet.update(dt, this.outer_bounds);
 	}
 
 	for(let bullet of this.player_bullets) {
-		bullet.update(dt);
+		bullet.update(dt, this.outer_bounds);
 	}
+
+	this.player_bullets = this.player_bullets.filter(bullet => bullet.active);
+	this.enemy_bullets = this.enemy_bullets.filter(bullet => bullet.active);
 
 	// TODO: Test for collision among: player_bullets and enemy_bullets, enemy_bullets and player, player_bullets and enemies
 };
@@ -116,3 +134,12 @@ Engine.prototype.update = function(dt) {
 Engine.prototype.get_entities = function() {
 	return [this.player].concat(this.enemies, this.enemy_bullets, this.player_bullets);
 };
+
+
+/**
+ * @typedef {Object} Bounds
+ * @property {number} top    - The uppermost pixel
+ * @property {number} right  - The rightmost pixel
+ * @property {number} left   - The leftmost pixel
+ * @property {number} bottom - The lowermost pixel
+ */

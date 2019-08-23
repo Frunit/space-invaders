@@ -45,18 +45,16 @@ Player.prototype.fire = function() {
 /**
  * `Player.move` moves the player, respecting boundaries.
  * @param {number} direction - A vector depending on direction and time delta. Negative for going left, positive for going right.
- * @param {number} minx - Hard border on the left side (in pixels from left)
- * @param {number} maxx - Hard border on the right side (in pixels from left)
+ * @param {Bounds} bounds - The boundaries in whicht the fighter can move
  */
-Player.prototype.move = function(direction, minx, maxx) {
-	// TODO: The boundaries could be given once, since they never change
+Player.prototype.move = function(direction, bounds) {
 	this.x += direction * this.speed;
 
-	if(this.x < minx) {
-		this.x = minx;
+	if(this.x < bounds.left) {
+		this.x = bounds.left;
 	}
-	else if (this.x + this.w > maxx) {
-		this.x = maxx - this.w;
+	else if (this.x + this.w > bounds.right) {
+		this.x = bounds.right - this.w;
 	}
 };
 
@@ -66,7 +64,7 @@ Player.prototype.move = function(direction, minx, maxx) {
  * @param {number} dt - The time delta since last update in seconds
  */
 Player.prototype.update = function(dt) {
-	this.sprite.update();
+	this.sprite.update(dt);
 	if(this.cooldown) {
 		this.cooldown -= dt;
 		if(this.cooldown < 0) {
@@ -140,21 +138,19 @@ Enemy.prototype.fire = function() {
  * `Enemy.update` moves the enemy, respecting boundaries, and updates the sprite.
  * @param {number} dx - A vector depending on direction and time delta. Negative for going left, positive for going right.
  * @param {number} dy - A vector depending on direction and time delta. Positive for going down.
- * @param {number} minx - Soft border on the left side (in pixels from left)
- * @param {number} maxx - Soft border on the right side (in pixels from left)
- * @param {number} maxy - Hard border on the bottom side (in pixels from top)
+ * @param {Bounds} bounds - Soft boundaries for the monster
  * @returns {boolean} Whether the object touched one of the soft borders.
  */
-Enemy.prototype.update = function(dx, dy, minx, maxx, maxy) {
+Enemy.prototype.update = function(dx, dy, bounds) {
 	this.x += dx * this.speed.x;
 	this.y += dy * this.speed.y;
 
-	this.sprite.update();
+	this.sprite.update(dt);
 
-	let reached_border = (this.x < minx || this.x + this.w > maxx);
+	let reached_border = (this.x < bounds.left || this.x + this.w > bounds.right);
 
-	if(this.y > maxy) {
-		this.y = maxy; // TODO: Player should lose at this point
+	if(this.y > bounds.bottom) {
+		this.y = bounds.bottom; // TODO: Player should lose at this point
 	}
 
 	return reached_border;
@@ -172,8 +168,9 @@ function Bullet(x, y, speed) {
 	// TODO: The bullets for enemies and the player should look differently
 	this.x = x;
 	this.y = y;
-	this.w = 12
-	this.h = 20
+	this.w = 12;
+	this.h = 20;
+	this.active = true;
 	this.speed = speed;
 	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 5, {x: 0, y: 156}, [{x: 0, y: 0}, {x: 12, y: 0}, {x: 24, y: 0}]);
 }
@@ -183,8 +180,13 @@ function Bullet(x, y, speed) {
  * `Bullet.update` moves the bullet according to its speed and updates its
  * sprite.
  * @param {number} dt - The time delta since last update in seconds
+ * @param {Bounds} bounds - Boundaries for the bullets
  */
-Bullet.prototype.update = function(dt) {
-	this.y += dt * this.speed;
+Bullet.prototype.update = function(dt, bounds) {
 	this.sprite.update(dt);
+	this.y += dt * this.speed;
+
+	if(this.y + this.h < bounds.top || this.y > bounds.bottom) {
+		this.active = false;
+	}
 };

@@ -74,5 +74,5 @@ GUI.prototype.render = function(entities) {
 			params.w, params.h,
 			entity.x * this.scale, entity.y * this.scale,
 			params.w * this.scale, params.h * this.scale);
-	};
+	}
 };

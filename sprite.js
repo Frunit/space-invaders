@@ -33,10 +33,10 @@ function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}]) 
 /**
  * `Sprite.update` updates the current sprite position on the sprite sheet if
  * enough time has passed since the last update.
+ * @param {number} dt - The time delta since last update in seconds
  */
-Sprite.prototype.update = function() {
-	// TODO: This does not use delay in milliseconds but in steps!
-	this.delay_counter++;
+Sprite.prototype.update = function(dt) {
+	this.delay_counter += dt;
 
 	if(this.delay_counter >= this.delay) {
 		this.delay_counter = 0;
