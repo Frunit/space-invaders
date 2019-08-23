@@ -1,5 +1,12 @@
 'use strict';
 
+
+/**
+ * `Player` is the object for the space ship controlled by the player.
+ * @constructor
+ * @param {number} x - The initial x coordinate (from left) of the player
+ * @param {number} y - The initial y coordinate (from top) of the player
+ */
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
@@ -19,6 +26,11 @@ function Player(x, y) {
 }
 
 
+/**
+ * `Player.fire` fires a bullet if the last bullet was long enough ago (i.e. the
+ * cooldown is ok).
+ * @returns {Bullet|null} A Bullet object if the ship fired or null if the cooldown prevented firing.
+ */
 Player.prototype.fire = function() {
 	if(this.cooldown) {
 		return null;
@@ -30,7 +42,14 @@ Player.prototype.fire = function() {
 };
 
 
+/**
+ * `Player.move` moves the player, respecting boundaries.
+ * @param {number} direction - A vector depending on direction and time delta. Negative for going left, positive for going right.
+ * @param {number} minx - Hard border on the left side (in pixels from left)
+ * @param {number} maxx - Hard border on the right side (in pixels from left)
+ */
 Player.prototype.move = function(direction, minx, maxx) {
+	// TODO: The boundaries could be given once, since they never change
 	this.x += direction * this.speed;
 
 	if(this.x < minx) {
@@ -42,6 +61,10 @@ Player.prototype.move = function(direction, minx, maxx) {
 };
 
 
+/**
+ * `Player.update` updates the player object, updating the sprite and cooldown.
+ * @param {number} dt - The time delta since last update in seconds
+ */
 Player.prototype.update = function(dt) {
 	this.sprite.update();
 	if(this.cooldown) {
@@ -53,6 +76,13 @@ Player.prototype.update = function(dt) {
 };
 
 
+/**
+ * `Enemy` is an object for an enemy space ship/monster.
+ * @constructor
+ * @param {number} x - The initial x coordinate (from left) of the object
+ * @param {number} y - The initial y coordinate (from top) of the object
+ * @param {number} type - The type of the enemy. Must be on of [0, 1, 2].
+ */
 function Enemy(x, y, type) {
 	this.x = x;
 	this.y = y;
@@ -90,6 +120,11 @@ function Enemy(x, y, type) {
 }
 
 
+/**
+ * `Enemy.fire` fires a bullet if the last bullet was long enough ago (i.e. the
+ * cooldown is ok).
+ * @returns {Bullet|null} A Bullet object if the ship fired or null if the cooldown prevented firing.
+ */
 Enemy.prototype.fire = function() {
 	if(this.cooldown) {
 		return null;
@@ -101,6 +136,15 @@ Enemy.prototype.fire = function() {
 };
 
 
+/**
+ * `Enemy.update` moves the enemy, respecting boundaries, and updates the sprite.
+ * @param {number} dx - A vector depending on direction and time delta. Negative for going left, positive for going right.
+ * @param {number} dy - A vector depending on direction and time delta. Positive for going down.
+ * @param {number} minx - Soft border on the left side (in pixels from left)
+ * @param {number} maxx - Soft border on the right side (in pixels from left)
+ * @param {number} maxy - Hard border on the bottom side (in pixels from top)
+ * @returns {boolean} Whether the object touched one of the soft borders.
+ */
 Enemy.prototype.update = function(dx, dy, minx, maxx, maxy) {
 	this.x += dx * this.speed.x;
 	this.y += dy * this.speed.y;
@@ -117,7 +161,15 @@ Enemy.prototype.update = function(dx, dy, minx, maxx, maxy) {
 };
 
 
+/**
+ * `Bullet` is an object for a bullet fired by the player or an enemy.
+ * @constructor
+ * @param {number} x - The initial x coordinate (from left) of the object
+ * @param {number} y - The initial y coordinate (from top) of the object
+ * @param {number} speed - The vertical speed of the bullet in pixels per second. Positive for going downwards.
+ */
 function Bullet(x, y, speed) {
+	// TODO: The bullets for enemies and the player should look differently
 	this.x = x;
 	this.y = y;
 	this.w = 12
@@ -127,14 +179,12 @@ function Bullet(x, y, speed) {
 }
 
 
-Bullet.prototype.update = function(dt, miny, maxy) {
+/**
+ * `Bullet.update` moves the bullet according to its speed and updates its
+ * sprite.
+ * @param {number} dt - The time delta since last update in seconds
+ */
+Bullet.prototype.update = function(dt) {
 	this.y += dt * this.speed;
 	this.sprite.update(dt);
-
-	/*if(this.y < miny) {
-		this.y = miny;
-	}
-	else if (this.y > maxy) {
-		this.y = maxy;
-	}*/
 };

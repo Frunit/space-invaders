@@ -1,17 +1,45 @@
 'use strict';
 
+/**
+ * Space Invaders is a game written in Javascript (ECMA 2015+) without any
+ * frameworks for the it-talents.de competition September 2019 sponsored by
+ * Airbus.
+ *
+ * More information is given in the `readme.md`.
+ *
+ * Programmatic organisation
+ * -------------------------
+ *
+ * The game has three global objects, that are:
+ * - `game`: The actual game, holding the engine and the gui.
+ * - `input`: Organizes key presses that can be pulled by the game.
+ * - `resources`: Organizes graphics used by the gui. This is defined globally
+ *     to be able to load graphics before the game is initialized.
+ *
+ * In addition, there are four debugging outputs (in addition to the omnipresent
+ * `console`), `debug1` through `debug4` that represent input fields to write
+ * quickly changing values that would spam the console too much. The debug
+ * outputs will be removed when the game is published. `debug4` will show the
+ * current frames per second.
+ */
+
+
+// Define the four global debug outputs. They can be accessed with:
+// debug[1-4].value = 'my value';
+// debug4 is used for FPS!
 const debug1 = document.getElementById('debug1');
 const debug2 = document.getElementById('debug2');
 const debug3 = document.getElementById('debug3');
 const debug4 = document.getElementById('debug4');
-const debug5 = document.getElementById('debug5');
-const debug6 = document.getElementById('debug6');
-const debug7 = document.getElementById('debug7');
-const debug8 = document.getElementById('debug8');
 
-
+/**
+ * `Game` is the master object for the Space Invaders game. It manages timing,
+ * the engine and the gui.
+ * @constructor
+ */
 function Game() {
 
+	// TODO: The options and the version may be externalized using json or the like.
 	this.options = {
 		optimal_size: {w: 900, h: 600},
 	};
@@ -19,32 +47,50 @@ function Game() {
 	this.version = 'pre-alpha';
 
 	this.last_time = 0;
+
+	// last_fps and frames are only used to show the current frames per second
+	// they might be removed after finishing the game.
 	this.last_fps = 0;
 	this.frames = 0;
-	this.clicked_element = null;
-	this.right_clicked_element = null;
+
 	this.engine = null;
 	this.gui = null;
 }
 
 
-// The game loop
+/**
+ * `Game.loop` is the actual game loop. It lets itself being called by
+ * Javascript, updates the game, and renders it.
+ * Currently, also the frames per second are shown for debug purposes.
+ */
 Game.prototype.loop = function() {
+	// I don't know how much time passed since the last frame, so I try to find
+	// it out and give the time delta (dt) to the update function, so movement
+	// is smooth even if the function is, for any reason, not called regularly.
 	const now = Date.now();
 	const dt = (now - this.last_time) / 1000;
 
+	// Update the game and draw the newest state.
 	this.update(dt);
 	this.gui.render(this.engine.get_entities());
 	this.update_fps(now);
 
 	this.last_time = now;
 
+	// Ask Javascript to call this function again when suitable.
+	// Advantage over a timeout is that it automatically pauses the game when
+	// the window is, for example, minimized.
 	requestAnimationFrame(() => this.loop());
 };
 
 
+/**
+ * `Game.update_fps` is a debugging function to show the current frames per
+ * second.
+ * @param {number} now - The current Javascript timestamp (i.e. in milliseconds)
+ */
 Game.prototype.update_fps = function(now) {
-	// FPS will be shown as 1/s
+	// FPS will be shown as 1/s (== Hz)
 	this.frames++;
 	if(now - this.last_fps > 1000) {
 		debug4.value = 'FPS: ' + this.frames;
@@ -54,11 +100,21 @@ Game.prototype.update_fps = function(now) {
 };
 
 
+/**
+ * `Game.update` updates all aspects of the game.
+ * Currently, it only updates the engine.
+ * @param {number} dt - The time delta since the last update in seconds
+ */
 Game.prototype.update = function(dt) {
+	this.engine.handle_input(dt);
 	this.engine.update(dt);
 };
 
 
+/**
+ * `Game.start` starts the game. That is, it creates and setups the engine,
+ * creates the gui, and starts the game loop.
+ */
 Game.prototype.start = function() {
 	this.engine = new Engine();
 	this.engine.setup();
@@ -70,6 +126,8 @@ Game.prototype.start = function() {
 };
 
 
+// The global object `input` takes care of key presses that are fed into it by
+// keydown and keyup events.
 const input = new Input();
 
 document.addEventListener('keydown', function(e) {
@@ -80,12 +138,12 @@ document.addEventListener('keyup', function(e) {
 	input.set_key(e, false);
 });
 
-
-
+// The global objects game and resources are defined last.
 const game = new Game();
 const resources = new Resources();
 
-
+// And finally, the necessary graphics are loaded and the game is started as
+// soon as the graphics were loaded.
 resources.on_ready(() => {game.start()});
 resources.load([
 	'gfx/sprites.png',

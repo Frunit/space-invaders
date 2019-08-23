@@ -1,18 +1,31 @@
 'use strict';
 
+
+/**
+ * `Engine` is the actual game engine. It *should* work without any gui, making
+ * it more easily testable.
+ * @constructor
+ */
 function Engine() {
+	// These variables store all objects in the game.
 	this.enemies = [];
 	this.enemy_bullets = [];
 	this.player = null;
 	this.player_bullets = [];
 
+	// Some status variables that are valid for all enemies (since enemies move
+	// in a synchronized way.
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1;
 }
 
 
+/**
+ * `Engine.setup` initializes the game with the player and enemies.
+ */
 Engine.prototype.setup = function() {
+	// TODO: Consider, whether this could be part of the constructor.
 	this.enemies = [];
 	this.enemy_bullets = [];
 	this.player = new Player(450, 300);
@@ -20,7 +33,9 @@ Engine.prototype.setup = function() {
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
+	this.enemy_speed_factor = 1;
 
+	// Create enemies
 	for(let y = 0; y < 5; y++) {
 		for(let x = 0; x < 8; x++) {
 			const type = Math.ceil(y / 2); // 0, 1, 1, 2, 2, ...
@@ -30,10 +45,14 @@ Engine.prototype.setup = function() {
 };
 
 
-Engine.prototype.update = function(dt) {
-	this.player.update(dt);
-
+/**
+ * `Engine.handle_input` handles player input.
+ * @param {number} dt - The time delta since last update in seconds
+ */
+Engine.prototype.handle_input = function(dt) {
 	if(input.is_down('LEFT')) {
+		// TODO: These borders are really ugly and should be defined elsewhere.
+		// Also, they are constant...
 		this.player.move(dt * -1, 20, 880);
 	}
 	else if(input.is_down('RIGHT')) {
@@ -46,6 +65,15 @@ Engine.prototype.update = function(dt) {
 			this.player_bullets.push(bullet);
 		}
 	}
+}
+
+
+/**
+ * `Engine.update` updates all objects in the game.
+ * @param {number} dt - The time delta since last update in seconds
+ */
+Engine.prototype.update = function(dt) {
+	this.player.update(dt);
 
 	if(this.enemy_moves_down) {
 		for(let enemy of this.enemies) {
@@ -68,6 +96,7 @@ Engine.prototype.update = function(dt) {
 		}
 	}
 
+	// TODO: Bullets (of both types) should be removed when out of bounds.
 	for(let bullet of this.enemy_bullets) {
 		bullet.update(dt);
 	}
@@ -80,6 +109,10 @@ Engine.prototype.update = function(dt) {
 };
 
 
+/**
+ * `Engine.get_entities` returns all entities in the game for the gui to draw.
+ * @returns {Object[]} An array with all entities (player, enemies, bullets)
+ */
 Engine.prototype.get_entities = function() {
 	return [this.player].concat(this.enemies, this.enemy_bullets, this.player_bullets);
 };
