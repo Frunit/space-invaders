@@ -8,6 +8,7 @@ function Engine() {
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
+	this.enemy_speed_factor = 1;
 }
 
 
@@ -54,7 +55,7 @@ Engine.prototype.update = function(dt) {
 	}
 	else {
 		let reached_boundary = false;
-		const dir = this.enemy_direction * dt;
+		const dir = this.enemy_direction * dt * this.enemy_speed_factor;
 
 		for(let enemy of this.enemies) {
 			reached_boundary = enemy.update(dir, 0, 20, 880, 500) || reached_boundary;
@@ -63,6 +64,7 @@ Engine.prototype.update = function(dt) {
 		if(reached_boundary) {
 			this.enemy_moves_down = 10;
 			this.enemy_direction *= -1;
+			this.enemy_speed_factor += 0.05
 		}
 	}
 
