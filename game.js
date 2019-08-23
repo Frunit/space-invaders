@@ -1,26 +1,11 @@
 'use strict';
 
-/**
+/*
  * Space Invaders is a game written in Javascript (ECMA 2015+) without any
  * frameworks for the it-talents.de competition September 2019 sponsored by
  * Airbus.
  *
  * More information is given in the `readme.md`.
- *
- * Programmatic organisation
- * -------------------------
- *
- * The game has three global objects, that are:
- * - `game`: The actual game, holding the engine and the gui.
- * - `input`: Organizes key presses that can be pulled by the game.
- * - `resources`: Organizes graphics used by the gui. This is defined globally
- *     to be able to load graphics before the game is initialized.
- *
- * In addition, there are four debugging outputs (in addition to the omnipresent
- * `console`), `debug1` through `debug4` that represent input fields to write
- * quickly changing values that would spam the console too much. The debug
- * outputs will be removed when the game is published. `debug4` will show the
- * current frames per second.
  */
 
 
