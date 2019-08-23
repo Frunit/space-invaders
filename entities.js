@@ -136,12 +136,13 @@ Enemy.prototype.fire = function() {
 
 /**
  * `Enemy.update` moves the enemy, respecting boundaries, and updates the sprite.
+ * @param {number} dt - The time delta since last update in seconds
  * @param {number} dx - A vector depending on direction and time delta. Negative for going left, positive for going right.
  * @param {number} dy - A vector depending on direction and time delta. Positive for going down.
  * @param {Bounds} bounds - Soft boundaries for the monster
  * @returns {boolean} Whether the object touched one of the soft borders.
  */
-Enemy.prototype.update = function(dx, dy, bounds) {
+Enemy.prototype.update = function(dt, dx, dy, bounds) {
 	this.x += dx * this.speed.x;
 	this.y += dy * this.speed.y;
 
