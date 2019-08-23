@@ -107,16 +107,9 @@ Enemy.prototype.update = function(dx, dy, minx, maxx, maxy) {
 
 	this.sprite.update();
 
-	let reached_border = false;
+	let reached_border = (this.x < minx || this.x + this.w > maxx);
 
-	if(this.x < minx) {
-		reached_border = true;
-	}
-	else if (this.x + this.w > maxx) {
-		reached_border = true;
-	}
-
-	if (this.y > maxy) {
+	if(this.y > maxy) {
 		this.y = maxy; // TODO: Player should lose at this point
 	}
 

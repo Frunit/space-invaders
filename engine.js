@@ -7,7 +7,7 @@ function Engine() {
 	this.player_bullets = [];
 
 	this.enemy_direction = -1;
-	this.enemy_must_move_down = 0;
+	this.enemy_moves_down = 0;
 }
 
 
@@ -18,7 +18,7 @@ Engine.prototype.setup = function() {
 	this.player_bullets = [];
 
 	this.enemy_direction = -1;
-	this.enemy_must_move_down = 0;
+	this.enemy_moves_down = 0;
 
 	for(let y = 0; y < 5; y++) {
 		for(let x = 0; x < 8; x++) {
@@ -46,30 +46,25 @@ Engine.prototype.update = function(dt) {
 		}
 	}
 
-	let direction_has_changed = false;
-	let reached_boundary = false
-
-	for(let enemy of this.enemies) {
-		if(this.enemy_must_move_down) {
+	if(this.enemy_moves_down) {
+		for(let enemy of this.enemies) {
 			enemy.update(0, dt, 20, 880, 500);
 		}
-		else {
-			reached_boundary = enemy.update(this.enemy_direction * dt, 0, 20, 880, 500);
+		this.enemy_moves_down--;
+	}
+	else {
+		let reached_boundary = false;
+		const dir = this.enemy_direction * dt;
+
+		for(let enemy of this.enemies) {
+			reached_boundary = enemy.update(dir, 0, 20, 880, 500) || reached_boundary;
 		}
 
-		if(reached_boundary && !direction_has_changed) {
+		if(reached_boundary) {
+			this.enemy_moves_down = 10;
 			this.enemy_direction *= -1;
-			direction_has_changed = true;
 		}
 	}
-
-	if(this.enemy_must_move_down > 0) {
-		this.enemy_must_move_down--;
-	}
-	else if(direction_has_changed) {
-		this.enemy_must_move_down = 10;
-	}
-
 
 	for(let bullet of this.enemy_bullets) {
 		bullet.update(dt);
