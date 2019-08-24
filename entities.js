@@ -17,7 +17,7 @@ function Player(x, y) {
 	this.speed = 96; // pixel per second
 
 	this.bullet_offset = {x: this.w/2, y: 0};
-	this.bullet_speed = -20; // pixel per second
+	this.bullet_speed = -300; // pixel per second
 
 	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
 
@@ -85,7 +85,7 @@ function Enemy(x, y, type) {
 	this.x = x;
 	this.y = y;
 	this.speed = {x: 64, y: 64}; // pixel per second
-	this.bullet_speed = 20; // pixel per second
+	this.bullet_speed = 300; // pixel per second
 
 	switch(type) {
 		case 0: {
