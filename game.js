@@ -60,7 +60,11 @@ Game.prototype.loop = function() {
 	// it out and give the time delta (dt) to the update function, so movement
 	// is smooth even if the function is, for any reason, not called regularly.
 	const now = Date.now();
-	const dt = (now - this.last_time) / 1000;
+	let dt = (now - this.last_time) / 1000;
+
+	if(dt > 0.5) {
+		dt = 0;
+	}
 
 	// Update the game and draw the newest state.
 	this.update(dt);
