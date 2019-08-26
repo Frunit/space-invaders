@@ -38,7 +38,7 @@ Player.prototype.fire = function() {
 
 	this.cooldown = this.max_cooldown;
 
-	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed);
+	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, 0);
 };
 
 
@@ -133,7 +133,9 @@ Enemy.prototype.fire = function() {
 
 	this.cooldown = this.max_cooldown;
 
-	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed);
+	const type = Math.floor(Math.random() * 3) + 1; // Random number: one of [1, 2, 3]
+
+	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, type);
 };
 
 
@@ -169,12 +171,39 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
  * @param {number} speed - The vertical speed of the bullet in pixels per second. Positive for going downwards.
  */
 function export Bullet(x, y, speed) {
-	// TODO: The bullets for enemies and the player should look differently
-	this.w = 12;
-	this.h = 20;
+	// TODO: The bullets need to point to the right sprite positions
+
+	switch(type) {
+		case 0: {
+			this.w = 4;
+			this.h = 16;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
+			break;
+		}
+		case 1: {
+			this.w = 12;
+			this.h = 28;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 32}, [{x: 0, y: 0}, {x: 44, y: 0}]);
+			break;
+		}
+		case 2: {
+			this.w = 12;
+			this.h = 28;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
+			break;
+		}
+		case 3: {
+			this.w = 12;
+			this.h = 24;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
+			break;
+		}
+		default:
+			console.warn('Unknown Enemy type received: ' + type);
+	}
+
 	this.active = true;
 	this.speed = speed;
-	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 5, {x: 0, y: 156}, [{x: 0, y: 0}, {x: 12, y: 0}, {x: 24, y: 0}]);
 
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
