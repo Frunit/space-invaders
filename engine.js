@@ -445,7 +445,7 @@ Engine.prototype.game_over = function() {
  * @returns {Object[]} An array with all entities (players, enemies, bullets)
  */
 Engine.prototype.get_entities = function() {
-	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets);
+	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets, this.walls, this.goodies);
 };
 
 
