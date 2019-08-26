@@ -17,6 +17,7 @@ export function Engine(window_size, border, num_players) {
 	this.enemy_bullets = [];
 	this.players = [];
 	this.player_bullets = [];
+	this.walls = [];
 	this.goodies = [];
 
 	// Some status variables that are valid for all enemies (since enemies move
@@ -52,6 +53,7 @@ Engine.prototype.setup = function() {
 	this.enemy_bullets = [];
 	this.players = [];
 	this.player_bullets = [];
+	this.walls = [];
 	this.goodies = [];
 
 	this.enemy_direction = -1;
@@ -69,6 +71,29 @@ Engine.prototype.setup = function() {
 		for(let x = 0; x < 8; x++) {
 			const type = Math.ceil(y / 2); // 0, 1, 1, 2, 2, ...
 			this.enemies.push(new Enemy(x*50+50, y*50+10, type));
+		}
+	}
+
+	const fort_pos = [
+		'__XXXXXX__',
+		'XXXXXXXXXX',
+		'XXXXXXXXXX',
+		'XX______XX',
+	];
+
+	// Create forts
+	for(let i = 0; i < 3; i++) {
+		for(let y = 0; y < fort_pos.length; y++) {
+			for(let x = 0; x < fort_pos[0].length; x++) {
+				if(fort_pos[y][x] === 'X') {
+					this.walls.push(
+						new Wall(
+							i * 200 + 100 + x * 8, // x position
+							450 + y * 8            // y position
+						)
+					);
+				}
+			}
 		}
 	}
 };
@@ -195,6 +220,8 @@ Engine.prototype.update = function(dt) {
 	this.collide(this.player_bullets, this.enemy_bullets);
 	this.collide(this.player_bullets, this.enemies);
 	this.collide(this.enemy_bullets, this.players);
+	this.collide(this.player_bullets, this.walls);
+	this.collide(this.enemy_bullets, this.walls);
 	this.collide(this.goodies, this.players);
 };
 

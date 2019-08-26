@@ -381,3 +381,25 @@ Goody.prototype.update = function(dt, bounds) {
 		this.active = false;
 	}
 };
+
+
+/**
+ * `Wall` is an object for a wall that is a piece of a fort.
+ * @constructor
+ * @param {number} x - The initial x coordinate (from left) of the object pointing to its center
+ * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
+ */
+function export Wall(x, y) {
+	this.object = 'wall';
+	this.w = 8;
+	this.h = 8;
+	this.score = 0;
+
+	// TODO: Needs the right sprite positions.
+	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
+
+	this.x = Math.floor(x - this.w/2);
+	this.y = Math.floor(y - this.h/2);
+}
+
+// TODO: Would be cool, if the walls that are shot down not only disappear, but fall down in a kind of parabola.
