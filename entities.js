@@ -259,7 +259,7 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
 
 	this.sprite.update(dt);
 
-	let reached_border = (this.x < bounds.left || this.x + this.w > bounds.right);
+	let reached_border = ((this.x < bounds.left && dx < 0) || (this.x + this.w > bounds.right && dx > 0));
 
 	if(this.y > bounds.bottom) {
 		this.y = bounds.bottom; // TODO: Player should lose at this point

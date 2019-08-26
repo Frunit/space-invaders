@@ -102,6 +102,9 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	}
 
 	// Create enemies
+	const enemy_offset = this.inner_bounds.left + (this.inner_bounds.right - this.inner_bounds.left) / 2 - level.enemies[0].length / 2 * 60;
+	const enemy_upper = 30;
+
 	// TODO: Positioning should happen according to the size of the enemy block!
 	for(let y = 0; y < level.enemies.length; y++) {
 		for(let x = 0; x < level.enemies[0].length; x++) {
@@ -110,14 +113,20 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 				continue;
 			}
 
-			this.enemies.push(new Enemy(x*50+50, y*50+10, +type));
+			this.enemies.push(
+				new Enemy(
+					enemy_offset + x * 60,
+					enemy_upper + y * 50,
+					+type
+				)
+			);
 		}
 	}
 
 	// Create forts
-	// TODO: Positioning should happen according to the size and number of forts!
-	let fort_x_dist = (this.inner_bounds.right - this.inner_bounds.left) / (level.forts + 1);
-	let fort_offset = this.inner_bounds.left + fort_x_dist - level.fort[0].length / 2 * 16;
+	const fort_x_dist = (this.inner_bounds.right - this.inner_bounds.left) / (level.forts + 1);
+	const fort_offset = this.inner_bounds.left + fort_x_dist - level.fort[0].length / 2 * 16;
+	const fort_upper = 530 - level.fort.length * 16;
 
 	for(let i = 0; i < level.forts; i++) {
 		for(let y = 0; y < level.fort.length; y++) {
@@ -126,7 +135,7 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 					this.walls.push(
 						new Wall(
 							fort_offset + i * fort_x_dist + x * 16, // x position
-							450 + y * 16            // y position
+							fort_upper + y * 16                     // y position
 						)
 					);
 				}
