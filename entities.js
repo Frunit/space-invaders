@@ -4,15 +4,15 @@
 /**
  * `Player` is the object for the space ship controlled by the player.
  * @constructor
- * @param {number} x - The initial x coordinate (from left) of the player
- * @param {number} y - The initial y coordinate (from top) of the player
+ * @param {number} x - The initial x coordinate (from left) of the player pointing to its center
+ * @param {number} y - The initial y coordinate (from top) of the player pointing to its center
  */
 function export Player(x, y) {
-	this.x = x;
-	this.y = y;
-
 	this.w = 60;
 	this.h = 32;
+
+	this.x = Math.floor(x - this.w/2);
+	this.y = Math.floor(y - this.h/2);
 
 	this.speed = 96; // pixel per second
 
@@ -77,8 +77,8 @@ Player.prototype.update = function(dt) {
 /**
  * `Enemy` is an object for an enemy space ship/monster.
  * @constructor
- * @param {number} x - The initial x coordinate (from left) of the object
- * @param {number} y - The initial y coordinate (from top) of the object
+ * @param {number} x - The initial x coordinate (from left) of the object pointing to its center
+ * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  * @param {number} type - The type of the enemy. Must be on of [0, 1, 2].
  */
 function export Enemy(x, y, type) {
@@ -91,27 +91,30 @@ function export Enemy(x, y, type) {
 		case 0: {
 			this.w = 32;
 			this.h = 32;
-			this.bullet_offset = {x: this.w/2, y: 0};
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 0}, [{x: 0, y: 0}, {x: 32, y: 0}]);
 			break;
 		}
 		case 1: {
 			this.w = 44;
 			this.h = 32;
-			this.bullet_offset = {x: this.w/2, y: 0};
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 32}, [{x: 0, y: 0}, {x: 44, y: 0}]);
 			break;
 		}
 		case 2: {
 			this.w = 48;
 			this.h = 32;
-			this.bullet_offset = {x: this.w/2, y: 0};
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
 			break;
 		}
 		default:
 			console.warn('Unknown Enemy type received: ' + type);
 	}
+
+	this.bullet_offset = {x: this.w/2, y: 0};
+
+	// Coordinates are generally measured from top left, not center.
+	this.x -= Math.floor(this.w/2);
+	this.y -= Math.floor(this.h/2);
 
 	this.max_cooldown = 1;
 	this.cooldown = 0;
@@ -161,19 +164,20 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
 /**
  * `Bullet` is an object for a bullet fired by the player or an enemy.
  * @constructor
- * @param {number} x - The initial x coordinate (from left) of the object
- * @param {number} y - The initial y coordinate (from top) of the object
+ * @param {number} x - The initial x coordinate (from left) of the object pointing to its center
+ * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  * @param {number} speed - The vertical speed of the bullet in pixels per second. Positive for going downwards.
  */
 function export Bullet(x, y, speed) {
 	// TODO: The bullets for enemies and the player should look differently
-	this.x = x;
-	this.y = y;
 	this.w = 12;
 	this.h = 20;
 	this.active = true;
 	this.speed = speed;
 	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 5, {x: 0, y: 156}, [{x: 0, y: 0}, {x: 12, y: 0}, {x: 24, y: 0}]);
+
+	this.x = Math.floor(x - this.w/2);
+	this.y = Math.floor(y - this.h/2);
 }
 
 
