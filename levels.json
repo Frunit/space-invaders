@@ -2,12 +2,13 @@
 	"levels": [
 		{
 			"fort": [
-				"__XXXXXX__",
-				"XXXXXXXXXX",
-				"XXXXXXXXXX",
-				"XX______XX"
+				"__XXXX__",
+				"XXXXXXXX",
+				"XXXXXXXX",
+				"XXXXXXXX",
+				"XX____XX"
 			],
-			"forts": 3,
+			"forts": 4,
 			"enemies": [
 				"0000000000",
 				"1111111111",

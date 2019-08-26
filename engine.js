@@ -116,13 +116,16 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 
 	// Create forts
 	// TODO: Positioning should happen according to the size and number of forts!
+	let fort_x_dist = (this.inner_bounds.right - this.inner_bounds.left) / (level.forts + 1);
+	let fort_offset = this.inner_bounds.left + fort_x_dist - level.fort[0].length / 2 * 16;
+
 	for(let i = 0; i < level.forts; i++) {
 		for(let y = 0; y < level.fort.length; y++) {
 			for(let x = 0; x < level.fort[0].length; x++) {
 				if(level.fort[y][x] === 'X') {
 					this.walls.push(
 						new Wall(
-							i * 200 + 100 + x * 16, // x position
+							fort_offset + i * fort_x_dist + x * 16, // x position
 							450 + y * 16            // y position
 						)
 					);
