@@ -12,8 +12,8 @@ Features
 
 Besides the classical alien monsters that slowly attack from above and the
 brave fighter controlled by the player, I added some features inspired by
-another classic, [Break Out](https://en.wikipedia.org/wiki/Breakout_(video_game)).
-Here, I was inspired by the version on the [Atari ST](https://en.wikipedia.org/wiki/Atari_ST).
+another classic, [Break Out](https://en.wikipedia.org/wiki/Breakout_(video_game)),
+specifically by the version on the [Atari ST](https://en.wikipedia.org/wiki/Atari_ST).
 After shooting down a monster, there is a certain chance for a power-up
 appearing. If the player manages to collect it, the fighter will get an
 advantage, like a ball that can be controlled just as in *Break Out* to take out

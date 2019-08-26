@@ -10,7 +10,7 @@
  * @param {number} window_size.h - Height in pixels
  * @param {number} window_border - The border width in pixels
  */
-function Engine(window_size, border) {
+export function Engine(window_size, border) {
 	// These variables store all objects in the game.
 	this.enemies = [];
 	this.enemy_bullets = [];

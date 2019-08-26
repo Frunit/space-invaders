@@ -7,7 +7,7 @@
  * @param {number} x - The initial x coordinate (from left) of the player
  * @param {number} y - The initial y coordinate (from top) of the player
  */
-function Player(x, y) {
+function export Player(x, y) {
 	this.x = x;
 	this.y = y;
 
@@ -81,7 +81,7 @@ Player.prototype.update = function(dt) {
  * @param {number} y - The initial y coordinate (from top) of the object
  * @param {number} type - The type of the enemy. Must be on of [0, 1, 2].
  */
-function Enemy(x, y, type) {
+function export Enemy(x, y, type) {
 	this.x = x;
 	this.y = y;
 	this.speed = {x: 64, y: 64}; // pixel per second
@@ -165,7 +165,7 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
  * @param {number} y - The initial y coordinate (from top) of the object
  * @param {number} speed - The vertical speed of the bullet in pixels per second. Positive for going downwards.
  */
-function Bullet(x, y, speed) {
+function export Bullet(x, y, speed) {
 	// TODO: The bullets for enemies and the player should look differently
 	this.x = x;
 	this.y = y;

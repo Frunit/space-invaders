@@ -15,13 +15,31 @@
 // TODO: Implement power-ups
 // TODO: Maybe implement music and sound
 
-// Define the four global debug outputs. They can be accessed with:
-// debug[1-4].value = 'my value';
-// debug4 is used for FPS!
-const debug1 = document.getElementById('debug1');
-const debug2 = document.getElementById('debug2');
-const debug3 = document.getElementById('debug3');
-const debug4 = document.getElementById('debug4');
+
+// Depending on whether the browser or node.js is used, offer a different debug
+// function
+if(typeof window === 'undefined') {
+	const debug = function(num, message) {
+		console.log(num, message);
+	};
+}
+else {
+	window.debug = function(num, message) {
+		document.getElementById('debug' + num).value = message;
+	};
+}
+
+
+import { Resources } from './resources.js';
+import { Sprite } from './sprite.js';
+import { Player, Enemy, Bullet } from './entities.js';
+import { Engine } from './engine.js';
+
+// Attention! No curly brackets. This uses the default export that is dependent
+// on whether this runs in a browser or not (for testing in node.js).
+import Input from './input.js';
+import GUI from './gui.js';
+
 
 /**
  * `Game` is the master object for the Space Invaders game. It manages timing,
@@ -47,6 +65,27 @@ function Game() {
 
 	this.engine = null;
 	this.gui = null;
+
+
+	// The global object `input` takes care of key presses that are fed into it by
+	// keydown and keyup events.
+	// The global objects game and resources are defined last.
+	// Both are defined differently, depending on the context (browser vs. node.js)
+	if(typeof window === 'undefined') {
+		global.input = new Input();
+		global.resources = new Resources();
+	}
+	else {
+		window.input = new Input();
+		window.resources = new Resources();
+	}
+
+	// And finally, the necessary graphics are loaded and the game is started as
+	// soon as the graphics were loaded.
+	resources.on_ready(() => {this.start()});
+	resources.load([
+		'gfx/sprites.png',
+	]);
 }
 
 
@@ -89,7 +128,7 @@ Game.prototype.update_fps = function(now) {
 	// FPS will be shown as 1/s (== Hz)
 	this.frames++;
 	if(now - this.last_fps > 1000) {
-		debug4.value = 'FPS: ' + this.frames;
+		debug(4, 'FPS: ' + this.frames);
 		this.frames = 0;
 		this.last_fps = now;
 	}
@@ -115,32 +154,9 @@ Game.prototype.start = function() {
 	this.engine = new Engine(this.options.total_size, this.options.border);
 	this.engine.setup();
 
-	this.gui = new GUI(document.getElementById('game'), this.options.total_size);
+	this.gui = new GUI('game', this.options.total_size);
 
 	this.last_time = Date.now();
 	this.loop();
 };
 
-
-// The global object `input` takes care of key presses that are fed into it by
-// keydown and keyup events.
-const input = new Input();
-
-document.addEventListener('keydown', function(e) {
-	input.set_key(e, true);
-});
-
-document.addEventListener('keyup', function(e) {
-	input.set_key(e, false);
-});
-
-// The global objects game and resources are defined last.
-const game = new Game();
-const resources = new Resources();
-
-// And finally, the necessary graphics are loaded and the game is started as
-// soon as the graphics were loaded.
-resources.on_ready(() => {game.start()});
-resources.load([
-	'gfx/sprites.png',
-]);

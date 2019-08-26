@@ -7,6 +7,14 @@
  */
 function Input() {
 	this.pressed_keys = {};
+
+	document.addEventListener('keydown', function(e) {
+		this.set_key(e, true);
+	});
+
+	document.addEventListener('keyup', function(e) {
+		this.set_key(e, false);
+	});
 }
 
 
@@ -65,3 +73,43 @@ Input.prototype.is_down = function(key) {
 	return this.pressed_keys[key];
 };
 
+
+
+/**
+ * `Fake_Input` tracks the relevant key presses of the user.
+ * @constructor
+ */
+function Fake_Input() {
+	this.pressed_keys = {};
+}
+
+
+/**
+ * `Fake_Input.set_key` sets or unsets values depending on the key given.
+ * The key must be one of:
+ * - SPACE, ENTER, ESCAPE, LEFT, RIGHT
+ * @param {string} key - The name of the key
+ * @param {boolean} status - If true, the value will be set, if false, the value will be unset.
+ */
+Fake_Input.prototype.set_key = function(key, status) {
+	this.pressed_keys[key] = status;
+};
+
+
+/**
+ * `Fake_Input.is_down` returns whether a certain key was pressed.
+ * The given key must be an abstraction understood by this class. Currently,
+ * these are:
+ * - SPACE, ENTER, ESCAPE, LEFT, RIGHT
+ * @param {string} key - The key (or rather, its abstraction) to ask for.
+ * @returns {boolean|undefined} True if the key is currently pressed, false or undefined otherwise (undefined if it was never pressed)
+ */
+Fake_Input.prototype.is_down = function(key) {
+	return this.pressed_keys[key];
+};
+
+
+// This exports a different Input depending on whether the script runs in a
+// browser or not. This is used for testing in node.js.
+const exported_class = if(typeof window === 'undefined') ? Fake_Input : Input;
+export default exported_class;
