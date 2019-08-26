@@ -8,6 +8,7 @@
  * @param {number} y - The initial y coordinate (from top) of the player pointing to its center
  */
 function export Player(x, y) {
+	this.object = 'player';
 	this.w = 60;
 	this.h = 32;
 
@@ -22,9 +23,13 @@ function export Player(x, y) {
 	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
 
 	this.score = 0;
+	this.lives = 3;
 
 	this.max_cooldown = 1;
 	this.cooldown = 0;
+
+	this.off_time = -1;
+	this.is_dead = false;
 }
 
 
@@ -34,7 +39,7 @@ function export Player(x, y) {
  * @returns {Bullet|null} A Bullet object if the ship fired or null if the cooldown prevented firing.
  */
 Player.prototype.fire = function() {
-	if(this.cooldown) {
+	if(this.cooldown || this.off_time >= 0) {
 		return null;
 	}
 
@@ -50,6 +55,10 @@ Player.prototype.fire = function() {
  * @param {Bounds} bounds - The boundaries in whicht the fighter can move
  */
 Player.prototype.move = function(direction, bounds) {
+	if(this.off_time >= 0) {
+		return;
+	};
+
 	this.x += direction * this.speed;
 
 	if(this.x < bounds.left) {
@@ -84,6 +93,7 @@ Player.prototype.update = function(dt) {
  * @param {number} type - The type of the enemy. Must be on of [0, 1, 2].
  */
 function export Enemy(x, y, type) {
+	this.object = 'enemy';
 	this.x = x;
 	this.y = y;
 	this.speed = {x: 64, y: 64}; // pixel per second
@@ -178,6 +188,7 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
  * @param {number} owner=-1 - The owner of the bullet. 0 or positive numbers refer to the respective player, negative numbers are enemy bullets (default).
  */
 function export Bullet(x, y, speed, type, owner=-1) {
+	this.object = 'bullet';
 	// TODO: The bullets need to point to the right sprite positions
 
 	switch(type) {

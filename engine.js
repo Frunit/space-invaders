@@ -59,6 +59,7 @@ Engine.prototype.setup = function() {
 	// Create players
 	for(let i = 0; i < this.num_players; i++) {
 		this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom));
+		this.dead_times.push(-1);
 	}
 
 	// Create enemies
@@ -137,7 +138,16 @@ Engine.prototype.handle_input = function(dt) {
  */
 Engine.prototype.update = function(dt) {
 	for(let player of this.players) {
+		if(player.is_dead) {
+			continue;
+		}
 		player.update(dt);
+		if(player.off_time >= 0) {
+			player.off_time -= dt;
+			if(player.off_time < 0) {
+				this.resurrect(player);
+			}
+		}
 	}
 
 	if(this.enemy_moves_down) {
@@ -204,6 +214,10 @@ Engine.prototype.collide = function(bullets, others) {
 				if(bullet.owner >= 0) {
 					this.players[bullet_owner].score += other.score;
 				}
+
+				if(other.type === 'player') {
+					this.kill(other);
+				}
 				break;
 			}
 		}
@@ -240,6 +254,64 @@ Engine.prototype.collider = function(a, b) {
 Engine.prototype.remove_multiple_elements = function(array, to_remove) {
 	for(let i = to_remove.length -1; i >= 0; i--)
 		array.splice(to_remove[i],1);
+};
+
+
+/**
+ * `Engine.kill` kills the given player. One lives is subtracted and an
+ * explosion is shown.
+ * @param {Player} player - The player that shall be killed.
+ */
+Engine.prototype.kill = function(player) {
+	player.lives--;
+	player.off_time = 2;
+	// TODO: This sprite is wrong!
+	player.sprite = new Sprite('sprites.png', {w: 30, h: 30}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
+};
+
+
+/**
+ * `Engine.resurrect` resurrects the given player. The player gets another
+ * fighter and can play again. If the player does not have lives left, it will
+ * be permanently disabled.
+ * @param {Player} player - The player that shall be resurrected.
+ */
+Engine.prototype.resurrect = function(player) {
+	if(player.lives < 0) {
+		player.off_time = Infinity;
+		player.is_dead = true;
+		player.h = 0;
+		player.w = 0;
+		this.test_game_over();
+	}
+	else {
+		player.off_time = -1;
+		player.x = this.outer_bounds.right/2;
+		player.sprite = new Sprite('sprites.png', {w: player.w, h: player.h}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
+	}
+};
+
+
+/**
+ * `Engine.test_game_over` tests whether the game is over, i.e. all players are
+ * dead. If so, Engine#game_over is invoked.
+ */
+Engine.prototype.test_game_over = function() {
+	for(let player of this.players) {
+		if(!player.is_dead) {
+			return;
+		}
+	}
+
+	this.game_over();
+};
+
+
+/**
+ * `Engine.game_over` does not do anything, yet. Shall later show high score.
+ */
+Engine.prototype.game_over = function() {
+	// TODO: Do the game over! Show high score.
 };
 
 

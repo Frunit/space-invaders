@@ -8,8 +8,6 @@
  * More information is given in the `readme.md`.
  */
 
-// TODO: Implement scoring system
-// TODO: Implement lives
 // TODO: Implement forts (these protection thingies that block shots and can slowly disintegrate)
 // TODO: Implement different levels <-- add more monsters
 // TODO: Implement power-ups
