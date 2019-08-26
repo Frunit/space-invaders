@@ -142,35 +142,6 @@ Engine.prototype.collide = function(array1, array2) {
 	const colliding1 = [];
 	const colliding2 = [];
 
-	/**
-	 * `collider` checks if the bounding boxes of a and b overlap.
-	 * @param {Object} a - The first object
-	 * @param {Object} b - The second object
-	 * @returns {boolean} Whether or not the bounding boxes overlap.
-	 */
-	const collider = function(a, b) {
-		// TODO: If the bounding boxes hit, this should continue doing some kind of pixel-perfect detection, at least for forts.
-		return !(
-			a.x       > b.x + b.w ||
-			a.y       > b.y + b.h ||
-			a.x + a.w < b.x       ||
-			a.y + a.h < b.y
-		);
-	};
-
-
-	/**
-	 * `remove_multiple_elements` removes all elements from array with the
-	 * indices given in to_remove in place. to_remove must be sorted!
-	 * @param {Array} array - The array to change
-	 * @param {number[]} to_remove - The list of indices to remove from array
-	 */
-	const remove_multiple_elements = function(array, to_remove) {
-		for(let i = to_remove.length -1; i >= 0; i--)
-			array.splice(to_remove[i],1);
-	};
-
-
 	for(let i = 0; i < array1.length; i++) {
 		for(let j = 0; j < array2.length; j++) {
 			const ent1 = array1[i];
@@ -179,12 +150,42 @@ Engine.prototype.collide = function(array1, array2) {
 			if(collider(ent1, ent2)) {
 				colliding1.push(i);
 				colliding2.push(j);
+				break;
 			}
 		}
 	}
 
 	remove_multiple_elements(array1, colliding1);
 	remove_multiple_elements(array2, colliding2);
+};
+
+
+/**
+ * `Engine.collider` checks if the bounding boxes of a and b overlap.
+ * @param {Object} a - The first object
+ * @param {Object} b - The second object
+ * @returns {boolean} Whether or not the bounding boxes overlap.
+ */
+Engine.prototype.collider = function(a, b) {
+	// TODO: If the bounding boxes hit, this might continue doing some kind of pixel-perfect detection.
+	return !(
+		a.x       > b.x + b.w ||
+		a.y       > b.y + b.h ||
+		a.x + a.w < b.x       ||
+		a.y + a.h < b.y
+	);
+};
+
+
+/**
+ * `Engine.remove_multiple_elements` removes all elements from array with the
+ * indices given in to_remove in place. to_remove must be sorted!
+ * @param {Array} array - The array to change
+ * @param {number[]} to_remove - The list of indices to remove from array
+ */
+Engine.prototype.remove_multiple_elements = function(array, to_remove) {
+	for(let i = to_remove.length -1; i >= 0; i--)
+		array.splice(to_remove[i],1);
 };
 
 
