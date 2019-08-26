@@ -212,7 +212,7 @@ Engine.prototype.collide = function(bullets, others) {
 				colliding_others.push(j);
 
 				if(bullet.owner >= 0) {
-					this.players[bullet_owner].score += other.score;
+					this.players[bullet.owner].score += other.score;
 				}
 
 				if(other.type === 'player') {

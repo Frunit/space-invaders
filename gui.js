@@ -115,5 +115,5 @@ Fake_GUI.prototype.render = function(entities) {
 
 // This exports a different GUI depending on whether the script runs in a
 // browser or not. This is used for testing in node.js.
-const exported_class = if(typeof window === 'undefined') ? Fake_GUI : GUI;
+const exported_class = typeof window === 'undefined' ? Fake_GUI : GUI;
 export default exported_class;

@@ -121,5 +121,5 @@ Fake_Input.prototype.is_down = function(key) {
 
 // This exports a different Input depending on whether the script runs in a
 // browser or not. This is used for testing in node.js.
-const exported_class = if(typeof window === 'undefined') ? Fake_Input : Input;
+const exported_class = typeof window === 'undefined' ? Fake_Input : Input;
 export default exported_class;
