@@ -40,6 +40,31 @@ function export Player(x, y) {
 
 
 /**
+ * `Player.reset` resets the player except for the position, score, lives, and
+ * death status.
+ */
+Player.prototype.reset = function() {
+	this.w = 60;
+	this.h = 32;
+	this.speed = 96; // pixel per second
+	this.bullet_offset = {x: this.w/2, y: 0};
+	this.bullet_double_x_offset = 20;
+	this.bullet_speed = -300; // pixel per second
+
+	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
+
+	this.max_cooldown = 1;
+	this.rapid_cooldown = 0.3;
+	this.cooldown = 0;
+	this.off_time = -1;
+
+	this.invulnerable = 0;
+	this.double_laser = 0;
+	this.rapid_fire = 0;
+};
+
+
+/**
  * `Player.fire` fires a bullet if the last bullet was long enough ago (i.e. the
  * cooldown is ok). Respects rapid_fire and double_laser.
  * @returns {Bullet[]} A list of Bullet objects if the ship fired. The list is empty if the cooldown prevented firing.

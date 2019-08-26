@@ -10,8 +10,9 @@
  * @param {number} window_size.h - Height in pixels
  * @param {number} window_border - The border width in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
+ * @param {Level[]} levels - The available levels
  */
-export function Engine(window_size, border, num_players) {
+export function Engine(window_size, border, num_players, levels) {
 	// These variables store all objects in the game.
 	this.enemies = [];
 	this.enemy_bullets = [];
@@ -25,6 +26,9 @@ export function Engine(window_size, border, num_players) {
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1;
+
+	this.level_list = levels;
+	this.level = 0;
 
 	this.num_players = num_players;
 
@@ -45,47 +49,70 @@ export function Engine(window_size, border, num_players) {
 
 
 /**
- * `Engine.setup` initializes the game with the player and enemies.
+ * `Engine.next_level` loads the next level.
  */
-Engine.prototype.setup = function() {
-	// TODO: Consider, whether this could be part of the constructor.
+Engine.prototype.next_level = function() {
+	this.level++;
+	const current = this.level_list[this.level % this.level_list.length];
+	const recurrence = Math.floor(this.level / this.level_list.length);
+	this.setup(current, recurrence, false);
+};
+
+
+/**
+ * `Engine.setup` initializes the game with the player and enemies.
+ * @param {Level} level=null - The level to set up. If no level is given, the first level will be used.
+ * @param {number} recurrence=0 - How often was this level played (0 for first time, 1 for second time, ...)
+ * @param {boolean} fresh=false - If true, forces new player objects (instead of using the existing ones). If no player objects are present, they are created in any case.
+ */
+Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	this.enemies = [];
 	this.enemy_bullets = [];
-	this.players = [];
 	this.player_bullets = [];
 	this.walls = [];
 	this.goodies = [];
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
-	this.enemy_speed_factor = 1;
+	this.enemy_speed_factor = 1 + recurrence * 0.33;
 
-	// Create players
-	for(let i = 0; i < this.num_players; i++) {
-		this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom));
-		this.dead_times.push(-1);
+	if(fresh) {
+		this.players = [];
 	}
 
-	// Create enemies
-	for(let y = 0; y < 5; y++) {
-		for(let x = 0; x < 8; x++) {
-			const type = Math.ceil(y / 2); // 0, 1, 1, 2, 2, ...
-			this.enemies.push(new Enemy(x*50+50, y*50+10, type));
+	if(this.players.length) {
+		// Reset players
+		for(let i = 0; i < this.num_players; i++) {
+			this.players[i].reset();
+			this.players[i] = (this.outer_bounds.right * (i+1))/(this.num_players + 1)
+		}
+	else {
+		// Create players
+		for(let i = 0; i < this.num_players; i++) {
+			this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom - 20));
+			this.dead_times.push(-1);
 		}
 	}
 
-	const fort_pos = [
-		'__XXXXXX__',
-		'XXXXXXXXXX',
-		'XXXXXXXXXX',
-		'XX______XX',
-	];
+	// Create enemies
+	// TODO: Positioning should happen according to the size of the enemy block!
+	for(let y = 0; y < level.enemies.length; y++) {
+		for(let x = 0; x < level[0].enemies.length; x++) {
+			let type = level.enemies[y][x];
+			if(type === '_') {
+				continue;
+			}
+
+			this.enemies.push(new Enemy(x*50+50, y*50+10, +type));
+		}
+	}
 
 	// Create forts
-	for(let i = 0; i < 3; i++) {
-		for(let y = 0; y < fort_pos.length; y++) {
-			for(let x = 0; x < fort_pos[0].length; x++) {
-				if(fort_pos[y][x] === 'X') {
+	// TODO: Positioning should happen according to the size and number of forts!
+	for(let i = 0; i < level.forts; i++) {
+		for(let y = 0; y < level.fort.length; y++) {
+			for(let x = 0; x < level.fort[0].length; x++) {
+				if(level.fort[y][x] === 'X') {
 					this.walls.push(
 						new Wall(
 							i * 200 + 100 + x * 8, // x position

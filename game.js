@@ -8,7 +8,6 @@
  * More information is given in the `readme.md`.
  */
 
-// TODO: Implement different levels <-- add more monsters
 // TODO: Implement special UFO on top that traverses the screen
 // TODO: Maybe implement music and sound
 
@@ -50,6 +49,26 @@ function Game() {
 		total_size: {w: 900, h: 600},
 		border: 20,
 	};
+
+	// TODO: Load levels from levels.json!
+	this.levels = [
+		{
+			fort: [
+				"__XXXXXX__",
+				"XXXXXXXXXX",
+				"XXXXXXXXXX",
+				"XX______XX"
+			],
+			forts: 3,
+			enemies: [
+				"0000000000",
+				"1111111111",
+				"1111111111",
+				"2222222222",
+				"2222222222"
+			]
+		}
+	];
 
 	this.version = 'pre-alpha';
 
@@ -148,7 +167,7 @@ Game.prototype.update = function(dt) {
  * creates the gui, and starts the game loop.
  */
 Game.prototype.start = function() {
-	this.engine = new Engine(this.options.total_size, this.options.border, 1);
+	this.engine = new Engine(this.options.total_size, this.options.border, 1, this.levels);
 	this.engine.setup();
 
 	this.gui = new GUI('game', this.options.total_size);
