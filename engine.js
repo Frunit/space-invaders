@@ -9,12 +9,13 @@
  * @param {number} window_size.w - Width in pixels
  * @param {number} window_size.h - Height in pixels
  * @param {number} window_border - The border width in pixels
+ * @param {number} num_players - The number of players. Should be 1 or 2.
  */
-export function Engine(window_size, border) {
+export function Engine(window_size, border, num_players) {
 	// These variables store all objects in the game.
 	this.enemies = [];
 	this.enemy_bullets = [];
-	this.player = null;
+	this.players = [];
 	this.player_bullets = [];
 
 	// Some status variables that are valid for all enemies (since enemies move
@@ -22,6 +23,8 @@ export function Engine(window_size, border) {
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1;
+
+	this.num_players = num_players;
 
 	this.outer_bounds = {
 		left: 0,
@@ -46,12 +49,17 @@ Engine.prototype.setup = function() {
 	// TODO: Consider, whether this could be part of the constructor.
 	this.enemies = [];
 	this.enemy_bullets = [];
-	this.player = new Player(this.outer_bounds.right/2, this.inner_bounds.bottom);
+	this.players = [];
 	this.player_bullets = [];
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1;
+
+	// Create players
+	for(let i = 0; i < this.num_players; i++) {
+		this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom));
+	}
 
 	// Create enemies
 	for(let y = 0; y < 5; y++) {
@@ -68,17 +76,56 @@ Engine.prototype.setup = function() {
  * @param {number} dt - The time delta since last update in seconds
  */
 Engine.prototype.handle_input = function(dt) {
-	if(input.is_down('LEFT')) {
-		this.player.move(dt * -1, this.inner_bounds);
-	}
-	else if(input.is_down('RIGHT')) {
-		this.player.move(dt, this.inner_bounds);
-	}
+	if(this.num_players === 1) {
+		if(input.is_down('LEFT0') ||
+				input.is_down('LEFT1')) {
+			this.players[0].move(dt * -1, this.inner_bounds);
+		}
+		else if(input.is_down('RIGHT0') ||
+				input.is_down('RIGHT1')) {
+			this.players[0].move(dt, this.inner_bounds);
+		}
 
-	if(input.is_down('SPACE')) {
-		const bullet = this.player.fire();
-		if(bullet !== null) {
-			this.player_bullets.push(bullet);
+		if(input.is_down('SPACE') ||
+				input.is_down('CTRL') ||
+				input.is_down('SHIFT') ||
+				input.is_down('UP0') ||
+				input.is_down('UP1')) {
+			const bullet = this.players[0].fire();
+			if(bullet !== null) {
+				this.player_bullets.push(bullet);
+			}
+		}
+	}
+	else {
+		if(input.is_down('LEFT0')) {
+			this.players[0].move(dt * -1, this.inner_bounds);
+		}
+		else if(input.is_down('RIGHT0')) {
+			this.players[0].move(dt, this.inner_bounds);
+		}
+
+		if(input.is_down('LEFT1')) {
+			this.players[1].move(dt * -1, this.inner_bounds);
+		}
+		else if(input.is_down('RIGHT1')) {
+			this.players[1].move(dt, this.inner_bounds);
+		}
+
+		if(input.is_down('SHIFT') ||
+				input.is_down('UP0')) {
+			const bullet = this.players[0].fire();
+			if(bullet !== null) {
+				this.player_bullets.push(bullet);
+			}
+		}
+
+		if(input.is_down('CTRL') ||
+				input.is_down('UP1')) {
+			const bullet = this.players[1].fire();
+			if(bullet !== null) {
+				this.player_bullets.push(bullet);
+			}
 		}
 	}
 }
@@ -89,7 +136,9 @@ Engine.prototype.handle_input = function(dt) {
  * @param {number} dt - The time delta since last update in seconds
  */
 Engine.prototype.update = function(dt) {
-	this.player.update(dt);
+	for(let player of this.players) {
+		player.update(dt);
+	}
 
 	if(this.enemy_moves_down) {
 		for(let enemy of this.enemies) {
@@ -128,7 +177,7 @@ Engine.prototype.update = function(dt) {
 
 	this.collide(this.player_bullets, this.enemy_bullets);
 	this.collide(this.player_bullets, this.enemies);
-	this.collide(this.enemy_bullets, [this.player]);
+	this.collide(this.enemy_bullets, this.players);
 };
 
 
@@ -153,7 +202,7 @@ Engine.prototype.collide = function(bullets, others) {
 				colliding_others.push(j);
 
 				if(bullet.owner >= 0) {
-					this.player.score += other.score;
+					this.players[bullet_owner].score += other.score;
 				}
 				break;
 			}
@@ -196,10 +245,10 @@ Engine.prototype.remove_multiple_elements = function(array, to_remove) {
 
 /**
  * `Engine.get_entities` returns all entities in the game for the gui to draw.
- * @returns {Object[]} An array with all entities (player, enemies, bullets)
+ * @returns {Object[]} An array with all entities (players, enemies, bullets)
  */
 Engine.prototype.get_entities = function() {
-	return [this.player].concat(this.enemies, this.enemy_bullets, this.player_bullets);
+	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets);
 };
 
 

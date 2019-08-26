@@ -151,7 +151,7 @@ Game.prototype.update = function(dt) {
  * creates the gui, and starts the game loop.
  */
 Game.prototype.start = function() {
-	this.engine = new Engine(this.options.total_size, this.options.border);
+	this.engine = new Engine(this.options.total_size, this.options.border, 1);
 	this.engine.setup();
 
 	this.gui = new GUI('game', this.options.total_size);
@@ -159,4 +159,3 @@ Game.prototype.start = function() {
 	this.last_time = Date.now();
 	this.loop();
 };
-

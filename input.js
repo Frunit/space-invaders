@@ -30,6 +30,12 @@ Input.prototype.set_key = function(event, status) {
 	let key;
 
 	switch(code) {
+		case 'ControlRight':
+		case 'Control':
+			key = 'CTRL'; break
+		case 'ShiftLeft':
+		case 'Shift':
+			key = 'SHIFT'; break
 		case 'Space':
 		case 'Spacebar':
 		case ' ':
@@ -40,21 +46,25 @@ Input.prototype.set_key = function(event, status) {
 		case 'Esc':
 			key = 'ESCAPE'; break;
 		case 'KeyA':
-		case 'ArrowLeft':
 		case 'a':
-			key = 'LEFT'; break;
+			key = 'LEFT0'; break;
+		case 'ArrowLeft':
+			key = 'LEFT1'; break;
 		case 'KeyD':
-		case 'ArrowRight':
 		case 'd':
-			key = 'RIGHT'; break;
-		/*case 'KeyW':
-		case 'ArrowUp':
+			key = 'RIGHT0'; break;
+		case 'ArrowRight':
+			key = 'RIGHT1'; break;
+		case 'KeyW':
 		case 'w':
-			key = 'UP'; break;
+			key = 'UP0'; break;
+		case 'ArrowUp':
+			key = 'UP1'; break;
 		case 'KeyS':
-		case 'ArrowDown':
+			key = 'DOWN0'; break;
 		case 's':
-			key = 'DOWN'; break;*/
+		case 'ArrowDown':
+			key = 'DOWN1'; break;
 	}
 
 	this.pressed_keys[key] = status;
@@ -65,7 +75,7 @@ Input.prototype.set_key = function(event, status) {
  * `Input.is_down` returns whether a certain key was pressed.
  * The given key must be an abstraction understood by this class. Currently,
  * these are:
- * - SPACE, ENTER, ESCAPE, LEFT, RIGHT
+ * - CTRL, SHIFT, SPACE, ENTER, ESCAPE, LEFT[01], RIGHT[01], UP[01], DOWN[01]
  * @param {string} key - The key (or rather, its abstraction) to ask for.
  * @returns {boolean|undefined} True if the key is currently pressed, false or undefined otherwise (undefined if it was never pressed)
  */
@@ -87,7 +97,7 @@ function Fake_Input() {
 /**
  * `Fake_Input.set_key` sets or unsets values depending on the key given.
  * The key must be one of:
- * - SPACE, ENTER, ESCAPE, LEFT, RIGHT
+ * - CTRL, SHIFT, SPACE, ENTER, ESCAPE, LEFT[01], RIGHT[01], UP[01], DOWN[01]
  * @param {string} key - The name of the key
  * @param {boolean} status - If true, the value will be set, if false, the value will be unset.
  */
@@ -100,7 +110,7 @@ Fake_Input.prototype.set_key = function(key, status) {
  * `Fake_Input.is_down` returns whether a certain key was pressed.
  * The given key must be an abstraction understood by this class. Currently,
  * these are:
- * - SPACE, ENTER, ESCAPE, LEFT, RIGHT
+ * - CTRL, SHIFT, SPACE, ENTER, ESCAPE, LEFT[01], RIGHT[01], UP[01], DOWN[01]
  * @param {string} key - The key (or rather, its abstraction) to ask for.
  * @returns {boolean|undefined} True if the key is currently pressed, false or undefined otherwise (undefined if it was never pressed)
  */
