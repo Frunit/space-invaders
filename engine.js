@@ -17,6 +17,7 @@ export function Engine(window_size, border, num_players) {
 	this.enemy_bullets = [];
 	this.players = [];
 	this.player_bullets = [];
+	this.goodies = [];
 
 	// Some status variables that are valid for all enemies (since enemies move
 	// in a synchronized way.
@@ -51,6 +52,7 @@ Engine.prototype.setup = function() {
 	this.enemy_bullets = [];
 	this.players = [];
 	this.player_bullets = [];
+	this.goodies = [];
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
@@ -93,7 +95,7 @@ Engine.prototype.handle_input = function(dt) {
 				input.is_down('UP0') ||
 				input.is_down('UP1')) {
 			const bullet = this.players[0].fire();
-			if(bullet !== null) {
+			if(bullet.length) {
 				this.player_bullets.push(bullet);
 			}
 		}
@@ -116,7 +118,7 @@ Engine.prototype.handle_input = function(dt) {
 		if(input.is_down('SHIFT') ||
 				input.is_down('UP0')) {
 			const bullet = this.players[0].fire();
-			if(bullet !== null) {
+			if(bullet.length) {
 				this.player_bullets.push(bullet);
 			}
 		}
@@ -124,7 +126,7 @@ Engine.prototype.handle_input = function(dt) {
 		if(input.is_down('CTRL') ||
 				input.is_down('UP1')) {
 			const bullet = this.players[1].fire();
-			if(bullet !== null) {
+			if(bullet.length) {
 				this.player_bullets.push(bullet);
 			}
 		}
@@ -179,15 +181,21 @@ Engine.prototype.update = function(dt) {
 		bullet.update(dt, this.outer_bounds);
 	}
 
-	// Remove bullets that left the screen
+	for(let goody of this.goodies) {
+		goody.update(dt, this.outer_bounds);
+	}
+
+	// Remove bullets and goodies that left the screen
 	this.player_bullets = this.player_bullets.filter(bullet => bullet.active);
 	this.enemy_bullets = this.enemy_bullets.filter(bullet => bullet.active);
+	this.goodies = this.goodies.filter(goody => goody.active);
 
 	// TODO: Would be nice with some cool effect upon exploding!
 
 	this.collide(this.player_bullets, this.enemy_bullets);
 	this.collide(this.player_bullets, this.enemies);
 	this.collide(this.enemy_bullets, this.players);
+	this.collide(this.goodies, this.players);
 };
 
 
@@ -195,8 +203,8 @@ Engine.prototype.update = function(dt) {
  * `Engine.collide` compares all entities of the first list with all entities of
  * the second list and tests if they collide. If so, the elements are removed
  * from the arrays in place.
- * @param {Bullet[]} bullets - The first array of entities
- * @param {Object[]} others - The second array of entities. Bullets, Enemies, ...
+ * @param {Object[]} bullets - The first array of entities. Bullets or Goodies
+ * @param {Object[]} others - The second array of entities. Bullets, Enemies, or Players
  */
 Engine.prototype.collide = function(bullets, others) {
 	const colliding_bullets = [];
@@ -211,11 +219,15 @@ Engine.prototype.collide = function(bullets, others) {
 				colliding_bullets.push(i);
 				colliding_others.push(j);
 
-				if(bullet.owner >= 0) {
+				if(bullet.object === 'goody') {
+					this.apply_goody(bullet.type, other);
+				}
+
+				else if(bullet.owner >= 0) {
 					this.players[bullet.owner].score += other.score;
 				}
 
-				if(other.type === 'player') {
+				else if(other.object === 'player') {
 					this.kill(other);
 				}
 				break;
@@ -254,6 +266,59 @@ Engine.prototype.collider = function(a, b) {
 Engine.prototype.remove_multiple_elements = function(array, to_remove) {
 	for(let i = to_remove.length -1; i >= 0; i--)
 		array.splice(to_remove[i],1);
+};
+
+
+/**
+ * `Engine.apply_goody` applies a goody to a player. Depending on the goody, the
+ * player gets an advantage (or maybe also a disadvantage).
+ * @param {number} type - The type of the goody.
+ * @param {Player} player - The player to apply the goody on.
+ */
+Engine.prototype.apply_goody = function(type, player) {
+	switch(type) {
+		case 0: {
+			this.kill(player);
+			break;
+		}
+		case 1: {
+			player.lives++;
+			break;
+		}
+		case 2: {
+			this.make_invulnerable(player);
+			break;
+		}
+		case 3: {
+			this.start_break_out(player);
+			break;
+		}
+		case 4: {
+			this.make_double_laser(player);
+			break;
+		}
+		case 5: {
+			player.rapid_fire += 7;
+			break;
+		}
+	}
+};
+
+
+Engine.prototype.make_invulnerable = function(player) {
+	// TODO: Add sprite to show invulnerability
+	player.invulnerable += 7;
+};
+
+
+Engine.prototype.start_break_out = function(player) {
+	// TODO: Add Break-out mode!
+};
+
+
+Engine.prototype.make_double_laser = function(player) {
+	// TODO: Add sprite to show double laser
+	player.double_laser += 7;
 };
 
 

@@ -18,6 +18,7 @@ function export Player(x, y) {
 	this.speed = 96; // pixel per second
 
 	this.bullet_offset = {x: this.w/2, y: 0};
+	this.bullet_double_x_offset = 20;
 	this.bullet_speed = -300; // pixel per second
 
 	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
@@ -26,26 +27,64 @@ function export Player(x, y) {
 	this.lives = 3;
 
 	this.max_cooldown = 1;
+	this.rapid_cooldown = 0.3;
 	this.cooldown = 0;
 
 	this.off_time = -1;
 	this.is_dead = false;
+
+	this.invulnerable = 0;
+	this.double_laser = 0;
+	this.rapid_fire = 0;
 }
 
 
 /**
  * `Player.fire` fires a bullet if the last bullet was long enough ago (i.e. the
- * cooldown is ok).
- * @returns {Bullet|null} A Bullet object if the ship fired or null if the cooldown prevented firing.
+ * cooldown is ok). Respects rapid_fire and double_laser.
+ * @returns {Bullet[]} A list of Bullet objects if the ship fired. The list is empty if the cooldown prevented firing.
  */
 Player.prototype.fire = function() {
 	if(this.cooldown || this.off_time >= 0) {
 		return null;
 	}
 
-	this.cooldown = this.max_cooldown;
+	this.cooldown = this.rapid_fire ? this.rapid_cooldown : this.max_cooldown;
 
-	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, 0, 0);
+	let bullets = [];
+
+	if(this.double_laser) {
+		bullets.push(
+			new Bullet(
+				this.x + this.bullet_offset.x - this.bullet_double_x_offset,
+				this.y + this.bullet_offset.y,
+				this.bullet_speed,
+				0,
+				0
+			)
+		);
+		bullets.push(
+			new Bullet(
+				this.x + this.bullet_offset.x + this.bullet_double_x_offset,
+				this.y + this.bullet_offset.y,
+				this.bullet_speed,
+				0,
+				0
+			)
+		);
+	}
+	else {
+		bullets.push(
+			new Bullet(
+				this.x + this.bullet_offset.x,
+				this.y + this.bullet_offset.y,
+				this.bullet_speed,
+				0,
+				0
+			)
+		);
+	}
+	return bullets;
 };
 
 
@@ -82,6 +121,29 @@ Player.prototype.update = function(dt) {
 			this.cooldown = 0;
 		}
 	}
+
+	if(this.invulnerable) {
+		this.invulnerable -= dt;
+		if(this.invulnerable < 0) {
+			// TODO: Change Sprite back to normal
+			this.invulnerable = 0;
+		}
+	}
+
+	if(this.double_laser) {
+		this.double_laser -= dt;
+		if(this.double_laser < 0) {
+			// TODO: Change Sprite back to normal
+			this.double_laser = 0;
+		}
+	}
+
+	if(this.rapid_fire) {
+		this.rapid_fire -= dt;
+		if(this.rapid_fire < 0) {
+			this.rapid_fire = 0;
+		}
+	}
 };
 
 
@@ -93,6 +155,7 @@ Player.prototype.update = function(dt) {
  * @param {number} type - The type of the enemy. Must be on of [0, 1, 2].
  */
 function export Enemy(x, y, type) {
+	// TODO: Enemies should shoot! Otherwise, the game might be a little bit too easy ;)
 	this.object = 'enemy';
 	this.x = x;
 	this.y = y;
@@ -236,6 +299,81 @@ function export Bullet(x, y, speed, type, owner=-1) {
  * @param {Bounds} bounds - Boundaries for the bullets
  */
 Bullet.prototype.update = function(dt, bounds) {
+	this.sprite.update(dt);
+	this.y += dt * this.speed;
+
+	if(this.y + this.h < bounds.top || this.y > bounds.bottom) {
+		this.active = false;
+	}
+};
+
+
+/**
+ * `Goody` is an object for a goody that is released by a killed enemy.
+ * @constructor
+ * @param {number} x - The initial x coordinate (from left) of the object pointing to its center
+ * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
+ * @param {number} speed - The vertical speed of the goody in pixels per second. Positive for going downwards.
+ * @param {number} type - The type of the goody. Currently, 0-5 are valid. These are:
+ * 		0. Kill the player
+ * 		1. Add one life to the player
+ * 		2. Invulnerability for n seconds
+ * 		3. Break-out mode!!!
+ * 		4. Double laser for n seconds
+ * 		5. Rapid fire for n seconds
+ */
+function export Goody(x, y, speed, type) {
+	this.object = 'goody';
+	this.w = 20;
+	this.h = 10;
+	this.type = type;
+
+	// TODO: The goodies need to point to the right sprite positions
+
+	switch(type) {
+		case 0: {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
+			break;
+		}
+		case 1: {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 32}, [{x: 0, y: 0}, {x: 44, y: 0}]);
+			break;
+		}
+		case 2: {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
+			break;
+		}
+		case 3: {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
+			break;
+		}
+		case 4: {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
+			break;
+		}
+		case 5: {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
+			break;
+		}
+		default:
+			console.warn('Unknown Goody type received: ' + type);
+	}
+
+	this.active = true;
+	this.speed = speed;
+
+	this.x = Math.floor(x - this.w/2);
+	this.y = Math.floor(y - this.h/2);
+}
+
+
+/**
+ * `Goody.update` moves the goody according to its speed and updates its
+ * sprite.
+ * @param {number} dt - The time delta since last update in seconds
+ * @param {Bounds} bounds - Boundaries for the goodies
+ */
+Goody.prototype.update = function(dt, bounds) {
 	this.sprite.update(dt);
 	this.y += dt * this.speed;
 

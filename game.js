@@ -10,7 +10,7 @@
 
 // TODO: Implement forts (these protection thingies that block shots and can slowly disintegrate)
 // TODO: Implement different levels <-- add more monsters
-// TODO: Implement power-ups
+// TODO: Implement special UFO on top that traverses the screen
 // TODO: Maybe implement music and sound
 
 

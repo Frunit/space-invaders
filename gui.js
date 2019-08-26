@@ -98,7 +98,7 @@ function Fake_GUI(target, expected_size, scale=1) {
  * @returns {Array[]} Array of arrays with the parameters that would have been used for rendering.
  */
 Fake_GUI.prototype.render = function(entities) {
-	const render_elements = [];
+	const render_elements = [];
 	for(let entity of entities) {
 		const params = entity.sprite.render();
 
