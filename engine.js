@@ -1,5 +1,8 @@
 'use strict';
 
+import {Player, Enemy, Wall} from './entities.js';
+// TODO: Sprites could be created only in entities.js, removing this import
+import {Sprite} from './sprite.js';
 
 /**
  * `Engine` is the actual game engine. It *should* work without any gui, making
@@ -86,18 +89,22 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 			this.players[i].reset();
 			this.players[i] = (this.outer_bounds.right * (i+1))/(this.num_players + 1)
 		}
+	}
 	else {
 		// Create players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom - 20));
-			this.dead_times.push(-1);
 		}
+	}
+
+	if(level === null) {
+		level = this.level_list[0];
 	}
 
 	// Create enemies
 	// TODO: Positioning should happen according to the size of the enemy block!
 	for(let y = 0; y < level.enemies.length; y++) {
-		for(let x = 0; x < level[0].enemies.length; x++) {
+		for(let x = 0; x < level.enemies[0].length; x++) {
 			let type = level.enemies[y][x];
 			if(type === '_') {
 				continue;
@@ -115,8 +122,8 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 				if(level.fort[y][x] === 'X') {
 					this.walls.push(
 						new Wall(
-							i * 200 + 100 + x * 8, // x position
-							450 + y * 8            // y position
+							i * 200 + 100 + x * 16, // x position
+							450 + y * 16            // y position
 						)
 					);
 				}
@@ -146,10 +153,8 @@ Engine.prototype.handle_input = function(dt) {
 				input.is_down('SHIFT') ||
 				input.is_down('UP0') ||
 				input.is_down('UP1')) {
-			const bullet = this.players[0].fire();
-			if(bullet.length) {
-				this.player_bullets.push(bullet);
-			}
+			const bullets = this.players[0].fire();
+			this.player_bullets.push(...bullets);
 		}
 	}
 	else {
@@ -169,18 +174,14 @@ Engine.prototype.handle_input = function(dt) {
 
 		if(input.is_down('SHIFT') ||
 				input.is_down('UP0')) {
-			const bullet = this.players[0].fire();
-			if(bullet.length) {
-				this.player_bullets.push(bullet);
-			}
+			const bullets = this.players[0].fire();
+			this.player_bullets.push(...bullets);
 		}
 
 		if(input.is_down('CTRL') ||
 				input.is_down('UP1')) {
-			const bullet = this.players[1].fire();
-			if(bullet.length) {
-				this.player_bullets.push(bullet);
-			}
+			const bullets = this.players[0].fire();
+			this.player_bullets.push(...bullets);
 		}
 	}
 }
@@ -355,13 +356,19 @@ Engine.prototype.apply_goody = function(type, player) {
 			player.rapid_fire += 7;
 			break;
 		}
+		case 6: {
+			player.score += 500;
+			break;
+		}
+		default:
+			console.warn('Unknown Goody type received: ' + type);
 	}
 };
 
 
 Engine.prototype.make_invulnerable = function(player) {
-	// TODO: Add sprite to show invulnerability
 	player.invulnerable += 7;
+	player.sprite = new Sprite('sprites.png', {w: player.w, h: player.h}, 0, {x: 64, y: 100}, [{x: 0, y: 0}, {x: player.w, y: 0}]);
 };
 
 
@@ -371,8 +378,8 @@ Engine.prototype.start_break_out = function(player) {
 
 
 Engine.prototype.make_double_laser = function(player) {
-	// TODO: Add sprite to show double laser
 	player.double_laser += 7;
+	player.sprite = new Sprite('sprites.png', {w: player.w, h: player.h}, 0, {x: 188, y: 136}, [{x: 0, y: 0}]);
 };
 
 
@@ -384,8 +391,7 @@ Engine.prototype.make_double_laser = function(player) {
 Engine.prototype.kill = function(player) {
 	player.lives--;
 	player.off_time = 2;
-	// TODO: This sprite is wrong!
-	player.sprite = new Sprite('sprites.png', {w: 30, h: 30}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
+	player.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 56, y: 136}, [{x: 0, y: 0}, {x: 64, y: 0}]);
 };
 
 
@@ -406,7 +412,7 @@ Engine.prototype.resurrect = function(player) {
 	else {
 		player.off_time = -1;
 		player.x = this.outer_bounds.right/2;
-		player.sprite = new Sprite('sprites.png', {w: player.w, h: player.h}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
+		player.sprite = new Sprite('sprites.png', {w: player.w, h: player.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 	}
 };
 

@@ -7,14 +7,6 @@
  */
 function Input() {
 	this.pressed_keys = {};
-
-	document.addEventListener('keydown', function(e) {
-		this.set_key(e, true);
-	});
-
-	document.addEventListener('keyup', function(e) {
-		this.set_key(e, false);
-	});
 }
 
 

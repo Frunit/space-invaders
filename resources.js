@@ -8,7 +8,7 @@
  * It loads everything and calls the callback as soon as everything loaded.
  * @constructor
  */
-function export Resources() {
+export function Resources() {
 	this.resource_cache = {};
 	this.ready_callback = () => {};
 	this.loaded = 0;

@@ -27,8 +27,6 @@ else {
 
 
 import { Resources } from './resources.js';
-import { Sprite } from './sprite.js';
-import { Player, Enemy, Bullet } from './entities.js';
 import { Engine } from './engine.js';
 
 // Attention! No curly brackets. This uses the default export that is dependent
@@ -42,7 +40,7 @@ import GUI from './gui.js';
  * the engine and the gui.
  * @constructor
  */
-function Game() {
+export function Game() {
 
 	// TODO: The options and the version may be externalized using json or the like.
 	this.options = {
@@ -94,6 +92,14 @@ function Game() {
 	else {
 		window.input = new Input();
 		window.resources = new Resources();
+
+		document.addEventListener('keydown', function(e) {
+			input.set_key(e, true);
+		});
+
+		document.addEventListener('keyup', function(e) {
+			input.set_key(e, false);
+		});
 	}
 
 	// And finally, the necessary graphics are loaded and the game is started as

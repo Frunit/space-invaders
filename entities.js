@@ -1,13 +1,16 @@
 'use strict';
 
 
+import {Sprite} from './sprite.js';
+
+
 /**
  * `Player` is the object for the space ship controlled by the player.
  * @constructor
  * @param {number} x - The initial x coordinate (from left) of the player pointing to its center
  * @param {number} y - The initial y coordinate (from top) of the player pointing to its center
  */
-function export Player(x, y) {
+export function Player(x, y) {
 	this.object = 'player';
 	this.w = 60;
 	this.h = 32;
@@ -21,7 +24,7 @@ function export Player(x, y) {
 	this.bullet_double_x_offset = 20;
 	this.bullet_speed = -300; // pixel per second
 
-	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
+	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 
 	this.score = 0;
 	this.lives = 3;
@@ -51,7 +54,7 @@ Player.prototype.reset = function() {
 	this.bullet_double_x_offset = 20;
 	this.bullet_speed = -300; // pixel per second
 
-	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
+	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 
 	this.max_cooldown = 1;
 	this.rapid_cooldown = 0.3;
@@ -71,7 +74,7 @@ Player.prototype.reset = function() {
  */
 Player.prototype.fire = function() {
 	if(this.cooldown || this.off_time >= 0) {
-		return null;
+		return [];
 	}
 
 	this.cooldown = this.rapid_fire ? this.rapid_cooldown : this.max_cooldown;
@@ -150,7 +153,7 @@ Player.prototype.update = function(dt) {
 	if(this.invulnerable) {
 		this.invulnerable -= dt;
 		if(this.invulnerable < 0) {
-			// TODO: Change Sprite back to normal
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 			this.invulnerable = 0;
 		}
 	}
@@ -158,7 +161,7 @@ Player.prototype.update = function(dt) {
 	if(this.double_laser) {
 		this.double_laser -= dt;
 		if(this.double_laser < 0) {
-			// TODO: Change Sprite back to normal
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 			this.double_laser = 0;
 		}
 	}
@@ -179,7 +182,7 @@ Player.prototype.update = function(dt) {
  * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  * @param {number} type - The type of the enemy. Must be on of [0, 1, 2].
  */
-function export Enemy(x, y, type) {
+export function Enemy(x, y, type) {
 	// TODO: Enemies should shoot! Otherwise, the game might be a little bit too easy ;)
 	this.object = 'enemy';
 	this.x = x;
@@ -191,22 +194,22 @@ function export Enemy(x, y, type) {
 		case 0: {
 			this.w = 32;
 			this.h = 32;
-			this.score = 10;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 0}, [{x: 0, y: 0}, {x: 32, y: 0}]);
+			this.score = 30;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 300, {x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
 			break;
 		}
 		case 1: {
 			this.w = 44;
 			this.h = 32;
 			this.score = 20;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 32}, [{x: 0, y: 0}, {x: 44, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 300, {x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
 			break;
 		}
 		case 2: {
 			this.w = 48;
 			this.h = 32;
-			this.score = 30;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
+			this.score = 10;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 300, {x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
 			break;
 		}
 		default:
@@ -275,37 +278,36 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
  * @param {number} type - The type of the bullet. 0 is the player's bullet, 1-3 are the enemy bullets.
  * @param {number} owner=-1 - The owner of the bullet. 0 or positive numbers refer to the respective player, negative numbers are enemy bullets (default).
  */
-function export Bullet(x, y, speed, type, owner=-1) {
+export function Bullet(x, y, speed, type, owner=-1) {
 	this.object = 'bullet';
-	// TODO: The bullets need to point to the right sprite positions
 
 	switch(type) {
 		case 0: {
 			this.w = 4;
 			this.h = 16;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 144, y: 36}, [{x: 0, y: 0}]);
 			break;
 		}
 		case 1: {
 			this.w = 12;
 			this.h = 28;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 32}, [{x: 0, y: 0}, {x: 44, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 100, {x: 0, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]);
 			break;
 		}
 		case 2: {
 			this.w = 12;
 			this.h = 28;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 100, {x: 52, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]);
 			break;
 		}
 		case 3: {
 			this.w = 12;
 			this.h = 24;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 100, {x: 92, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]);
 			break;
 		}
 		default:
-			console.warn('Unknown Enemy type received: ' + type);
+			console.warn('Unknown Bullet type received: ' + type);
 	}
 
 	this.score = 0;
@@ -347,41 +349,17 @@ Bullet.prototype.update = function(dt, bounds) {
  * 		4. Double laser for n seconds
  * 		5. Rapid fire for n seconds
  */
-function export Goody(x, y, speed, type) {
+export function Goody(x, y, speed, type) {
 	this.object = 'goody';
-	this.w = 20;
-	this.h = 10;
+	this.w = 46;
+	this.h = 22;
 	this.type = type;
 
-	// TODO: The goodies need to point to the right sprite positions
-
-	switch(type) {
-		case 0: {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
-			break;
-		}
-		case 1: {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 32}, [{x: 0, y: 0}, {x: 44, y: 0}]);
-			break;
-		}
-		case 2: {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
-			break;
-		}
-		case 3: {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
-			break;
-		}
-		case 4: {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
-			break;
-		}
-		case 5: {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
-			break;
-		}
-		default:
-			console.warn('Unknown Goody type received: ' + type);
+	if(type >= 0 && type < 6) {
+		this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 260, y: 0}, [{x: 0, y: this.h*type}]);
+	}
+	else {
+		console.warn('Unknown Goody type received: ' + type);
 	}
 
 	this.active = true;
@@ -414,14 +392,13 @@ Goody.prototype.update = function(dt, bounds) {
  * @param {number} x - The initial x coordinate (from left) of the object pointing to its center
  * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  */
-function export Wall(x, y) {
+export function Wall(x, y) {
 	this.object = 'wall';
-	this.w = 8;
-	this.h = 8;
+	this.w = 16;
+	this.h = 16;
 	this.score = 0;
 
-	// TODO: Needs the right sprite positions.
-	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
+	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 152, y: 36}, [{x: 0, y: 0}]);
 
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
