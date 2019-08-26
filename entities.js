@@ -21,6 +21,8 @@ function export Player(x, y) {
 
 	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 1, {x: 0, y: 124}, [{x: 0, y: 0}]);
 
+	this.score = 0;
+
 	this.max_cooldown = 1;
 	this.cooldown = 0;
 }
@@ -38,7 +40,7 @@ Player.prototype.fire = function() {
 
 	this.cooldown = this.max_cooldown;
 
-	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, 0);
+	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, 0, 0);
 };
 
 
@@ -91,18 +93,21 @@ function export Enemy(x, y, type) {
 		case 0: {
 			this.w = 32;
 			this.h = 32;
+			this.score = 10;
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 0}, [{x: 0, y: 0}, {x: 32, y: 0}]);
 			break;
 		}
 		case 1: {
 			this.w = 44;
 			this.h = 32;
+			this.score = 20;
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 32}, [{x: 0, y: 0}, {x: 44, y: 0}]);
 			break;
 		}
 		case 2: {
 			this.w = 48;
 			this.h = 32;
+			this.score = 30;
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 30, {x: 0, y: 64}, [{x: 0, y: 0}, {x: 48, y: 0}]);
 			break;
 		}
@@ -169,8 +174,10 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
  * @param {number} x - The initial x coordinate (from left) of the object pointing to its center
  * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  * @param {number} speed - The vertical speed of the bullet in pixels per second. Positive for going downwards.
+ * @param {number} type - The type of the bullet. 0 is the player's bullet, 1-3 are the enemy bullets.
+ * @param {number} owner=-1 - The owner of the bullet. 0 or positive numbers refer to the respective player, negative numbers are enemy bullets (default).
  */
-function export Bullet(x, y, speed) {
+function export Bullet(x, y, speed, type, owner=-1) {
 	// TODO: The bullets need to point to the right sprite positions
 
 	switch(type) {
@@ -202,6 +209,7 @@ function export Bullet(x, y, speed) {
 			console.warn('Unknown Enemy type received: ' + type);
 	}
 
+	this.score = 0;
 	this.active = true;
 	this.speed = speed;
 

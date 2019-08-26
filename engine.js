@@ -120,6 +120,7 @@ Engine.prototype.update = function(dt) {
 		bullet.update(dt, this.outer_bounds);
 	}
 
+	// Remove bullets that left the screen
 	this.player_bullets = this.player_bullets.filter(bullet => bullet.active);
 	this.enemy_bullets = this.enemy_bullets.filter(bullet => bullet.active);
 
@@ -135,28 +136,32 @@ Engine.prototype.update = function(dt) {
  * `Engine.collide` compares all entities of the first list with all entities of
  * the second list and tests if they collide. If so, the elements are removed
  * from the arrays in place.
- * @param {Object[]} array1 - The first array of entities
- * @param {Object[]} array2 - The second array of entities
+ * @param {Bullet[]} bullets - The first array of entities
+ * @param {Object[]} others - The second array of entities. Bullets, Enemies, ...
  */
-Engine.prototype.collide = function(array1, array2) {
-	const colliding1 = [];
-	const colliding2 = [];
+Engine.prototype.collide = function(bullets, others) {
+	const colliding_bullets = [];
+	const colliding_others = [];
 
-	for(let i = 0; i < array1.length; i++) {
-		for(let j = 0; j < array2.length; j++) {
-			const ent1 = array1[i];
-			const ent2 = array2[j];
+	for(let i = 0; i < bullets.length; i++) {
+		for(let j = 0; j < others.length; j++) {
+			const bullet = bullets[i];
+			const other = others[j];
 
-			if(collider(ent1, ent2)) {
-				colliding1.push(i);
-				colliding2.push(j);
+			if(this.collider(bullet, other)) {
+				colliding_bullets.push(i);
+				colliding_others.push(j);
+
+				if(bullet.owner >= 0) {
+					this.player.score += other.score;
+				}
 				break;
 			}
 		}
 	}
 
-	remove_multiple_elements(array1, colliding1);
-	remove_multiple_elements(array2, colliding2);
+	this.remove_multiple_elements(bullets, colliding_bullets);
+	this.remove_multiple_elements(others, colliding_others);
 };
 
 
