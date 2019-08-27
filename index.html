@@ -14,6 +14,17 @@
 
 <div id="game"></div>
 
+<div id="highscore-div">
+<input type="text" id="highscore" size="8">
+</div>
+
+<script>
+document.getElementById('hs').addEventListener('input', function(e) {
+	const value = document.getElementById('hs').value.toUpperCase();
+	document.getElementById('hs').value = value.replace(/[^A-Z0-9 ]/g, '').substr(0, 8);
+});
+</script>
+
 <script type="module">
 import { Game } from './game.js';
 

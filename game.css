@@ -10,3 +10,20 @@ canvas {
 input {
 	border: 1px solid grey;
 }
+
+#highscore-div {
+	position: absolute;
+	top: 300px;
+	left: 300px;
+	display: none;
+}
+
+#highscore {
+	font-family: monospace;
+	font-weight: bold;
+	font-size: 12pt;
+	border: 0px;
+	background-color: black;
+	color: white;
+	padding: 12px;
+}
