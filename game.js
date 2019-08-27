@@ -26,11 +26,11 @@ else {
 }
 
 
-import { Resources } from './resources.js';
 import { Engine } from './engine.js';
 
 // Attention! No curly brackets. This uses the default export that is dependent
 // on whether this runs in a browser or not (for testing in node.js).
+import Resources from './resources.js';
 import Input from './input.js';
 import GUI from './gui.js';
 

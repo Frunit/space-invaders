@@ -36,7 +36,34 @@ The documentation root will be in the file `./out/index.html`.
 Testing
 -------
 
-I will include unit tests with help of [QUnit](https://qunitjs.com).
+Automatic testing of a Javascript game ment for the browser is apparently hard.
+I tried to separated browser-specific stuff as much as possible from browser-
+independet stuff. The independent things can be tested automatically in node.js.
+For this, I use [QUnit](https://qunitjs.com). QUnit can in principle also test
+browser content, but this doesn't work automatically but involves the user
+opening a specially prepared test page. This in turn might be possible using a
+headless browser with some modifications, but that was too much effort for this
+competition project.
+
+Due to these limitations, `GUI`, `Input`, and `Resources` are not covered by
+tests. I created "fake" classes to replace these three classes as closely as
+possible in the tests. The class to import is chosen automatically at runtime
+depending on the presence of the `window` object (which is only present in
+browsers).
+
+For testing, you need the following (assuming that an up-to-date version of
+node.js and npm are installed):
+
+```sh
+npm install --global qunit  # Of course, you may install it locally as well
+npm install --save esm
+node -r esm $(which qunit)
+```
+
+The last line is so quirky, because node does not understand ECMA 2016 `import`
+statement. These need to be loaded by the `esm` module and then, qunit must be
+started with `esm` active. Very annoying! Maybe it works out of the box in a few
+years.
 
 
 Programmatic organisation
