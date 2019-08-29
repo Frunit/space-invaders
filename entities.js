@@ -1,5 +1,5 @@
 'use strict';
-
+//TODO: I should implement an abstract class for all entities, such that common attributes are always there.
 
 import {Sprite} from './sprite.js';
 

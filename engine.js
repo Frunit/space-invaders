@@ -61,6 +61,7 @@ Engine.prototype.next_level = function() {
 };
 
 
+// TODO: Engine.setup is too long. Especially level setup should be pur into another function
 /**
  * `Engine.setup` initializes the game with the player and enemies.
  * @param {Level} level=null - The level to set up. If no level is given, the first level will be used.
@@ -104,7 +105,6 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	const enemy_offset = this.inner_bounds.left + (this.inner_bounds.right - this.inner_bounds.left) / 2 - level.enemies[0].length / 2 * 60;
 	const enemy_upper = 30;
 
-	// TODO: Positioning should happen according to the size of the enemy block!
 	for(let y = 0; y < level.enemies.length; y++) {
 		for(let x = 0; x < level.enemies[0].length; x++) {
 			let type = level.enemies[y][x];
@@ -255,7 +255,7 @@ Engine.prototype.update = function(dt) {
 	this.enemy_bullets = this.enemy_bullets.filter(bullet => bullet.active);
 	this.goodies = this.goodies.filter(goody => goody.active);
 
-	// TODO: Would be nice with some cool effect upon exploding!
+	// TODO: I need to react differently upon hits to allow for explosions, goodies, ...
 
 	this.collide(this.player_bullets, this.enemy_bullets);
 	this.collide(this.player_bullets, this.enemies);
@@ -286,7 +286,7 @@ Engine.prototype.collide = function(bullets, others) {
 				colliding_bullets.push(i);
 				colliding_others.push(j);
 
-				if(bullet.object === 'goody') {
+				if(bullet.object === 'goody' && other.object === 'player') {
 					this.apply_goody(bullet.type, other);
 				}
 
