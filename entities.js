@@ -176,6 +176,55 @@ Player.prototype.update = function(dt) {
 
 
 /**
+ * `Player.make_invulnerable` makes the player invulnerable for some seconds.
+ */
+Player.prototype.make_invulnerable = function() {
+	this.invulnerable += 7;
+	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 64, y: 100}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+};
+
+
+// TODO: Need sprite for invulnerable + double laser (or need to combine sprites)
+/**
+ * `Player.make_double_laser` gives the player a double laser for some seconds.
+ */
+Player.prototype.make_double_laser = function() {
+	this.double_laser += 7;
+	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 188, y: 136}, [{x: 0, y: 0}]);
+};
+
+
+/**
+ * `Player.kill` kills the player. One lives is subtracted and an explosion
+ * is shown. The player will be disabled for two seconds.
+ */
+Player.prototype.kill = function() {
+	this.lives--;
+	this.off_time = 2;
+	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 56, y: 136}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+};
+
+
+/**
+ * `Player.resurrect` resurrects the player. The player gets another fighter
+ * and can play again. If the player does not have lives left, it will be
+ * permanently disabled. The disable check is done here and not in Player.kill,
+ * so the explosion is shown in any case.
+ */
+Player.prototype.resurrect = function() {
+	if(player.lives < 0) {
+		this.off_time = Infinity;
+		this.is_dead = true;
+		this.h = 0;
+		this.w = 0;
+	}
+	else {
+		this.reset()
+	}
+};
+
+
+/**
  * `Enemy` is an object for an enemy space ship/monster.
  * @constructor
  * @param {number} x - The initial x coordinate (from left) of the object pointing to its center

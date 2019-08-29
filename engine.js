@@ -1,8 +1,7 @@
 'use strict';
 
 import {Player, Enemy, Wall} from './entities.js';
-// TODO: Sprites could be created only in entities.js, removing this import
-import {Sprite} from './sprite.js';
+
 
 /**
  * `Engine` is the actual game engine. It *should* work without any gui, making
@@ -212,7 +211,8 @@ Engine.prototype.update = function(dt) {
 		if(player.off_time >= 0) {
 			player.off_time -= dt;
 			if(player.off_time < 0) {
-				this.resurrect(player);
+				player.resurrect();
+				this.test_game_over();
 			}
 		}
 	}
@@ -345,7 +345,7 @@ Engine.prototype.remove_multiple_elements = function(array, to_remove) {
 Engine.prototype.apply_goody = function(type, player) {
 	switch(type) {
 		case 0: {
-			this.kill(player);
+			player.kill();
 			break;
 		}
 		case 1: {
@@ -353,15 +353,15 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		case 2: {
-			this.make_invulnerable(player);
+			player.make_invulnerable();
 			break;
 		}
 		case 3: {
-			this.start_break_out(player);
+			this.start_break_out();
 			break;
 		}
 		case 4: {
-			this.make_double_laser(player);
+			player.make_double_laser();
 			break;
 		}
 		case 5: {
@@ -378,54 +378,13 @@ Engine.prototype.apply_goody = function(type, player) {
 };
 
 
-Engine.prototype.make_invulnerable = function(player) {
-	player.invulnerable += 7;
-	player.sprite = new Sprite('sprites.png', {w: player.w, h: player.h}, 0, {x: 64, y: 100}, [{x: 0, y: 0}, {x: player.w, y: 0}]);
-};
-
-
+/**
+ * `Engine.start_break_out` puts a ball on the player's fighter that will start
+ * right away upwards.
+ * @param {Player} player - The player to place the ball on.
+ */
 Engine.prototype.start_break_out = function(player) {
 	// TODO: Add Break-out mode!
-};
-
-
-Engine.prototype.make_double_laser = function(player) {
-	player.double_laser += 7;
-	player.sprite = new Sprite('sprites.png', {w: player.w, h: player.h}, 0, {x: 188, y: 136}, [{x: 0, y: 0}]);
-};
-
-
-/**
- * `Engine.kill` kills the given player. One lives is subtracted and an
- * explosion is shown.
- * @param {Player} player - The player that shall be killed.
- */
-Engine.prototype.kill = function(player) {
-	player.lives--;
-	player.off_time = 2;
-	player.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 56, y: 136}, [{x: 0, y: 0}, {x: 64, y: 0}]);
-};
-
-
-/**
- * `Engine.resurrect` resurrects the given player. The player gets another
- * fighter and can play again. If the player does not have lives left, it will
- * be permanently disabled.
- * @param {Player} player - The player that shall be resurrected.
- */
-Engine.prototype.resurrect = function(player) {
-	if(player.lives < 0) {
-		player.off_time = Infinity;
-		player.is_dead = true;
-		player.h = 0;
-		player.w = 0;
-		this.test_game_over();
-	}
-	else {
-		player.off_time = -1;
-		player.x = this.outer_bounds.right/2;
-		player.sprite = new Sprite('sprites.png', {w: player.w, h: player.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
-	}
 };
 
 
