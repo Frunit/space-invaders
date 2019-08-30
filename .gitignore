@@ -1,4 +1,5 @@
 out/
+ignore/
 
 .eslintrc.js
 node_modules/
