@@ -1,7 +1,7 @@
 Space Invaders
 ==============
 
-Space Invaders is a game written in Javascript (ECMA 2015+) without any
+Space Invaders is a game written in Javascript (ECMAScript 2018) without any
 frameworks for the
 [it-talents.de competition September 2019](https://www.it-talents.de/foerderung/code-competition/airbus-code-competition-09-2019)
 sponsored by Airbus.
