@@ -270,8 +270,8 @@ Engine.prototype.update = function(dt) {
  * `Engine.collide` compares all entities of the first list with all entities of
  * the second list and tests if they collide. If so, the elements are removed
  * from the arrays in place.
- * @param {Object[]} bullets - The first array of entities. Bullets or Goodies
- * @param {Object[]} others - The second array of entities. Bullets, Enemies, or Players
+ * @param {Entity[]} bullets - The first array of entities. Bullets or Goodies
+ * @param {Entity[]} others - The second array of entities. Bullets, Enemies, or Players
  */
 Engine.prototype.collide = function(bullets, others) {
 	const colliding_bullets = [];
@@ -291,7 +291,7 @@ Engine.prototype.collide = function(bullets, others) {
 				}
 
 				else if(bullet.owner >= 0) {
-					this.players[bullet.owner].score += other.score;
+					this.players[bullet.owner].score += other.score_value;
 				}
 
 				else if(other.object === 'player') {
@@ -309,8 +309,8 @@ Engine.prototype.collide = function(bullets, others) {
 
 /**
  * `Engine.collider` checks if the bounding boxes of a and b overlap.
- * @param {Object} a - The first object
- * @param {Object} b - The second object
+ * @param {Entity} a - The first object
+ * @param {Entity} b - The second object
  * @returns {boolean} Whether or not the bounding boxes overlap.
  */
 Engine.prototype.collider = function(a, b) {
@@ -413,7 +413,7 @@ Engine.prototype.game_over = function() {
 
 /**
  * `Engine.get_entities` returns all entities in the game for the gui to draw.
- * @returns {Object[]} An array with all entities (players, enemies, bullets)
+ * @returns {Entity[]} An array with all entities (players, enemies, bullets)
  */
 Engine.prototype.get_entities = function() {
 	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets, this.walls, this.goodies);

@@ -1,7 +1,30 @@
 'use strict';
-//TODO: I should implement an abstract class for all entities, such that common attributes are always there.
+
 
 import {Sprite} from './sprite.js';
+
+
+/**
+ * `Entity` is an abstract object for all elements on the screen. Its purpose is
+ * to ensure that certain properties are always present, no matter what kind of
+ * entity it is.
+ * @constructor
+ * @abstract
+ */
+function Entity() {
+	// The following properties *should* be overwritten by the inheriting "class"
+	this.object = 'abstract';
+	this.w = 0;
+	this.h = 0;
+	this.x = 0;
+	this.y = 0;
+	this.sprite = null;
+
+	// The following properties *may* be overwritten by the inheriting "class"
+	this.score_value = 0;
+	this.speed = {x: 0, y: 0};
+	this.active = true;
+}
 
 
 /**
@@ -11,6 +34,7 @@ import {Sprite} from './sprite.js';
  * @param {number} y - The initial y coordinate (from top) of the player pointing to its center
  */
 export function Player(x, y) {
+	Entity.call(this);
 	this.object = 'player';
 	this.w = 60;
 	this.h = 32;
@@ -18,11 +42,11 @@ export function Player(x, y) {
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
 
-	this.speed = 96; // pixel per second
+	this.speed.x = 96; // pixel per second
 
 	this.bullet_offset = {x: this.w/2, y: 0};
 	this.bullet_double_x_offset = 20;
-	this.bullet_speed = -300; // pixel per second
+	this.bullet_speed = {x: 0, y: -300}; // pixel per second
 
 	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 
@@ -49,10 +73,10 @@ export function Player(x, y) {
 Player.prototype.reset = function() {
 	this.w = 60;
 	this.h = 32;
-	this.speed = 96; // pixel per second
+	this.speed.x = 96; // pixel per second
 	this.bullet_offset = {x: this.w/2, y: 0};
 	this.bullet_double_x_offset = 20;
-	this.bullet_speed = -300; // pixel per second
+	this.bullet_speed = {x:0, y:-300}; // pixel per second
 
 	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 
@@ -126,7 +150,7 @@ Player.prototype.move = function(direction, bounds) {
 		return;
 	};
 
-	this.x += direction * this.speed;
+	this.x += direction * this.speed.x;
 
 	if(this.x < bounds.left) {
 		this.x = bounds.left;
@@ -233,9 +257,8 @@ Player.prototype.resurrect = function() {
  */
 export function Enemy(x, y, type) {
 	// TODO: Enemies should shoot! Otherwise, the game might be a little bit too easy ;)
+	Entity.call(this);
 	this.object = 'enemy';
-	this.x = x;
-	this.y = y;
 	this.speed = {x: 64, y: 64}; // pixel per second
 	this.bullet_speed = 300; // pixel per second
 
@@ -243,21 +266,21 @@ export function Enemy(x, y, type) {
 		case 0: {
 			this.w = 32;
 			this.h = 32;
-			this.score = 30;
+			this.score_value = 30;
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 300, {x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
 			break;
 		}
 		case 1: {
 			this.w = 44;
 			this.h = 32;
-			this.score = 20;
+			this.score_value = 20;
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 300, {x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
 			break;
 		}
 		case 2: {
 			this.w = 48;
 			this.h = 32;
-			this.score = 10;
+			this.score_value = 10;
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 300, {x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
 			break;
 		}
@@ -268,8 +291,8 @@ export function Enemy(x, y, type) {
 	this.bullet_offset = {x: this.w/2, y: 0};
 
 	// Coordinates are generally measured from top left, not center.
-	this.x -= Math.floor(this.w/2);
-	this.y -= Math.floor(this.h/2);
+	this.x = Math.floor(x - this.w/2);
+	this.y = Math.floor(y - this.h/2);
 
 	this.max_cooldown = 1;
 	this.cooldown = 0;
@@ -328,7 +351,10 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
  * @param {number} owner=-1 - The owner of the bullet. 0 or positive numbers refer to the respective player, negative numbers are enemy bullets (default).
  */
 export function Bullet(x, y, speed, type, owner=-1) {
+	Entity.call(this);
 	this.object = 'bullet';
+	this.owner = owner;
+	this.speed.y = speed;
 
 	switch(type) {
 		case 0: {
@@ -358,10 +384,6 @@ export function Bullet(x, y, speed, type, owner=-1) {
 		default:
 			console.warn('Unknown Bullet type received: ' + type);
 	}
-
-	this.score = 0;
-	this.active = true;
-	this.speed = speed;
 
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
@@ -397,8 +419,10 @@ Bullet.prototype.update = function(dt, bounds) {
  * 		3. Break-out mode!!!
  * 		4. Double laser for n seconds
  * 		5. Rapid fire for n seconds
+ * 		6. Bonus points to score
  */
 export function Goody(x, y, speed, type) {
+	Entity.call(this);
 	this.object = 'goody';
 	this.w = 46;
 	this.h = 22;
@@ -411,8 +435,7 @@ export function Goody(x, y, speed, type) {
 		console.warn('Unknown Goody type received: ' + type);
 	}
 
-	this.active = true;
-	this.speed = speed;
+	this.speed.y = speed;
 
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
@@ -442,10 +465,11 @@ Goody.prototype.update = function(dt, bounds) {
  * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  */
 export function Wall(x, y) {
+	Entity.call(this);
 	this.object = 'wall';
 	this.w = 16;
 	this.h = 16;
-	this.score = 0;
+	this.gravity = 300;
 
 	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 152, y: 36}, [{x: 0, y: 0}]);
 

@@ -23,10 +23,10 @@ QUnit.test('initial Player properties', function(assert) {
 	assert.strictEqual(player.h,     32, 'h');
 	assert.strictEqual(player.x,     70, 'x');
 	assert.strictEqual(player.y,     84, 'y');
-	assert.strictEqual(player.speed, 96, 'speed');
+	assert.deepEqual(player.speed, {x: 96, y: 0}, 'speed');
 	assert.deepEqual(player.bullet_offset, {x: 30, y: 0}, 'bullet_offset');
 	assert.strictEqual(player.bullet_double_x_offset, 20, 'bullet_double_x_offset');
-	assert.strictEqual(player.bullet_speed, -300, 'bullet_speed');
+	assert.deepEqual(player.bullet_speed, {x: 0, y: -300}, 'bullet_speed');
 	assert.strictEqual(player.score, 0, 'score');
 	assert.strictEqual(player.lives, 3, 'lives');
 });
