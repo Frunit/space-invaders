@@ -22,8 +22,10 @@ function Entity() {
 
 	// The following properties *may* be overwritten by the inheriting "class"
 	this.score_value = 0;
+	this.off_time = -1;
 	this.speed = {x: 0, y: 0};
 	this.active = true;
+	this.collidable = true;
 }
 
 
@@ -57,7 +59,6 @@ export function Player(x, y) {
 	this.rapid_cooldown = 0.3;
 	this.cooldown = 0;
 
-	this.off_time = -1;
 	this.is_dead = false;
 
 	this.invulnerable = 0;
@@ -84,6 +85,7 @@ Player.prototype.reset = function() {
 	this.rapid_cooldown = 0.3;
 	this.cooldown = 0;
 	this.off_time = -1;
+	this.collidable = true;
 
 	this.invulnerable = 0;
 	this.double_laser = 0;
@@ -97,7 +99,7 @@ Player.prototype.reset = function() {
  * @returns {Bullet[]} A list of Bullet objects if the ship fired. The list is empty if the cooldown prevented firing.
  */
 Player.prototype.fire = function() {
-	if(this.cooldown || this.off_time >= 0) {
+	if(this.cooldown) {
 		return [];
 	}
 
@@ -174,6 +176,10 @@ Player.prototype.update = function(dt) {
 		}
 	}
 
+	if(this.off_time >= 0) {
+		this.off_time -= dt;
+	}
+
 	if(this.invulnerable) {
 		this.invulnerable -= dt;
 		if(this.invulnerable < 0) {
@@ -225,6 +231,8 @@ Player.prototype.make_double_laser = function() {
 Player.prototype.kill = function() {
 	this.lives--;
 	this.off_time = 2;
+	this.cooldown = 2;
+	this.collidable = false;
 	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 56, y: 136}, [{x: 0, y: 0}, {x: 64, y: 0}]);
 };
 
@@ -329,6 +337,20 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
 	this.x += dx * this.speed.x;
 	this.y += dy * this.speed.y;
 
+	if(this.cooldown) {
+		this.cooldown -= dt;
+		if(this.cooldown < 0) {
+			this.cooldown = 0;
+		}
+	}
+
+	if(this.off_time >= 0) {
+		this.off_time -= dt;
+		if(this.off_time < 0) {
+			this.active = false;
+		}
+	}
+
 	this.sprite.update(dt);
 
 	let reached_border = ((this.x < bounds.left && dx < 0) || (this.x + this.w > bounds.right && dx > 0));
@@ -338,6 +360,20 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
 	}
 
 	return reached_border;
+};
+
+
+/**
+ * `Enemy.kill` kills the enemy. It turns into an explosion for some seconds.
+ */
+Enemy.prototype.kill = function() {
+	this.off_time = 2;
+	this.cooldown = 2;
+	this.collidable = false;
+	this.speed.x = 0;
+	this.speed.y = 0;
+	// TODO: This needs the right explosion sprite.
+	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 56, y: 136}, [{x: 0, y: 0}, {x: 64, y: 0}]);
 };
 
 
@@ -400,9 +436,28 @@ Bullet.prototype.update = function(dt, bounds) {
 	this.sprite.update(dt);
 	this.y += dt * this.speed;
 
+	if(this.off_time >= 0) {
+		this.off_time -= dt;
+		if(this.off_time < 0) {
+			this.active = false;
+		}
+	}
+
 	if(this.y + this.h < bounds.top || this.y > bounds.bottom) {
 		this.active = false;
 	}
+};
+
+
+/**
+ * `Bullet.kill` kills the bullet. It turns into an explosion for some seconds.
+ */
+Bullet.prototype.kill = function() {
+	this.off_time = 2;
+	this.speed.y = 0;
+	this.collidable = false;
+	// TODO: This needs the right explosion sprite.
+	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 56, y: 136}, [{x: 0, y: 0}, {x: 64, y: 0}]);
 };
 
 
@@ -477,4 +532,40 @@ export function Wall(x, y) {
 	this.y = Math.floor(y - this.h/2);
 }
 
-// TODO: Would be cool, if the walls that are shot down not only disappear, but fall down in a kind of parabola.
+
+/**
+ * `Wall.update` moves the wall, respecting boundaries.
+ * @param {number} dt - The time delta since last update in seconds
+ * @param {Bounds} bounds - Hard boundaries for the wall piece
+ */
+Wall.prototype.update = function(dt, bounds) {
+	// TODO: Might be cool, if the block could rotate :)
+
+	// As long as the block is collidable, it does not move, so no update is needed
+	if(this.collidable) {
+		return;
+	};
+
+	this.x += dt * this.speed.x;
+	this.y += dt * this.speed.y;
+
+	// Accelerate towards the bottom
+	this.speed.y += dt * this.gravity;
+
+	if(		this.x + this.w < bounds.left ||
+			this.x > bounds.right ||
+			this.y > bounds.bottom) {
+		this.active = false;
+	}
+};
+
+
+/**
+ * `Wall.kill` "kills" the wall. It flies out of the screen in a kind of
+ * parabola.
+ */
+Wall.prototype.kill = function() {
+	this.speed.x = Math.random() * 60 - 30;  // [-30 ..  +30]
+	this.speed.y = Math.random() * 200;      // [  0 .. +200]
+	this.collidable = false;
+};

@@ -250,60 +250,80 @@ Engine.prototype.update = function(dt) {
 		goody.update(dt, this.outer_bounds);
 	}
 
-	// Remove bullets and goodies that left the screen
+	// Remove entities that are inactive. They may have either left the screen
+	// or their explosion is finished.
 	this.player_bullets = this.player_bullets.filter(bullet => bullet.active);
 	this.enemy_bullets = this.enemy_bullets.filter(bullet => bullet.active);
 	this.goodies = this.goodies.filter(goody => goody.active);
+	this.walls = this.walls.filter(wall => wall.active);
+	this.enemies = this.enemies.filter(enemy => enemy.active);
 
-	// TODO: I need to react differently upon hits to allow for explosions, goodies, ...
-
-	this.collide(this.player_bullets, this.enemy_bullets);
-	this.collide(this.player_bullets, this.enemies);
-	this.collide(this.enemy_bullets, this.players);
-	this.collide(this.player_bullets, this.walls);
-	this.collide(this.enemy_bullets, this.walls);
-	this.collide(this.goodies, this.players);
+	this.collide_bullets(this.player_bullets, this.enemy_bullets);
+	this.collide_bullets(this.player_bullets, this.enemies);
+	this.collide_bullets(this.enemy_bullets, this.players);
+	this.collide_bullets(this.player_bullets, this.walls);
+	this.collide_bullets(this.enemy_bullets, this.walls);
+	this.collide_goodies(this.goodies, this.players);
 };
 
 
-/**
- * `Engine.collide` compares all entities of the first list with all entities of
- * the second list and tests if they collide. If so, the elements are removed
- * from the arrays in place.
- * @param {Entity[]} bullets - The first array of entities. Bullets or Goodies
- * @param {Entity[]} others - The second array of entities. Bullets, Enemies, or Players
- */
-Engine.prototype.collide = function(bullets, others) {
-	const colliding_bullets = [];
-	const colliding_others = [];
+Engine.prototype.collide_all = function(a, b) {
+	const colliding = [];
 
-	for(let i = 0; i < bullets.length; i++) {
-		for(let j = 0; j < others.length; j++) {
-			const bullet = bullets[i];
-			const other = others[j];
-
-			if(this.collider(bullet, other)) {
-				colliding_bullets.push(i);
-				colliding_others.push(j);
-
-				if(bullet.object === 'goody' && other.object === 'player') {
-					this.apply_goody(bullet.type, other);
-				}
-
-				else if(bullet.owner >= 0) {
-					this.players[bullet.owner].score += other.score_value;
-				}
-
-				else if(other.object === 'player') {
-					this.kill(other);
-				}
+	for(let i = 0; i < a.length; i++) {
+		for(let j = 0; j < b.length; j++) {
+			if(this.collider(a[i], b[j])) {
+				colliding.push([i, j]);
 				break;
 			}
 		}
 	}
 
-	this.remove_multiple_elements(bullets, colliding_bullets);
-	this.remove_multiple_elements(others, colliding_others);
+	return colliding;
+};
+
+
+/**
+ * `Engine.collide_bullets` compares all bullets of the first list with all
+ * entities of the second list and tests if they collide. If so, depending on
+ * the target, effects happen.
+ * @param {Bullet[]} bullets - The first array of entities. Bullets or Goodies
+ * @param {Entity[]} others - The second array of entities. Bullets, Enemies, Players, or Walls
+ */
+Engine.prototype.collide_bullets = function(bullets, others) {
+	const colliding = this.collide_all(bullets, others);
+
+	for(let [a, b] of colliding) {
+		const bullet = bullets[a];
+		const other = others[b];
+
+		if(bullet.owner >= 0) {
+			this.players[bullet.owner].score += other.score_value;
+		}
+
+		// Initiate specific "killing" animation
+		other.kill();
+	}
+
+	this.remove_multiple_elements(bullets, colliding.map(x => x[0]));
+};
+
+
+/**
+ * `Engine.collide_goodies` compares all goodies of the first list with all
+ * players of the second list and tests if they collide. If so, the goody is
+ * applied on the player.
+ * @param {Goody[]} goodies - An array of goodies
+ * @param {Player[]} players - An array of players
+ */
+Engine.prototype.collide_goodies = function(goodies, players) {
+	const colliding = this.collide_all(goodies, players);
+
+	for(let [a, b] of colliding) {
+		this.apply_goody(goodies[a].type, players[b]);
+	}
+
+	this.remove_multiple_elements(goodies, colliding.map(x => x[0]));
 };
 
 
@@ -315,7 +335,7 @@ Engine.prototype.collide = function(bullets, others) {
  */
 Engine.prototype.collider = function(a, b) {
 	// TODO: If the bounding boxes hit, this might continue doing some kind of pixel-perfect detection.
-	return !(
+	return a.collidable && b. collidable && !(
 		a.x       > b.x + b.w ||
 		a.y       > b.y + b.h ||
 		a.x + a.w < b.x       ||
