@@ -307,7 +307,10 @@ Engine.prototype.collide_bullets = function(bullets, others) {
 		}
 
 		// Initiate specific "killing" animation
-		other.kill();
+		const goody = other.kill();
+		if(goody !== null) {
+			this.goodies.push(goody);
+		}
 	}
 
 	this.remove_multiple_elements(bullets, colliding.map(x => x[0]));

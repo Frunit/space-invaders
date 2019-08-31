@@ -74,7 +74,6 @@ export function Player(x, y, num) {
  * death status.
  */
 Player.prototype.reset = function() {
-	console.log('resetted');
 	this.w = 60;
 	this.h = 32;
 	this.speed.x = 96; // pixel per second
@@ -259,12 +258,15 @@ Player.prototype.make_double_laser = function() {
  * `Player.kill` kills the player. One lives is subtracted and an explosion
  * is shown. The player will be disabled for two seconds.
  */
-Player.prototype.kill = function() {
-	this.lives--;
-	this.off_time = 2;
-	this.cooldown = 2;
-	this.collidable = false;
-	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+Player.prototype.kill = function(force=false) {
+	if(!self.invulnerable) {
+		this.lives--;
+		this.off_time = 2;
+		this.cooldown = 2;
+		this.collidable = false;
+		this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+	}
+	return null;
 };
 
 
@@ -299,6 +301,7 @@ export function Enemy(x, y, type) {
 	this.object = 'enemy';
 	this.speed = {x: 64, y: 64}; // pixel per second
 	this.bullet_speed = {x: 0, y: 300}; // pixel per second
+	this.goody_speed = {x: 0, y: 64};
 
 	switch(type) {
 		case 0: {
@@ -406,6 +409,13 @@ Enemy.prototype.kill = function() {
 	this.speed.x = 0;
 	this.speed.y = 0;
 	this.sprite = new Sprite('sprites.png', {w: 52, h: 32}, 0, {x: 68, y: 68}, [{x: 0, y: 0}]);
+
+	if(Math.random() < 0.333) {
+		const type = Math.floor(Math.random() * 7); // Random number: one of [0 .. 6]
+		return new Goody(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.goody_speed, type);
+	}
+
+	return null;
 };
 
 
@@ -489,6 +499,8 @@ Bullet.prototype.kill = function() {
 	this.speed.y = 0;
 	this.collidable = false;
 	this.sprite = new Sprite('sprites.png', {w: 12, h: 24}, 500, {x: 172, y: 36}, [{x: 0, y: 0}]);
+
+	return null;
 };
 
 
@@ -514,14 +526,14 @@ export function Goody(x, y, speed, type) {
 	this.h = 22;
 	this.type = type;
 
-	if(type >= 0 && type < 6) {
+	if(type >= 0 && type <= 6) {
 		this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 260, y: 0}, [{x: 0, y: this.h*type}]);
 	}
 	else {
 		console.warn('Unknown Goody type received: ' + type);
 	}
 
-	this.speed.y = speed;
+	this.speed = speed;
 
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
@@ -536,7 +548,7 @@ export function Goody(x, y, speed, type) {
  */
 Goody.prototype.update = function(dt, bounds) {
 	this.sprite.update(dt);
-	this.y += dt * this.speed;
+	this.y += dt * this.speed.y;
 
 	if(this.y + this.h < bounds.top || this.y > bounds.bottom) {
 		this.active = false;
@@ -599,4 +611,6 @@ Wall.prototype.kill = function() {
 	this.speed.x = Math.random() * 120 - 60; // [ -60 ..  +60]
 	this.speed.y = Math.random() * -200;     // [-200 .. +200]
 	this.collidable = false;
+
+	return null;
 };
