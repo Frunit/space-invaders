@@ -93,7 +93,7 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	else {
 		// Create players
 		for(let i = 0; i < this.num_players; i++) {
-			this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom - 20));
+			this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom - 20, i));
 		}
 	}
 
@@ -203,18 +203,12 @@ Engine.prototype.handle_input = function(dt) {
  * @param {number} dt - The time delta since last update in seconds
  */
 Engine.prototype.update = function(dt) {
+	// TODO: need to test for game over and next level
 	for(let player of this.players) {
 		if(player.is_dead) {
 			continue;
 		}
 		player.update(dt);
-		if(player.off_time >= 0) {
-			player.off_time -= dt;
-			if(player.off_time < 0) {
-				player.resurrect();
-				this.test_game_over();
-			}
-		}
 	}
 
 	if(this.enemy_moves_down) {
@@ -238,6 +232,13 @@ Engine.prototype.update = function(dt) {
 		}
 	}
 
+	for(let enemy of this.enemies) {
+		const bullet = enemy.fire();
+		if(bullet !== null) {
+			this.enemy_bullets.push(bullet);
+		}
+	}
+
 	for(let bullet of this.enemy_bullets) {
 		bullet.update(dt, this.outer_bounds);
 	}
@@ -248,6 +249,10 @@ Engine.prototype.update = function(dt) {
 
 	for(let goody of this.goodies) {
 		goody.update(dt, this.outer_bounds);
+	}
+
+	for(let wall of this.walls) {
+		wall.update(dt, this.outer_bounds);
 	}
 
 	// Remove entities that are inactive. They may have either left the screen

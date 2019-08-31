@@ -34,8 +34,9 @@ function Entity() {
  * @constructor
  * @param {number} x - The initial x coordinate (from left) of the player pointing to its center
  * @param {number} y - The initial y coordinate (from top) of the player pointing to its center
+ * @param {number} num - The number of the player (should be 0 or 1)
  */
-export function Player(x, y) {
+export function Player(x, y, num) {
 	Entity.call(this);
 	this.object = 'player';
 	this.w = 60;
@@ -54,6 +55,7 @@ export function Player(x, y) {
 
 	this.score = 0;
 	this.lives = 3;
+	this.num = num;
 
 	this.max_cooldown = 1;
 	this.rapid_cooldown = 0.3;
@@ -72,6 +74,7 @@ export function Player(x, y) {
  * death status.
  */
 Player.prototype.reset = function() {
+	console.log('resetted');
 	this.w = 60;
 	this.h = 32;
 	this.speed.x = 96; // pixel per second
@@ -99,6 +102,8 @@ Player.prototype.reset = function() {
  * @returns {Bullet[]} A list of Bullet objects if the ship fired. The list is empty if the cooldown prevented firing.
  */
 Player.prototype.fire = function() {
+	// TODO: The cooldown should be ignored, if no bullet of the player is present anywhere.
+	// Still, an inactive player (hidden or dead) should not shoot!
 	if(this.cooldown) {
 		return [];
 	}
@@ -114,7 +119,7 @@ Player.prototype.fire = function() {
 				this.y + this.bullet_offset.y,
 				this.bullet_speed,
 				0,
-				0
+				this.num
 			)
 		);
 		bullets.push(
@@ -123,7 +128,7 @@ Player.prototype.fire = function() {
 				this.y + this.bullet_offset.y,
 				this.bullet_speed,
 				0,
-				0
+				this.num
 			)
 		);
 	}
@@ -134,10 +139,11 @@ Player.prototype.fire = function() {
 				this.y + this.bullet_offset.y,
 				this.bullet_speed,
 				0,
-				0
+				this.num
 			)
 		);
 	}
+
 	return bullets;
 };
 
@@ -176,8 +182,14 @@ Player.prototype.update = function(dt) {
 		}
 	}
 
+	debug(1, this.lives);
+	debug(2, this.off_time);
+
 	if(this.off_time >= 0) {
 		this.off_time -= dt;
+		if(this.off_time < 0) {
+			this.resurrect();
+		}
 	}
 
 	if(this.invulnerable) {
@@ -234,7 +246,6 @@ Player.prototype.make_invulnerable = function() {
 };
 
 
-// TODO: Need sprite for invulnerable + double laser (or need to combine sprites)
 /**
  * `Player.make_double_laser` gives the player a double laser for some seconds.
  */
@@ -264,7 +275,7 @@ Player.prototype.kill = function() {
  * so the explosion is shown in any case.
  */
 Player.prototype.resurrect = function() {
-	if(player.lives < 0) {
+	if(this.lives < 0) {
 		this.off_time = Infinity;
 		this.is_dead = true;
 		this.h = 0;
@@ -284,11 +295,10 @@ Player.prototype.resurrect = function() {
  * @param {number} type - The type of the enemy. Must be on of [0, 1, 2].
  */
 export function Enemy(x, y, type) {
-	// TODO: Enemies should shoot! Otherwise, the game might be a little bit too easy ;)
 	Entity.call(this);
 	this.object = 'enemy';
 	this.speed = {x: 64, y: 64}; // pixel per second
-	this.bullet_speed = 300; // pixel per second
+	this.bullet_speed = {x: 0, y: 300}; // pixel per second
 
 	switch(type) {
 		case 0: {
@@ -333,7 +343,7 @@ export function Enemy(x, y, type) {
  * @returns {Bullet|null} A Bullet object if the ship fired or null if the cooldown prevented firing.
  */
 Enemy.prototype.fire = function() {
-	if(this.cooldown) {
+	if(this.cooldown || Math.random() < 0.999) {
 		return null;
 	}
 
@@ -341,7 +351,7 @@ Enemy.prototype.fire = function() {
 
 	const type = Math.floor(Math.random() * 3) + 1; // Random number: one of [1, 2, 3]
 
-	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, type);
+	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, type, -1);
 };
 
 
@@ -412,7 +422,7 @@ export function Bullet(x, y, speed, type, owner=-1) {
 	Entity.call(this);
 	this.object = 'bullet';
 	this.owner = owner;
-	this.speed.y = speed;
+	this.speed = speed;
 
 	switch(type) {
 		case 0: {
@@ -456,7 +466,7 @@ export function Bullet(x, y, speed, type, owner=-1) {
  */
 Bullet.prototype.update = function(dt, bounds) {
 	this.sprite.update(dt);
-	this.y += dt * this.speed;
+	this.y += dt * this.speed.y;
 
 	if(this.off_time >= 0) {
 		this.off_time -= dt;
@@ -586,7 +596,7 @@ Wall.prototype.update = function(dt, bounds) {
  * parabola.
  */
 Wall.prototype.kill = function() {
-	this.speed.x = Math.random() * 60 - 30;  // [-30 ..  +30]
-	this.speed.y = Math.random() * 200;      // [  0 .. +200]
+	this.speed.x = Math.random() * 120 - 60; // [ -60 ..  +60]
+	this.speed.y = Math.random() * -200;     // [-200 .. +200]
 	this.collidable = false;
 };

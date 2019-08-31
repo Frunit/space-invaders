@@ -34,6 +34,7 @@ function GUI(target, expected_size) {
  * @private
  */
 GUI.prototype._set_canvas_size = function() {
+	// TODO: set_canvas_size does not seem to work!
 	const window_width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	const window_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
