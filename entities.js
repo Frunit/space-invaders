@@ -183,16 +183,16 @@ Player.prototype.update = function(dt) {
 	if(this.invulnerable) {
 		this.invulnerable -= dt;
 		if(this.invulnerable < 0) {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 			this.invulnerable = 0;
+			this.choose_sprite();
 		}
 	}
 
 	if(this.double_laser) {
 		this.double_laser -= dt;
 		if(this.double_laser < 0) {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 			this.double_laser = 0;
+			this.choose_sprite();
 		}
 	}
 
@@ -205,12 +205,32 @@ Player.prototype.update = function(dt) {
 };
 
 
+Player.prototype.choose_sprite = function() {
+	if(this.invulnerable) {
+		if(this.double_laser) {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 64, y: 140}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]);
+		}
+		else {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 64, y: 104}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]);
+		}
+	}
+	else {
+		if(this.double_laser) {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 140}, [{x: 0, y: 0}]);
+		}
+		else {
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
+		}
+	}
+};
+
+
 /**
  * `Player.make_invulnerable` makes the player invulnerable for some seconds.
  */
 Player.prototype.make_invulnerable = function() {
 	this.invulnerable += 7;
-	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 64, y: 100}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+	this.choose_sprite();
 };
 
 
@@ -220,7 +240,7 @@ Player.prototype.make_invulnerable = function() {
  */
 Player.prototype.make_double_laser = function() {
 	this.double_laser += 7;
-	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 188, y: 136}, [{x: 0, y: 0}]);
+	this.choose_sprite();
 };
 
 
@@ -233,7 +253,7 @@ Player.prototype.kill = function() {
 	this.off_time = 2;
 	this.cooldown = 2;
 	this.collidable = false;
-	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 56, y: 136}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]);
 };
 
 
@@ -367,13 +387,15 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
  * `Enemy.kill` kills the enemy. It turns into an explosion for some seconds.
  */
 Enemy.prototype.kill = function() {
+	// All enemies have the same explosion, so they have to be moved to center the explosion
+	this.x += Math.floor(this.w/2 - 26);
+	this.w = 52;
 	this.off_time = 2;
 	this.cooldown = 2;
 	this.collidable = false;
 	this.speed.x = 0;
 	this.speed.y = 0;
-	// TODO: This needs the right explosion sprite.
-	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 56, y: 136}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+	this.sprite = new Sprite('sprites.png', {w: 52, h: 32}, 0, {x: 68, y: 68}, [{x: 0, y: 0}]);
 };
 
 
@@ -456,8 +478,7 @@ Bullet.prototype.kill = function() {
 	this.off_time = 2;
 	this.speed.y = 0;
 	this.collidable = false;
-	// TODO: This needs the right explosion sprite.
-	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 56, y: 136}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+	this.sprite = new Sprite('sprites.png', {w: 12, h: 24}, 500, {x: 172, y: 36}, [{x: 0, y: 0}]);
 };
 
 
