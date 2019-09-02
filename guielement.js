@@ -9,7 +9,7 @@ import {Sprite} from './sprite.js';
  * @constructor
  * @param {number} x - The x coordinate (from left) of the object pointing to its upper left corner
  * @param {number} y - The y coordinate (from top) of the object pointing to its upper left corner
- * @param {string} type - The type of the element. Currently, only 'life' is valid.
+ * @param {string} type - The type of the element. 'life' or 'selector'
  */
 function GUI_Element(x, y, type) {
 	switch(type) {
@@ -18,6 +18,12 @@ function GUI_Element(x, y, type) {
 			this.w = 16;
 			this.h = 16;
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 152, y: 36}, [{x: 0, y: 0}]);
+			break;
+		}
+		case 'selector': {
+			this.w = 60;
+			this.h = 32;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 			break;
 		}
 		default:

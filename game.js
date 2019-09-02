@@ -1,9 +1,11 @@
 'use strict';
 
 /*
- * Space Invaders is a game written in Javascript (ECMA 2015+) without any
- * frameworks for the it-talents.de competition September 2019 sponsored by
- * Airbus.
+ * Space Invaders is a game written by Mathias Bockwoldt in Javascript
+ * (ECMAScript 2018) without any frameworks for the it-talents.de competition
+ * September 2019 sponsored by Airbus.
+ *
+ * https://www.it-talents.de/foerderung/code-competition/airbus-code-competition-09-2019
  *
  * More information is given in the `readme.md`.
  */
@@ -26,7 +28,9 @@ else {
 }
 
 
-import { Engine } from './engine.js';
+import {Start} from './start.js';
+import {Engine} from './engine.js';
+import {Highscore} from './highscore.js';
 
 // Attention! No curly brackets. This uses the default export that is dependent
 // on whether this runs in a browser or not (for testing in node.js).
@@ -37,7 +41,7 @@ import Screen from './screen.js';
 
 /**
  * `Game` is the master object for the Space Invaders game. It manages timing,
- * the engine and the screen.
+ * the stages and the screen.
  * @constructor
  */
 function Game() {
@@ -78,7 +82,7 @@ function Game() {
 	this.last_fps = 0;
 	this.frames = 0;
 
-	this.engine = null;
+	this.stage = null;
 	this.screen = null;
 
 
@@ -124,16 +128,23 @@ Game.prototype.loop = function() {
 	const now = Date.now();
 	let dt = (now - this.last_time) / 1000;
 
+	// If the game was paused, the time delta will very long, so I'll pretend
+	// nothing happened.
 	if(dt > 0.5) {
 		dt = 0;
 	}
 
 	// Update the game and draw the newest state.
-	this.update(dt);
-	this.screen.render(this.engine.get_entities(), this.engine.get_texts());
+	const next_stage = this.update(dt);
+	this.screen.render(this.stage.get_entities(), this.stage.get_texts());
 	this.update_fps(now);
 
 	this.last_time = now;
+
+	// If the current stage has signalled finish, load the next stage.
+	if(next_stage !== null) {
+		this.next_stage(next_stage);
+	}
 
 	// Ask Javascript to call this function again when suitable.
 	// Advantage over a timeout is that it automatically pauses the game when
@@ -160,27 +171,62 @@ Game.prototype.update_fps = function(now) {
 
 /**
  * `Game.update` updates all aspects of the game.
- * Currently, it only updates the engine.
+ * Currently, it only updates the current stage.
  * @param {number} dt - The time delta since the last update in seconds
+ * @returns {Object|null} If the stage is finished, an object with information for the next stage is returned. Otherwise, null is returned.
  */
 Game.prototype.update = function(dt) {
-	this.engine.handle_input(dt);
-	this.engine.update(dt);
+	this.stage.handle_input(dt);
+
+	return this.stage.update(dt);
 };
 
 
 /**
- * `Game.start` starts the game. That is, it creates and setups the engine,
+ * `Game.start` starts the game. That is, it creates and setups the stage,
  * creates the screen, and starts the game loop.
  */
 Game.prototype.start = function() {
-	this.engine = new Engine(this.options.total_size, this.options.border, 1, this.levels);
-	this.engine.setup();
+	this.stage = new Engine(this.options.total_size, this.options.border, 1, this.levels);
+	this.stage.setup();
 
 	this.screen = new Screen('game', this.options.total_size);
 
 	this.last_time = Date.now();
 	this.loop();
+};
+
+
+/**
+ * `Game.next_stage` changes the stage to the given stage. It will try to use
+ * information given in the payload to initialize the new stage.
+ * @param {Object} payload - An object with stage-specific information.
+ * @param {string} payload.next_stage - The name of the stage to switch to (one of 'start', 'game', or 'highscore')
+ */
+Game.prototype.next_stage = function(payload) {
+	switch(payload.next_stage) {
+		case 'start': {
+			const num_players = num_players in payload ? payload.num_players : this.options.num_players;
+			this.stage = new Start(num_players);
+			break;
+		}
+		case 'game': {
+			const num_players = num_players in payload ? payload.num_players : this.options.num_players;
+			const start_level = start_level in payload ? payload.start_level : this.options.num_players;
+			this.stage = new Engine(this.options.total_size, this.options.border, num_players, this.levels, start_level);
+			break;
+		}
+		case 'highscore': {
+			const scores = scores in payload ? payload.scores : [];
+			const level = level in payload ? payload.level : 0;
+			this.stage = new Highscore(scores, level);
+			break;
+		}
+		default:
+			console.warn('Unknown next stage', payload.next_stage);
+	}
+
+	this.stage.setup();
 };
 
 

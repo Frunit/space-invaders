@@ -15,8 +15,9 @@ import {Text} from './text.js';
  * @param {number} window_border - The border width in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
  * @param {Level[]} levels - The available levels
+ * @param {number} level - The level to start at
  */
-function Engine(window_size, border, num_players, levels) {
+function Engine(window_size, border, num_players, levels, level) {
 	// These variables store all objects in the game.
 	this.enemies = [];
 	this.enemy_bullets = [];
@@ -33,8 +34,10 @@ function Engine(window_size, border, num_players, levels) {
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1;
 
+	this.game_is_over = false;
+
 	this.level_list = levels;
-	this.level = 0;
+	this.level = level;
 
 	this.num_players = num_players;
 
@@ -84,6 +87,8 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1 + recurrence * 0.33;
+
+	this.game_is_over = false;
 
 	// Players
 
@@ -230,14 +235,33 @@ Engine.prototype.handle_input = function(dt) {
 /**
  * `Engine.update` updates all objects in the game.
  * @param {number} dt - The time delta since last update in seconds
+ * @returns {Object|null} If the game is over, this returns an object with the next stage, score(s), and level. Otherwise, null is returned.
  */
 Engine.prototype.update = function(dt) {
-	// TODO: need to test for game over and next level
+	let living_players = 0;
 	for(let player of this.players) {
 		if(player.is_dead) {
 			continue;
 		}
+		living_players++;
 		player.update(dt);
+	}
+
+	if(living_players === 0) {
+		this.game_is_over = true;
+	}
+
+	if(this.game_is_over) {
+		const score = []
+		for(let player of this.players) {
+			score.push(player.score);
+		}
+
+		return {
+			next_stage: 'highscore',
+			scores: score,
+			level: this.level,
+		};
 	}
 
 	if(this.enemy_moves_down) {
@@ -303,6 +327,12 @@ Engine.prototype.update = function(dt) {
 	this.collide_bullets(this.player_bullets, this.walls);
 	this.collide_bullets(this.enemy_bullets, this.walls);
 	this.collide_goodies(this.goodies, this.players);
+
+	if(this.enemies.length === 0) {
+		this.next_level();
+	}
+
+	return null;
 };
 
 
@@ -447,29 +477,6 @@ Engine.prototype.apply_goody = function(type, player) {
  */
 Engine.prototype.start_break_out = function(player) {
 	// TODO: Add Break-out mode!
-};
-
-
-/**
- * `Engine.test_game_over` tests whether the game is over, i.e. all players are
- * dead. If so, Engine#game_over is invoked.
- */
-Engine.prototype.test_game_over = function() {
-	for(let player of this.players) {
-		if(!player.is_dead) {
-			return;
-		}
-	}
-
-	this.game_over();
-};
-
-
-/**
- * `Engine.game_over` does not do anything, yet. Shall later show high score.
- */
-Engine.prototype.game_over = function() {
-	// TODO: Do the game over! Show high score.
 };
 
 
