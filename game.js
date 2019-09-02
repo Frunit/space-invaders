@@ -50,6 +50,8 @@ function Game() {
 	this.options = {
 		total_size: {w: 900, h: 600},
 		border: 20,
+		num_players: 1,
+		start_level: 0,
 	};
 
 	// TODO: Load levels from levels.json!
@@ -187,7 +189,8 @@ Game.prototype.update = function(dt) {
  * creates the screen, and starts the game loop.
  */
 Game.prototype.start = function() {
-	this.stage = new Engine(this.options.total_size, this.options.border, 1, this.levels, 0);
+	//this.stage = new Engine(this.options.total_size, this.options.border, 1, this.levels, 0);
+	this.stage = new Start(this.options.total_size, 1);
 	this.stage.setup();
 
 	this.screen = new Screen('game', this.options.total_size);
@@ -212,7 +215,7 @@ Game.prototype.next_stage = function(payload) {
 		}
 		case 'game': {
 			const num_players = 'num_players' in payload ? payload.num_players : this.options.num_players;
-			const start_level = 'start_level' in payload ? payload.start_level : this.options.num_players;
+			const start_level = 'start_level' in payload ? payload.start_level : this.options.start_level;
 			this.stage = new Engine(this.options.total_size, this.options.border, num_players, this.levels, start_level);
 			break;
 		}

@@ -114,6 +114,7 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	}
 
 	// GUI
+	// TODO: Show lifes
 
 	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 30, 'life'));
 	const life_width = this.gui[this.gui.length - 1].w;
@@ -129,7 +130,7 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	}
 
 	this.texts.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
-	this.texts.push(new Text(String(this.level), (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
+	this.texts.push(new Text(String(this.level + 1), (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
 
 	// Level
 
@@ -220,14 +221,16 @@ Engine.prototype.handle_input = function(dt) {
 		}
 
 		if(input.is_down('SHIFT') ||
+				input.is_down('SPACE') ||
 				input.is_down('UP0')) {
 			const bullets = this.players[0].fire();
 			this.player_bullets.push(...bullets);
 		}
 
 		if(input.is_down('CTRL') ||
+				input.is_down('ENTER') ||
 				input.is_down('UP1')) {
-			const bullets = this.players[0].fire();
+			const bullets = this.players[1].fire();
 			this.player_bullets.push(...bullets);
 		}
 	}

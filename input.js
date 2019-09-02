@@ -76,6 +76,15 @@ Input.prototype.is_down = function(key) {
 };
 
 
+/**
+ * `Input.reset` resets are given key (i.e. marks it as "not pressed").
+ * @param {string} key - The key (or rather, its abstraction) to reset.
+ */
+Input.prototype.reset = function(key) {
+	this.pressed_keys[key] = false;
+};
+
+
 
 /**
  * `Fake_Input` tracks the relevant key presses of the user.

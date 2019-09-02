@@ -39,8 +39,8 @@ Start.prototype.setup = function() {
 	this.selector = new GUI_Element(300, 200, 'selector');
 	this.selector.y = 200 + this.selector.h * this.num_players;
 
-	this.texts.push(new Text('One player', 305 + this.selector.w, 200 + this.selector.h, Infinity));
-	this.texts.push(new Text('Two players', 305 + this.selector.w, 200 + this.selector.h * 2, Infinity));
+	this.texts.push(new Text('One player', 305 + this.selector.w, 224 + this.selector.h, Infinity));
+	this.texts.push(new Text('Two players', 305 + this.selector.w, 224 + this.selector.h * 2, Infinity));
 };
 
 
@@ -50,13 +50,19 @@ Start.prototype.setup = function() {
  */
 Start.prototype.handle_input = function(dt) {
 	if(input.is_down('UP0') || input.is_down('UP1')) {
+		input.reset('UP0');
+		input.reset('UP1');
 		this.select_next(-1);
 	}
 	else if(input.is_down('DOWN0') || input.is_down('DOWN1')) {
+		input.reset('DOWN0');
+		input.reset('DOWN1');
 		this.select_next(1);
 	}
 
 	if(input.is_down('SPACE') || input.is_down('ENTER')) {
+		input.reset('SPACE');
+		input.reset('ENTER');
 		this.finished = true;
 	}
 }

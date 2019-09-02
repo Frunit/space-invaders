@@ -502,6 +502,7 @@ Bullet.prototype.kill = function() {
 };
 
 
+// TODO: Goody-ideas: Faster movement
 /**
  * `Goody` is an object for a goody that is released by a killed enemy.
  * @constructor
