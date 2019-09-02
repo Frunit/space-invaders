@@ -155,7 +155,7 @@ Player.prototype.fire = function() {
 Player.prototype.move = function(direction, bounds) {
 	if(this.off_time >= 0) {
 		return;
-	};
+	}
 
 	this.x += direction * this.speed.x;
 
@@ -259,13 +259,14 @@ Player.prototype.make_double_laser = function() {
  * is shown. The player will be disabled for two seconds.
  */
 Player.prototype.kill = function(force=false) {
-	if(!self.invulnerable) {
+	if(!self.invulnerable || force) {
 		this.lives--;
 		this.off_time = 2;
 		this.cooldown = 2;
 		this.collidable = false;
 		this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]);
 	}
+
 	return null;
 };
 
@@ -587,7 +588,7 @@ Wall.prototype.update = function(dt, bounds) {
 	// As long as the block is collidable, it does not move, so no update is needed
 	if(this.collidable) {
 		return;
-	};
+	}
 
 	this.x += dt * this.speed.x;
 	this.y += dt * this.speed.y;

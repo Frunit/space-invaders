@@ -15,7 +15,7 @@
 // Depending on whether the browser or node.js is used, offer a different debug
 // function
 if(typeof window === 'undefined') {
-	const debug = function(num, message) {
+	global.debug = function(num, message) {
 		console.log(num, message);
 	};
 }
@@ -130,7 +130,7 @@ Game.prototype.loop = function() {
 
 	// Update the game and draw the newest state.
 	this.update(dt);
-	this.screen.render(this.engine.get_entities());
+	this.screen.render(this.engine.get_entities(), this.engine.get_texts());
 	this.update_fps(now);
 
 	this.last_time = now;

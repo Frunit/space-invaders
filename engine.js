@@ -1,6 +1,8 @@
 'use strict';
 
 import {Player, Enemy, Wall} from './entities.js';
+import {GUI_Element} from './guielement.js';
+import {Text} from './text.js';
 
 
 /**
@@ -22,6 +24,8 @@ function Engine(window_size, border, num_players, levels) {
 	this.player_bullets = [];
 	this.walls = [];
 	this.goodies = [];
+	this.gui = [];
+	this.texts = [];
 
 	// Some status variables that are valid for all enemies (since enemies move
 	// in a synchronized way.
@@ -61,7 +65,7 @@ Engine.prototype.next_level = function() {
 };
 
 
-// TODO: Engine.setup is too long. Especially level setup should be pur into another function
+// TODO: Engine.setup is too long. Especially level setup and GUI setup should be put into another function
 /**
  * `Engine.setup` initializes the game with the player and enemies.
  * @param {Level} level=null - The level to set up. If no level is given, the first level will be used.
@@ -74,20 +78,25 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	this.player_bullets = [];
 	this.walls = [];
 	this.goodies = [];
+	this.gui = [];
+	this.texts = [];
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1 + recurrence * 0.33;
 
+	// Players
+
 	if(fresh) {
 		this.players = [];
 	}
 
+	// TODO: Bounds calculation assumes that left bound is zero. This is not guaranteed!
 	if(this.players.length) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players[i].reset();
-			this.players[i] = (this.outer_bounds.right * (i+1))/(this.num_players + 1)
+			this.players[i].x = (this.outer_bounds.right * (i+1))/(this.num_players + 1);
 		}
 	}
 	else {
@@ -96,6 +105,26 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 			this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom - 20, i));
 		}
 	}
+
+	// GUI
+
+	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 5, 'life'));
+	const life_width = this.gui[this.gui.length - 1].w;
+
+	this.texts.push(new Text('', this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 5, Infinity));
+	this.texts[this.texts.length-1].set_score(this.players[0].score);
+
+	if(this.num_players === 2) {
+		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 5, 'life'));
+
+		this.texts.push(new Text('', this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 5, Infinity, 'right'));
+		this.texts[this.texts.length-1].set_score(this.players[1].score);
+	}
+
+	this.texts.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 5, Infinity, 'right'));
+	this.texts.push(new Text(String(this.level), (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 5, Infinity));
+
+	// Level
 
 	if(level === null) {
 		level = this.level_list[0];
@@ -255,6 +284,10 @@ Engine.prototype.update = function(dt) {
 		wall.update(dt, this.outer_bounds);
 	}
 
+	for(let text of this.texts) {
+		text.update(dt);
+	}
+
 	// Remove entities that are inactive. They may have either left the screen
 	// or their explosion is finished.
 	this.player_bullets = this.player_bullets.filter(bullet => bullet.active);
@@ -262,6 +295,7 @@ Engine.prototype.update = function(dt) {
 	this.goodies = this.goodies.filter(goody => goody.active);
 	this.walls = this.walls.filter(wall => wall.active);
 	this.enemies = this.enemies.filter(enemy => enemy.active);
+	this.texts = this.texts.filter(text => text.active);
 
 	this.collide_bullets(this.player_bullets, this.enemy_bullets);
 	this.collide_bullets(this.player_bullets, this.enemies);
@@ -441,10 +475,20 @@ Engine.prototype.game_over = function() {
 
 /**
  * `Engine.get_entities` returns all entities in the game for the screen to draw.
- * @returns {Entity[]} An array with all entities (players, enemies, bullets)
+ * @returns {Entity[]} An array with all entities (players, enemies, ...)
  */
 Engine.prototype.get_entities = function() {
-	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets, this.walls, this.goodies);
+	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets, this.walls, this.goodies, this.gui);
+};
+
+
+/**
+ * `Engine.get_texts` returns all text elements in the game for the screen to
+ * draw.
+ * @returns {Text[]} An array with all text elements
+ */
+Engine.prototype.get_texts = function() {
+	return this.texts;
 };
 
 

@@ -65,7 +65,7 @@ Screen.prototype._set_canvas_size = function() {
  * @param {Object[]} entities - An array of entities to be drawn/rendered on screen
  * @param {Sprite} entities[].sprite - The sprite of the entity to render
  */
-Screen.prototype.render = function(entities) {
+Screen.prototype.render = function(entities, texts) {
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	for(let entity of entities) {
 		const params = entity.sprite.render();
@@ -75,6 +75,15 @@ Screen.prototype.render = function(entities) {
 			params.w, params.h,
 			entity.x * this.scale, entity.y * this.scale,
 			params.w * this.scale, params.h * this.scale);
+	}
+
+	for(let text of texts) {
+		this.ctx.save();
+		this.ctx.font = `${text.size} ${text.family}`;
+		this.ctx.textAlign = text.alignment;
+		this.ctx.fillStyle = text.color;
+		this.ctx.fillText(text.text, text.x, text.y);
+		this.ctx.restore();
 	}
 };
 
