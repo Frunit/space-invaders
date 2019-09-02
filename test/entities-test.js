@@ -47,9 +47,10 @@ QUnit.test('Player reset functionality', function(assert) {
 	player2.make_invulnerable();
 	player2.fire();
 	player2.update(0.75);
-	player2.kill();
+	player2.kill(); // This should not have an effect, since the player is invulnerable
+	player2.kill(true); // This should kill it anyway
 	player2.update(4.123);
-	player2.lives++;
+	player2.lives++; // This weighs one kill. If the not-forced kill works, deepEqual will be false
 
 	player2.reset();
 
@@ -62,17 +63,9 @@ QUnit.test('Player properties after some time', function(assert) {
 	const player2 = new Player(100, 100);
 
 	player.update(0.5);
+	player.sprite.idx = 0; // The sprite index changes. This is taken care of here.
 
-	// Sprite will change since its also updated. So I have to use this
-	// rather complicated setup to test all *other* properties.
-	for(let prop in player) {
-		if(typeof player[prop] !== 'object') {
-			assert.equal(player[prop], player2[prop], prop);
-		}
-		else if(prop !== 'sprite') {
-			assert.deepEqual(player[prop], player2[prop], prop);
-		}
-	}
+	assert.deepEqual(player, player2);
 });
 
 

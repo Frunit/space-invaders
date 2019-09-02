@@ -181,9 +181,6 @@ Player.prototype.update = function(dt) {
 		}
 	}
 
-	debug(1, this.lives);
-	debug(2, this.off_time);
-
 	if(this.off_time >= 0) {
 		this.off_time -= dt;
 		if(this.off_time < 0) {
@@ -259,7 +256,7 @@ Player.prototype.make_double_laser = function() {
  * is shown. The player will be disabled for two seconds.
  */
 Player.prototype.kill = function(force=false) {
-	if(!self.invulnerable || force) {
+	if(!this.invulnerable || force) {
 		this.lives--;
 		this.off_time = 2;
 		this.cooldown = 2;
