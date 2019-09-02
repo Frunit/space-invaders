@@ -15,7 +15,7 @@
  * @param {number} size=12 - The font size
  * @param {string} family='monospace' - The font family
  */
-function Text(text, x, y, duration, alignment='left', color='#000000', size=12, family='monospace') {
+function Text(text, x, y, duration, alignment='left', color='#000000', size=24, family='monospace') {
 	this.text = text;
 	this.x = x;
 	this.y = y;

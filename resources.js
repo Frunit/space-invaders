@@ -74,11 +74,14 @@ Resources.prototype._load = function(url) {
 				img.src = url;
 				break;
 			}
-			case 'ttf': {
+			case 'ttf':
+			case 'woff':
+			case 'woff2': {
 				// The name is the base name,
 				// ./path/to/myfont.ttf -> myfont
 				let name = url.split('/').pop(); // remove path
 				name = name.replace(/\.[^.]+$/, ''); // remove extension
+				console.log(name, url);
 				const font = new FontFace(name, url);
 				font.load().then(
 					function(f) {

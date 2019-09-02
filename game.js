@@ -187,7 +187,7 @@ Game.prototype.update = function(dt) {
  * creates the screen, and starts the game loop.
  */
 Game.prototype.start = function() {
-	this.stage = new Engine(this.options.total_size, this.options.border, 1, this.levels);
+	this.stage = new Engine(this.options.total_size, this.options.border, 1, this.levels, 0);
 	this.stage.setup();
 
 	this.screen = new Screen('game', this.options.total_size);
@@ -206,19 +206,19 @@ Game.prototype.start = function() {
 Game.prototype.next_stage = function(payload) {
 	switch(payload.next_stage) {
 		case 'start': {
-			const num_players = num_players in payload ? payload.num_players : this.options.num_players;
+			const num_players = 'num_players' in payload ? payload.num_players : this.options.num_players;
 			this.stage = new Start(num_players);
 			break;
 		}
 		case 'game': {
-			const num_players = num_players in payload ? payload.num_players : this.options.num_players;
-			const start_level = start_level in payload ? payload.start_level : this.options.num_players;
+			const num_players = 'num_players' in payload ? payload.num_players : this.options.num_players;
+			const start_level = 'start_level' in payload ? payload.start_level : this.options.num_players;
 			this.stage = new Engine(this.options.total_size, this.options.border, num_players, this.levels, start_level);
 			break;
 		}
 		case 'highscore': {
-			const scores = scores in payload ? payload.scores : [];
-			const level = level in payload ? payload.level : 0;
+			const scores = 'scores' in payload ? payload.scores : [];
+			const level = 'level' in payload ? payload.level : 0;
 			this.stage = new Highscore(scores, level);
 			break;
 		}

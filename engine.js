@@ -5,6 +5,8 @@ import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
 
 
+// TODO: Sometimes, bullet stay hanging around
+
 /**
  * `Engine` is the actual game engine. It *should* work without any screen,
  * making, it more easily testable.
@@ -113,21 +115,21 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 
 	// GUI
 
-	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 5, 'life'));
+	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 30, 'life'));
 	const life_width = this.gui[this.gui.length - 1].w;
 
-	this.texts.push(new Text('', this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 5, Infinity));
+	this.texts.push(new Text('', this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
 	this.texts[this.texts.length-1].set_score(this.players[0].score);
 
 	if(this.num_players === 2) {
-		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 5, 'life'));
+		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 30, 'life'));
 
-		this.texts.push(new Text('', this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 5, Infinity, 'right'));
+		this.texts.push(new Text('', this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
 		this.texts[this.texts.length-1].set_score(this.players[1].score);
 	}
 
-	this.texts.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 5, Infinity, 'right'));
-	this.texts.push(new Text(String(this.level), (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 5, Infinity));
+	this.texts.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
+	this.texts.push(new Text(String(this.level), (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
 
 	// Level
 
@@ -368,6 +370,8 @@ Engine.prototype.collide_bullets = function(bullets, others) {
 
 		if(bullet.owner >= 0) {
 			this.players[bullet.owner].score += other.score_value;
+			// TODO: This is very error-prone!!!
+			this.texts[bullet.owner].set_score(this.players[bullet.owner].score);
 		}
 
 		// Initiate specific "killing" animation
@@ -462,6 +466,7 @@ Engine.prototype.apply_goody = function(type, player) {
 		}
 		case 6: {
 			player.score += 500;
+			// TODO: Update score string
 			break;
 		}
 		default:

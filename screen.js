@@ -79,7 +79,7 @@ Screen.prototype.render = function(entities, texts) {
 
 	for(let text of texts) {
 		this.ctx.save();
-		this.ctx.font = `${text.size} ${text.family}`;
+		this.ctx.font = `${text.size}px ${text.family}`;
 		this.ctx.textAlign = text.alignment;
 		this.ctx.fillStyle = text.color;
 		this.ctx.fillText(text.text, text.x, text.y);
