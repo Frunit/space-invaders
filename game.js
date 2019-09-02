@@ -40,7 +40,7 @@ import Screen from './screen.js';
  * the engine and the screen.
  * @constructor
  */
-export function Game() {
+function Game() {
 
 	// TODO: The options and the version may be externalized using json or the like.
 	this.options = {
@@ -182,3 +182,6 @@ Game.prototype.start = function() {
 	this.last_time = Date.now();
 	this.loop();
 };
+
+
+export {Game};

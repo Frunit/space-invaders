@@ -14,7 +14,7 @@ import {Player, Enemy, Wall} from './entities.js';
  * @param {number} num_players - The number of players. Should be 1 or 2.
  * @param {Level[]} levels - The available levels
  */
-export function Engine(window_size, border, num_players, levels) {
+function Engine(window_size, border, num_players, levels) {
 	// These variables store all objects in the game.
 	this.enemies = [];
 	this.enemy_bullets = [];
@@ -455,3 +455,6 @@ Engine.prototype.get_entities = function() {
  * @property {number} left   - The leftmost pixel
  * @property {number} bottom - The lowermost pixel
  */
+
+
+export {Engine};

@@ -17,7 +17,7 @@
  * @param {number} [frames[].x=0] - The x coordinate (from left) in pixel
  * @param {number} [frames[].y=0] - The y coordinate (from top) in pixel
  */
-export function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}]) {
+function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}]) {
 	// add standard path to graphics file name
 	this.pic = resources.get('gfx/' + url);
 	this.offset = offset;
@@ -99,3 +99,6 @@ Sprite.prototype.render = function() {
 		h: this.size.h,
 	};
 };
+
+
+export {Sprite};

@@ -36,7 +36,7 @@ function Entity() {
  * @param {number} y - The initial y coordinate (from top) of the player pointing to its center
  * @param {number} num - The number of the player (should be 0 or 1)
  */
-export function Player(x, y, num) {
+function Player(x, y, num) {
 	Entity.call(this);
 	this.object = 'player';
 	this.w = 60;
@@ -296,7 +296,7 @@ Player.prototype.resurrect = function() {
  * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  * @param {number} type - The type of the enemy. Must be on of [0, 1, 2].
  */
-export function Enemy(x, y, type) {
+function Enemy(x, y, type) {
 	Entity.call(this);
 	this.object = 'enemy';
 	this.speed = {x: 64, y: 64}; // pixel per second
@@ -428,7 +428,7 @@ Enemy.prototype.kill = function() {
  * @param {number} type - The type of the bullet. 0 is the player's bullet, 1-3 are the enemy bullets.
  * @param {number} owner=-1 - The owner of the bullet. 0 or positive numbers refer to the respective player, negative numbers are enemy bullets (default).
  */
-export function Bullet(x, y, speed, type, owner=-1) {
+function Bullet(x, y, speed, type, owner=-1) {
 	Entity.call(this);
 	this.object = 'bullet';
 	this.owner = owner;
@@ -519,7 +519,7 @@ Bullet.prototype.kill = function() {
  * 		5. Rapid fire for n seconds
  * 		6. Bonus points to score
  */
-export function Goody(x, y, speed, type) {
+function Goody(x, y, speed, type) {
 	Entity.call(this);
 	this.object = 'goody';
 	this.w = 46;
@@ -562,7 +562,7 @@ Goody.prototype.update = function(dt, bounds) {
  * @param {number} x - The initial x coordinate (from left) of the object pointing to its center
  * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  */
-export function Wall(x, y) {
+function Wall(x, y) {
 	Entity.call(this);
 	this.object = 'wall';
 	this.w = 16;
@@ -614,3 +614,6 @@ Wall.prototype.kill = function() {
 
 	return null;
 };
+
+
+export {Player, Enemy, Bullet, Goody, Wall};
