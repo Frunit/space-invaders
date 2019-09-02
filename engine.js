@@ -4,8 +4,8 @@ import {Player, Enemy, Wall} from './entities.js';
 
 
 /**
- * `Engine` is the actual game engine. It *should* work without any gui, making
- * it more easily testable.
+ * `Engine` is the actual game engine. It *should* work without any screen,
+ * making, it more easily testable.
  * @constructor
  * @param {Object} window_size - The window size
  * @param {number} window_size.w - Width in pixels
@@ -440,7 +440,7 @@ Engine.prototype.game_over = function() {
 
 
 /**
- * `Engine.get_entities` returns all entities in the game for the gui to draw.
+ * `Engine.get_entities` returns all entities in the game for the screen to draw.
  * @returns {Entity[]} An array with all entities (players, enemies, bullets)
  */
 Engine.prototype.get_entities = function() {

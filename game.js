@@ -32,12 +32,12 @@ import { Engine } from './engine.js';
 // on whether this runs in a browser or not (for testing in node.js).
 import Resources from './resources.js';
 import Input from './input.js';
-import GUI from './gui.js';
+import Screen from './screen.js';
 
 
 /**
  * `Game` is the master object for the Space Invaders game. It manages timing,
- * the engine and the gui.
+ * the engine and the screen.
  * @constructor
  */
 export function Game() {
@@ -79,7 +79,7 @@ export function Game() {
 	this.frames = 0;
 
 	this.engine = null;
-	this.gui = null;
+	this.screen = null;
 
 
 	// The global object `input` takes care of key presses that are fed into it by
@@ -130,7 +130,7 @@ Game.prototype.loop = function() {
 
 	// Update the game and draw the newest state.
 	this.update(dt);
-	this.gui.render(this.engine.get_entities());
+	this.screen.render(this.engine.get_entities());
 	this.update_fps(now);
 
 	this.last_time = now;
@@ -171,13 +171,13 @@ Game.prototype.update = function(dt) {
 
 /**
  * `Game.start` starts the game. That is, it creates and setups the engine,
- * creates the gui, and starts the game loop.
+ * creates the screen, and starts the game loop.
  */
 Game.prototype.start = function() {
 	this.engine = new Engine(this.options.total_size, this.options.border, 1, this.levels);
 	this.engine.setup();
 
-	this.gui = new GUI('game', this.options.total_size);
+	this.screen = new Screen('game', this.options.total_size);
 
 	this.last_time = Date.now();
 	this.loop();

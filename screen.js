@@ -1,14 +1,14 @@
 'use strict';
 
 /**
- * `GUI` takes care of displaying all aspects of the game.
+ * `Screen` takes care of displaying all aspects of the game.
  * If the expected_size is too large, all renderings will be scaled down to fit
  * on the screen.
  * @constructor
  * @param {string} target - The id of the HTML element to which the canvas shall be attached to. Should normally refer to a <div>.
  * @param {Object} expected_size - The size of the game space and the expected canvas size.
  */
-function GUI(target, expected_size) {
+function Screen(target, expected_size) {
 	// Create the canvas
 	this.canvas = document.createElement('canvas');
 	this.ctx = this.canvas.getContext('2d');
@@ -28,12 +28,12 @@ function GUI(target, expected_size) {
 
 
 /**
- * `GUI._set_canvas_size` tries to fit the canvas onto screen with the expected
+ * `Screen._set_canvas_size` tries to fit the canvas onto screen with the expected
  * size. If the screen is too small, the canvas and all drawings will be scaled
  * down appropriatly to maximized the canvas size.
  * @private
  */
-GUI.prototype._set_canvas_size = function() {
+Screen.prototype._set_canvas_size = function() {
 	// TODO: set_canvas_size does not seem to work!
 	const window_width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	const window_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -61,11 +61,11 @@ GUI.prototype._set_canvas_size = function() {
 
 
 /**
- * `GUI.render` renders all entities on the screen.
+ * `Screen.render` renders all entities on the screen.
  * @param {Object[]} entities - An array of entities to be drawn/rendered on screen
  * @param {Sprite} entities[].sprite - The sprite of the entity to render
  */
-GUI.prototype.render = function(entities) {
+Screen.prototype.render = function(entities) {
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	for(let entity of entities) {
 		const params = entity.sprite.render();
@@ -80,25 +80,25 @@ GUI.prototype.render = function(entities) {
 
 
 /**
- * `Fake_GUI` pretends to take care of displaying all aspects of the game.
+ * `Fake_Screen` pretends to take care of displaying all aspects of the game.
  * @constructor
  * @param {HTMLElement} target - The HTML element to which the canvas shall be attached to. Should normally be a <div>.
  * @param {Object} expected_size - The size of the game space and the expected canvas size.
- * @param {number} scale=1 - The scale. As the fake GUI does not have access to the window object, the scale can be given directly for testing purposes.
+ * @param {number} scale=1 - The scale. As the fake Screen does not have access to the window object, the scale can be given directly for testing purposes.
  */
-function Fake_GUI(target, expected_size, scale=1) {
+function Fake_Screen(target, expected_size, scale=1) {
 	this.expected_size = expected_size;
 	this.scale = scale;
 }
 
 
 /**
- * `Fake_GUI.render` renders all entities on the screen.
+ * `Fake_Screen.render` renders all entities on the screen.
  * @param {Object[]} entities - An array of entities to be drawn/rendered on screen
  * @param {Sprite} entities[].sprite - The sprite of the entity to render
  * @returns {Array[]} Array of arrays with the parameters that would have been used for rendering.
  */
-Fake_GUI.prototype.render = function(entities) {
+Fake_Screen.prototype.render = function(entities) {
 	const render_elements = [];
 	for(let entity of entities) {
 		const params = entity.sprite.render();
@@ -114,7 +114,7 @@ Fake_GUI.prototype.render = function(entities) {
 };
 
 
-// This exports a different GUI depending on whether the script runs in a
+// This exports a different Screen depending on whether the script runs in a
 // browser or not. This is used for testing in node.js.
-const exported_class = typeof window === 'undefined' ? Fake_GUI : GUI;
+const exported_class = typeof window === 'undefined' ? Fake_Screen : Screen;
 export default exported_class;
