@@ -1,11 +1,15 @@
 'use strict';
 
 import {Player, Enemy, Wall} from './entities.js';
+import {GUI_Element} from './guielement.js';
+import {Text} from './text.js';
 
+
+// TODO: Sometimes, bullet stay hanging around
 
 /**
- * `Engine` is the actual game engine. It *should* work without any gui, making
- * it more easily testable.
+ * `Engine` is the actual game engine. It *should* work without any screen,
+ * making, it more easily testable.
  * @constructor
  * @param {Object} window_size - The window size
  * @param {number} window_size.w - Width in pixels
@@ -13,8 +17,9 @@ import {Player, Enemy, Wall} from './entities.js';
  * @param {number} window_border - The border width in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
  * @param {Level[]} levels - The available levels
+ * @param {number} level - The level to start at
  */
-export function Engine(window_size, border, num_players, levels) {
+function Engine(window_size, border, num_players, levels, level) {
 	// These variables store all objects in the game.
 	this.enemies = [];
 	this.enemy_bullets = [];
@@ -22,6 +27,8 @@ export function Engine(window_size, border, num_players, levels) {
 	this.player_bullets = [];
 	this.walls = [];
 	this.goodies = [];
+	this.gui = [];
+	this.texts = [];
 
 	// Some status variables that are valid for all enemies (since enemies move
 	// in a synchronized way.
@@ -29,8 +36,10 @@ export function Engine(window_size, border, num_players, levels) {
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1;
 
+	this.game_is_over = false;
+
 	this.level_list = levels;
-	this.level = 0;
+	this.level = level;
 
 	this.num_players = num_players;
 
@@ -61,7 +70,7 @@ Engine.prototype.next_level = function() {
 };
 
 
-// TODO: Engine.setup is too long. Especially level setup should be pur into another function
+// TODO: Engine.setup is too long. Especially level setup and GUI setup should be put into another function
 /**
  * `Engine.setup` initializes the game with the player and enemies.
  * @param {Level} level=null - The level to set up. If no level is given, the first level will be used.
@@ -74,28 +83,56 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	this.player_bullets = [];
 	this.walls = [];
 	this.goodies = [];
+	this.gui = [];
+	this.texts = [];
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1 + recurrence * 0.33;
 
+	this.game_is_over = false;
+
+	// Players
+
 	if(fresh) {
 		this.players = [];
 	}
 
+	// TODO: Bounds calculation assumes that left bound is zero. This is not guaranteed!
 	if(this.players.length) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players[i].reset();
-			this.players[i] = (this.outer_bounds.right * (i+1))/(this.num_players + 1)
+			this.players[i].x = (this.outer_bounds.right * (i+1))/(this.num_players + 1);
 		}
 	}
 	else {
 		// Create players
 		for(let i = 0; i < this.num_players; i++) {
-			this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom - 20));
+			this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom - 20, i));
 		}
 	}
+
+	// GUI
+	// TODO: Show lifes
+
+	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 30, 'life'));
+	const life_width = this.gui[this.gui.length - 1].w;
+
+	this.texts.push(new Text('', this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
+	this.texts[this.texts.length-1].set_score(this.players[0].score);
+
+	if(this.num_players === 2) {
+		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 30, 'life'));
+
+		this.texts.push(new Text('', this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
+		this.texts[this.texts.length-1].set_score(this.players[1].score);
+	}
+
+	this.texts.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
+	this.texts.push(new Text(String(this.level + 1), (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
+
+	// Level
 
 	if(level === null) {
 		level = this.level_list[0];
@@ -184,14 +221,16 @@ Engine.prototype.handle_input = function(dt) {
 		}
 
 		if(input.is_down('SHIFT') ||
+				input.is_down('SPACE') ||
 				input.is_down('UP0')) {
 			const bullets = this.players[0].fire();
 			this.player_bullets.push(...bullets);
 		}
 
 		if(input.is_down('CTRL') ||
+				input.is_down('ENTER') ||
 				input.is_down('UP1')) {
-			const bullets = this.players[0].fire();
+			const bullets = this.players[1].fire();
 			this.player_bullets.push(...bullets);
 		}
 	}
@@ -201,20 +240,33 @@ Engine.prototype.handle_input = function(dt) {
 /**
  * `Engine.update` updates all objects in the game.
  * @param {number} dt - The time delta since last update in seconds
+ * @returns {Object|null} If the game is over, this returns an object with the next stage, score(s), and level. Otherwise, null is returned.
  */
 Engine.prototype.update = function(dt) {
+	let living_players = 0;
 	for(let player of this.players) {
 		if(player.is_dead) {
 			continue;
 		}
+		living_players++;
 		player.update(dt);
-		if(player.off_time >= 0) {
-			player.off_time -= dt;
-			if(player.off_time < 0) {
-				player.resurrect();
-				this.test_game_over();
-			}
+	}
+
+	if(living_players === 0) {
+		this.game_is_over = true;
+	}
+
+	if(this.game_is_over) {
+		const score = []
+		for(let player of this.players) {
+			score.push(player.score);
 		}
+
+		return {
+			next_stage: 'highscore',
+			scores: score,
+			level: this.level,
+		};
 	}
 
 	if(this.enemy_moves_down) {
@@ -238,6 +290,13 @@ Engine.prototype.update = function(dt) {
 		}
 	}
 
+	for(let enemy of this.enemies) {
+		const bullet = enemy.fire();
+		if(bullet !== null) {
+			this.enemy_bullets.push(bullet);
+		}
+	}
+
 	for(let bullet of this.enemy_bullets) {
 		bullet.update(dt, this.outer_bounds);
 	}
@@ -250,6 +309,14 @@ Engine.prototype.update = function(dt) {
 		goody.update(dt, this.outer_bounds);
 	}
 
+	for(let wall of this.walls) {
+		wall.update(dt, this.outer_bounds);
+	}
+
+	for(let text of this.texts) {
+		text.update(dt);
+	}
+
 	// Remove entities that are inactive. They may have either left the screen
 	// or their explosion is finished.
 	this.player_bullets = this.player_bullets.filter(bullet => bullet.active);
@@ -257,6 +324,7 @@ Engine.prototype.update = function(dt) {
 	this.goodies = this.goodies.filter(goody => goody.active);
 	this.walls = this.walls.filter(wall => wall.active);
 	this.enemies = this.enemies.filter(enemy => enemy.active);
+	this.texts = this.texts.filter(text => text.active);
 
 	this.collide_bullets(this.player_bullets, this.enemy_bullets);
 	this.collide_bullets(this.player_bullets, this.enemies);
@@ -264,6 +332,12 @@ Engine.prototype.update = function(dt) {
 	this.collide_bullets(this.player_bullets, this.walls);
 	this.collide_bullets(this.enemy_bullets, this.walls);
 	this.collide_goodies(this.goodies, this.players);
+
+	if(this.enemies.length === 0) {
+		this.next_level();
+	}
+
+	return null;
 };
 
 
@@ -299,10 +373,15 @@ Engine.prototype.collide_bullets = function(bullets, others) {
 
 		if(bullet.owner >= 0) {
 			this.players[bullet.owner].score += other.score_value;
+			// TODO: This is very error-prone!!!
+			this.texts[bullet.owner].set_score(this.players[bullet.owner].score);
 		}
 
 		// Initiate specific "killing" animation
-		other.kill();
+		const goody = other.kill();
+		if(goody !== null) {
+			this.goodies.push(goody);
+		}
 	}
 
 	this.remove_multiple_elements(bullets, colliding.map(x => x[0]));
@@ -390,6 +469,7 @@ Engine.prototype.apply_goody = function(type, player) {
 		}
 		case 6: {
 			player.score += 500;
+			// TODO: Update score string
 			break;
 		}
 		default:
@@ -409,34 +489,21 @@ Engine.prototype.start_break_out = function(player) {
 
 
 /**
- * `Engine.test_game_over` tests whether the game is over, i.e. all players are
- * dead. If so, Engine#game_over is invoked.
- */
-Engine.prototype.test_game_over = function() {
-	for(let player of this.players) {
-		if(!player.is_dead) {
-			return;
-		}
-	}
-
-	this.game_over();
-};
-
-
-/**
- * `Engine.game_over` does not do anything, yet. Shall later show high score.
- */
-Engine.prototype.game_over = function() {
-	// TODO: Do the game over! Show high score.
-};
-
-
-/**
- * `Engine.get_entities` returns all entities in the game for the gui to draw.
- * @returns {Entity[]} An array with all entities (players, enemies, bullets)
+ * `Engine.get_entities` returns all entities in the game for the screen to draw.
+ * @returns {Entity[]} An array with all entities (players, enemies, ...)
  */
 Engine.prototype.get_entities = function() {
-	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets, this.walls, this.goodies);
+	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets, this.walls, this.goodies, this.gui);
+};
+
+
+/**
+ * `Engine.get_texts` returns all text elements in the game for the screen to
+ * draw.
+ * @returns {Text[]} An array with all text elements
+ */
+Engine.prototype.get_texts = function() {
+	return this.texts;
 };
 
 
@@ -447,3 +514,6 @@ Engine.prototype.get_entities = function() {
  * @property {number} left   - The leftmost pixel
  * @property {number} bottom - The lowermost pixel
  */
+
+
+export {Engine};

@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - 12.4.0
+# command to install dependencies
+install:
+  - npm install --local qunit
+  - npm install --save esm
+# command to run tests
+script:
+  - node --require esm $(which qunit)

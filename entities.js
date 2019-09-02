@@ -34,8 +34,9 @@ function Entity() {
  * @constructor
  * @param {number} x - The initial x coordinate (from left) of the player pointing to its center
  * @param {number} y - The initial y coordinate (from top) of the player pointing to its center
+ * @param {number} num - The number of the player (should be 0 or 1)
  */
-export function Player(x, y) {
+function Player(x, y, num) {
 	Entity.call(this);
 	this.object = 'player';
 	this.w = 60;
@@ -54,6 +55,7 @@ export function Player(x, y) {
 
 	this.score = 0;
 	this.lives = 3;
+	this.num = num;
 
 	this.max_cooldown = 1;
 	this.rapid_cooldown = 0.3;
@@ -99,6 +101,8 @@ Player.prototype.reset = function() {
  * @returns {Bullet[]} A list of Bullet objects if the ship fired. The list is empty if the cooldown prevented firing.
  */
 Player.prototype.fire = function() {
+	// TODO: The cooldown should be ignored, if no bullet of the player is present anywhere.
+	// Still, an inactive player (hidden or dead) should not shoot!
 	if(this.cooldown) {
 		return [];
 	}
@@ -114,7 +118,7 @@ Player.prototype.fire = function() {
 				this.y + this.bullet_offset.y,
 				this.bullet_speed,
 				0,
-				0
+				this.num
 			)
 		);
 		bullets.push(
@@ -123,7 +127,7 @@ Player.prototype.fire = function() {
 				this.y + this.bullet_offset.y,
 				this.bullet_speed,
 				0,
-				0
+				this.num
 			)
 		);
 	}
@@ -134,10 +138,11 @@ Player.prototype.fire = function() {
 				this.y + this.bullet_offset.y,
 				this.bullet_speed,
 				0,
-				0
+				this.num
 			)
 		);
 	}
+
 	return bullets;
 };
 
@@ -150,7 +155,7 @@ Player.prototype.fire = function() {
 Player.prototype.move = function(direction, bounds) {
 	if(this.off_time >= 0) {
 		return;
-	};
+	}
 
 	this.x += direction * this.speed.x;
 
@@ -178,6 +183,9 @@ Player.prototype.update = function(dt) {
 
 	if(this.off_time >= 0) {
 		this.off_time -= dt;
+		if(this.off_time < 0) {
+			this.resurrect();
+		}
 	}
 
 	if(this.invulnerable) {
@@ -234,7 +242,6 @@ Player.prototype.make_invulnerable = function() {
 };
 
 
-// TODO: Need sprite for invulnerable + double laser (or need to combine sprites)
 /**
  * `Player.make_double_laser` gives the player a double laser for some seconds.
  */
@@ -248,12 +255,16 @@ Player.prototype.make_double_laser = function() {
  * `Player.kill` kills the player. One lives is subtracted and an explosion
  * is shown. The player will be disabled for two seconds.
  */
-Player.prototype.kill = function() {
-	this.lives--;
-	this.off_time = 2;
-	this.cooldown = 2;
-	this.collidable = false;
-	this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+Player.prototype.kill = function(force=false) {
+	if(!this.invulnerable || force) {
+		this.lives--;
+		this.off_time = 2;
+		this.cooldown = 2;
+		this.collidable = false;
+		this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+	}
+
+	return null;
 };
 
 
@@ -264,7 +275,7 @@ Player.prototype.kill = function() {
  * so the explosion is shown in any case.
  */
 Player.prototype.resurrect = function() {
-	if(player.lives < 0) {
+	if(this.lives < 0) {
 		this.off_time = Infinity;
 		this.is_dead = true;
 		this.h = 0;
@@ -283,12 +294,12 @@ Player.prototype.resurrect = function() {
  * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  * @param {number} type - The type of the enemy. Must be on of [0, 1, 2].
  */
-export function Enemy(x, y, type) {
-	// TODO: Enemies should shoot! Otherwise, the game might be a little bit too easy ;)
+function Enemy(x, y, type) {
 	Entity.call(this);
 	this.object = 'enemy';
 	this.speed = {x: 64, y: 64}; // pixel per second
-	this.bullet_speed = 300; // pixel per second
+	this.bullet_speed = {x: 0, y: 300}; // pixel per second
+	this.goody_speed = {x: 0, y: 64};
 
 	switch(type) {
 		case 0: {
@@ -333,7 +344,7 @@ export function Enemy(x, y, type) {
  * @returns {Bullet|null} A Bullet object if the ship fired or null if the cooldown prevented firing.
  */
 Enemy.prototype.fire = function() {
-	if(this.cooldown) {
+	if(this.cooldown || Math.random() < 0.999) {
 		return null;
 	}
 
@@ -341,7 +352,7 @@ Enemy.prototype.fire = function() {
 
 	const type = Math.floor(Math.random() * 3) + 1; // Random number: one of [1, 2, 3]
 
-	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, type);
+	return new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, type, -1);
 };
 
 
@@ -396,6 +407,13 @@ Enemy.prototype.kill = function() {
 	this.speed.x = 0;
 	this.speed.y = 0;
 	this.sprite = new Sprite('sprites.png', {w: 52, h: 32}, 0, {x: 68, y: 68}, [{x: 0, y: 0}]);
+
+	if(Math.random() < 0.333) {
+		const type = Math.floor(Math.random() * 7); // Random number: one of [0 .. 6]
+		return new Goody(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.goody_speed, type);
+	}
+
+	return null;
 };
 
 
@@ -408,11 +426,11 @@ Enemy.prototype.kill = function() {
  * @param {number} type - The type of the bullet. 0 is the player's bullet, 1-3 are the enemy bullets.
  * @param {number} owner=-1 - The owner of the bullet. 0 or positive numbers refer to the respective player, negative numbers are enemy bullets (default).
  */
-export function Bullet(x, y, speed, type, owner=-1) {
+function Bullet(x, y, speed, type, owner=-1) {
 	Entity.call(this);
 	this.object = 'bullet';
 	this.owner = owner;
-	this.speed.y = speed;
+	this.speed = speed;
 
 	switch(type) {
 		case 0: {
@@ -456,7 +474,7 @@ export function Bullet(x, y, speed, type, owner=-1) {
  */
 Bullet.prototype.update = function(dt, bounds) {
 	this.sprite.update(dt);
-	this.y += dt * this.speed;
+	this.y += dt * this.speed.y;
 
 	if(this.off_time >= 0) {
 		this.off_time -= dt;
@@ -479,9 +497,12 @@ Bullet.prototype.kill = function() {
 	this.speed.y = 0;
 	this.collidable = false;
 	this.sprite = new Sprite('sprites.png', {w: 12, h: 24}, 500, {x: 172, y: 36}, [{x: 0, y: 0}]);
+
+	return null;
 };
 
 
+// TODO: Goody-ideas: Faster movement
 /**
  * `Goody` is an object for a goody that is released by a killed enemy.
  * @constructor
@@ -497,21 +518,21 @@ Bullet.prototype.kill = function() {
  * 		5. Rapid fire for n seconds
  * 		6. Bonus points to score
  */
-export function Goody(x, y, speed, type) {
+function Goody(x, y, speed, type) {
 	Entity.call(this);
 	this.object = 'goody';
 	this.w = 46;
 	this.h = 22;
 	this.type = type;
 
-	if(type >= 0 && type < 6) {
+	if(type >= 0 && type <= 6) {
 		this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 260, y: 0}, [{x: 0, y: this.h*type}]);
 	}
 	else {
 		console.warn('Unknown Goody type received: ' + type);
 	}
 
-	this.speed.y = speed;
+	this.speed = speed;
 
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
@@ -526,7 +547,7 @@ export function Goody(x, y, speed, type) {
  */
 Goody.prototype.update = function(dt, bounds) {
 	this.sprite.update(dt);
-	this.y += dt * this.speed;
+	this.y += dt * this.speed.y;
 
 	if(this.y + this.h < bounds.top || this.y > bounds.bottom) {
 		this.active = false;
@@ -540,7 +561,7 @@ Goody.prototype.update = function(dt, bounds) {
  * @param {number} x - The initial x coordinate (from left) of the object pointing to its center
  * @param {number} y - The initial y coordinate (from top) of the object pointing to its center
  */
-export function Wall(x, y) {
+function Wall(x, y) {
 	Entity.call(this);
 	this.object = 'wall';
 	this.w = 16;
@@ -565,7 +586,7 @@ Wall.prototype.update = function(dt, bounds) {
 	// As long as the block is collidable, it does not move, so no update is needed
 	if(this.collidable) {
 		return;
-	};
+	}
 
 	this.x += dt * this.speed.x;
 	this.y += dt * this.speed.y;
@@ -586,7 +607,12 @@ Wall.prototype.update = function(dt, bounds) {
  * parabola.
  */
 Wall.prototype.kill = function() {
-	this.speed.x = Math.random() * 60 - 30;  // [-30 ..  +30]
-	this.speed.y = Math.random() * 200;      // [  0 .. +200]
+	this.speed.x = Math.random() * 120 - 60; // [ -60 ..  +60]
+	this.speed.y = Math.random() * -200;     // [-200 .. +200]
 	this.collidable = false;
+
+	return null;
 };
+
+
+export {Player, Enemy, Bullet, Goody, Wall};

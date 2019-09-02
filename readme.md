@@ -1,8 +1,8 @@
 Space Invaders
 ==============
 
-Space Invaders is a game written in Javascript (ECMAScript 2018) without any
-frameworks for the
+Space Invaders is a game written by Mathias Bockwoldt in Javascript
+(ECMAScript 2018) without any frameworks for the
 [it-talents.de competition September 2019](https://www.it-talents.de/foerderung/code-competition/airbus-code-competition-09-2019)
 sponsored by Airbus.
 
@@ -64,8 +64,8 @@ node -r esm $(which qunit)
 
 The last line is so quirky, because node does not understand ECMA 2016 `import`
 statement. These need to be loaded by the `esm` module and then, qunit must be
-started with `esm` active. Very annoying! Maybe it works out of the box in a few
-years.
+started with `esm` active. Very annoying! Maybe it will work out of the box in a
+few years.
 
 
 Programmatic organisation

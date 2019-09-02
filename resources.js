@@ -4,8 +4,9 @@
 
 
 /**
- * `Resources` keeps all resources needed in the game (currently only images).
- * It loads everything and calls the callback as soon as everything loaded.
+ * `Resources` keeps all resources needed in the game (currently images and
+ * fonts). It loads everything and calls the callback as soon as everything
+ * loaded.
  * @constructor
  */
 function Resources() {
@@ -17,7 +18,7 @@ function Resources() {
 
 
 /**
- * `Resources.load` loads all images given in the array of urls.
+ * `Resources.load` loads all files given in the array of urls.
  * @param {string[]} urls - The list of urls to load.
  */
 Resources.prototype.load = function load(urls) {
@@ -26,11 +27,11 @@ Resources.prototype.load = function load(urls) {
 
 
 /**
- * `Resources.get` returns the image object for the given url or `undefined` if
- * the image was never requested or `false` if the image was requested but did
- * not finish loading.
- * @param {string} url - The url of the image to get
- * @returns {Object|undefined|boolean} The image object or undefined or false (see description)
+ * `Resources.get` returns the object for the given url or `undefined` if
+ * the resource was never requested or `false` if the resource was requested but
+ * did not finish loading.
+ * @param {string} url - The url of the resource to get
+ * @returns {Object|undefined|boolean} The resource object or undefined or false (see description)
  */
 Resources.prototype.get = function(url) {
 	return this.resource_cache[url];
@@ -39,8 +40,8 @@ Resources.prototype.get = function(url) {
 
 /**
  * `Resources.on_ready` sets the callback function that shall be called when all
- * images were loaded.
- * @param {function} The function to be called when all images were loaded
+ * resources were loaded.
+ * @param {function} The function to be called when all resources were loaded
  */
 Resources.prototype.on_ready = function(func) {
 	this.ready_callback = func;
@@ -48,32 +49,60 @@ Resources.prototype.on_ready = function(func) {
 
 
 /**
- * `Resources._load` loads a given image.
- * If the loaded image was the last image in the list of images to be loaded,
- * the `ready_callback` is called
+ * `Resources._load` loads a given resource based on the url.
+ * If the loaded resource was the last resource in the list of resources to be
+ * loaded, the `ready_callback` is called.
  * @private
- * @param {string} url - The url of the image to load
+ * @param {string} url - The url of the resource to load
  */
 Resources.prototype._load = function(url) {
 	if(!this.resource_cache[url]) {
 		this.resource_cache[url] = false;
 		this.expected++;
-		const img = new Image();
-		img.onload = () => {
-			this.resource_cache[url] = img;
-			this.loaded++;
+		const ext = url.split('.').pop();
+		switch(ext) {
+			case 'png': {
+				const img = new Image();
+				img.onload = () => {
+					this.resource_cache[url] = img;
+					this.loaded++;
 
-			if(this._is_ready()) {
-				this.ready_callback();
+					if(this._is_ready()) {
+						this.ready_callback();
+					}
+				};
+				img.src = url;
+				break;
 			}
-		};
-		img.src = url;
+			case 'ttf':
+			case 'woff':
+			case 'woff2': {
+				// The name is the base name,
+				// ./path/to/myfont.ttf -> myfont
+				let name = url.split('/').pop(); // remove path
+				name = name.replace(/\.[^.]+$/, ''); // remove extension
+				console.log(name, url);
+				const font = new FontFace(name, url);
+				font.load().then(
+					function(f) {
+						document.fonts.add(f);
+						this.loaded++;
+
+						if(this._is_ready()) {
+							this.ready_callback();
+						}
+				});
+				break;
+			}
+			default:
+				console.warn('Unknown file type', url);
+		}
 	}
 };
 
 
 /**
- * `Resources._is_ready` checks whether all images were loaded.
+ * `Resources._is_ready` checks whether all resources were loaded.
  * @private
  * @returns {boolean} True if everything loaded, false if not
  */
@@ -94,7 +123,7 @@ function Fake_Resources() {
 
 
 /**
- * `Fake_Resources.load` "loads" all images given in the array of urls.
+ * `Fake_Resources.load` "loads" all resources given in the array of urls.
  * @param {string[]} urls - The list of urls to load.
  */
 Fake_Resources.prototype.load = function(urls) {
@@ -106,8 +135,8 @@ Fake_Resources.prototype.load = function(urls) {
 
 /**
  * `Fake_Resources.get` returns the string of the given url or `undefined` if
- * the image was never requested.
- * @param {string} url - The url of the image to get
+ * the resources was never requested.
+ * @param {string} url - The url of the resource to get
  * @returns {string|boolean} The url or false (see description)
  */
 Fake_Resources.prototype.get = function(url) {
@@ -117,8 +146,8 @@ Fake_Resources.prototype.get = function(url) {
 
 /**
  * `Fake_Resources.on_ready` sets the callback function that shall be called
- * when all images were "loaded".
- * @param {function} The function to be called when all images were "loaded"
+ * when all resources were "loaded".
+ * @param {function} The function to be called when all resources were "loaded"
  */
 Fake_Resources.prototype.on_ready = function(func) {
 	this.ready_callback = func;
