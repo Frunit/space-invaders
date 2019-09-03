@@ -1,12 +1,16 @@
 'use strict';
 
 /**
- * `Screen` takes care of displaying all aspects of the game.
+ * <tt>Screen</tt> takes care of displaying all aspects of the game.
  * If the expected_size is too large, all renderings will be scaled down to fit
  * on the screen.
+ *
  * @constructor
- * @param {string} target - The id of the HTML element to which the canvas shall be attached to. Should normally refer to a <div>.
- * @param {Object} expected_size - The size of the game space and the expected canvas size.
+ * @param {string} target
+ * 		The id of the HTML element to which the canvas shall be attached to.
+ * 		Should normally refer to a <div>.
+ * @param {object} expected_size
+ * 		The size of the game space and the expected canvas size.
  */
 function Screen(target, expected_size) {
 	// Create the canvas
@@ -28,9 +32,10 @@ function Screen(target, expected_size) {
 
 
 /**
- * `Screen._set_canvas_size` tries to fit the canvas onto screen with the expected
- * size. If the screen is too small, the canvas and all drawings will be scaled
- * down appropriatly to maximized the canvas size.
+ * <tt>Screen._set_canvas_size</tt> tries to fit the canvas onto screen with the
+ * expected size. If the screen is too small, the canvas and all drawings will
+ * be scaled down appropriatly to maximized the canvas size.
+ *
  * @private
  */
 Screen.prototype._set_canvas_size = function() {
@@ -61,9 +66,14 @@ Screen.prototype._set_canvas_size = function() {
 
 
 /**
- * `Screen.render` renders all entities on the screen.
- * @param {Object[]} entities - An array of entities to be drawn/rendered on screen
- * @param {Sprite} entities[].sprite - The sprite of the entity to render
+ * <tt>Screen.render</tt> renders all entities on the screen.
+ *
+ * @param {object[]} entities
+ * 		An array of entities to be drawn/rendered on screen
+ * @param {Sprite} entities[].sprite
+ * 		The sprite of the entity to render
+ * @param {Text[]} texts
+ * 		An array of <tt>Texts</tt> to be drawn on screen
  */
 Screen.prototype.render = function(entities, texts) {
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -89,11 +99,19 @@ Screen.prototype.render = function(entities, texts) {
 
 
 /**
- * `Fake_Screen` pretends to take care of displaying all aspects of the game.
+ * <tt>Fake_Screen</tt> pretends to take care of displaying all aspects of the
+ * game. It is meant for testing in a node environment, where no <tt>window</tt>
+ * object exists.
+ *
  * @constructor
- * @param {HTMLElement} target - The HTML element to which the canvas shall be attached to. Should normally be a <div>.
- * @param {Object} expected_size - The size of the game space and the expected canvas size.
- * @param {number} scale=1 - The scale. As the fake Screen does not have access to the window object, the scale can be given directly for testing purposes.
+ * @param {HTMLElement} target
+ * 		The HTML element to which the canvas shall be attached to. Should
+ * 		normally be a <div>.
+ * @param {object} expected_size
+ * 		The size of the game space and the expected canvas size.
+ * @param {number} [scale=1]
+ * 		The scale. As the fake Screen does not have access to the window object,
+ * 		the scale can be given directly for testing purposes.
  */
 function Fake_Screen(target, expected_size, scale=1) {
 	this.expected_size = expected_size;
@@ -102,10 +120,15 @@ function Fake_Screen(target, expected_size, scale=1) {
 
 
 /**
- * `Fake_Screen.render` renders all entities on the screen.
- * @param {Object[]} entities - An array of entities to be drawn/rendered on screen
- * @param {Sprite} entities[].sprite - The sprite of the entity to render
- * @returns {Array[]} Array of arrays with the parameters that would have been used for rendering.
+ * <tt>Fake_Screen.render</tt> renders all entities on the screen.
+ *
+ * @param {object[]} entities
+ * 		An array of entities to be drawn/rendered on screen
+ * @param {Sprite} entities[].sprite
+ * 		The sprite of the entity to render
+ * @returns {Array[]}
+ * 		Array of arrays with the parameters that would have been used for
+ * 		rendering.
  */
 Fake_Screen.prototype.render = function(entities) {
 	const render_elements = [];

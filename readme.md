@@ -6,7 +6,7 @@ Space Invaders is a game written by Mathias Bockwoldt in Javascript
 [it-talents.de competition September 2019](https://www.it-talents.de/foerderung/code-competition/airbus-code-competition-09-2019)
 sponsored by Airbus.
 
-A mostly up-to-date version can be played here: <https://www.frunit.de/si>
+A mostly up-to-date version can be played here: [frunit.de/si](https://www.frunit.de/si)
 
 
 Features

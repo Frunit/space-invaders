@@ -2,7 +2,8 @@
 
 
 /**
- * `Input` tracks the relevant key presses of the user.
+ * <tt>Input</tt> tracks the relevant key presses of the user.
+ *
  * @constructor
  */
 function Input() {
@@ -11,11 +12,15 @@ function Input() {
 
 
 /**
- * `Input.set_key` sets or unsets values depending on the key given by the event.
- * The values can represent multiple keys, for example, a key press on the left
- * arrow and on "a" will both set the value "LEFT".
- * @param {event} event - The keydown or keyup event
- * @param {boolean} status - If true, the value will be set, if false, the value will be unset.
+ * <tt>Input.set_key</tt> sets or unsets values depending on the key given by
+ * the event. The values can represent multiple keys, for example, a key press
+ * on the left arrow and on "a" will both set the value "LEFT".
+ *
+ * @param {event} event
+ * 		The keydown or keyup event
+ * @param {boolean} status
+ * 		If <tt>true</tt>, the value will be set, if <tt>false</tt>, the value
+ * 		will be unset.
  */
 Input.prototype.set_key = function(event, status) {
 	const code = event.code || event.key;
@@ -64,12 +69,16 @@ Input.prototype.set_key = function(event, status) {
 
 
 /**
- * `Input.is_down` returns whether a certain key was pressed.
+ * <tt>Input.is_down</tt> returns whether a certain key was pressed.
  * The given key must be an abstraction understood by this class. Currently,
  * these are:
  * - CTRL, SHIFT, SPACE, ENTER, ESCAPE, LEFT[01], RIGHT[01], UP[01], DOWN[01]
- * @param {string} key - The key (or rather, its abstraction) to ask for.
- * @returns {boolean|undefined} True if the key is currently pressed, false or undefined otherwise (undefined if it was never pressed)
+ *
+ * @param {string} key
+ * 		The key (or rather, its abstraction) to ask for.
+ * @returns {boolean|undefined}
+ * 		<tt>true</tt> if the key is currently pressed, <tt>false</tt> or
+ * 		<tt>undefined</tt> otherwise (<tt>undefined</tt> if it was never pressed)
  */
 Input.prototype.is_down = function(key) {
 	return this.pressed_keys[key];
@@ -77,7 +86,8 @@ Input.prototype.is_down = function(key) {
 
 
 /**
- * `Input.reset` resets are given key (i.e. marks it as "not pressed").
+ * <tt>Input.reset</tt> resets are given key (i.e. marks it as "not pressed").
+ *
  * @param {string} key - The key (or rather, its abstraction) to reset.
  */
 Input.prototype.reset = function(key) {
@@ -87,7 +97,10 @@ Input.prototype.reset = function(key) {
 
 
 /**
- * `Fake_Input` tracks the relevant key presses of the user.
+ * <tt>Fake_Input</tt> pretends to track the relevant key presses of the user.
+ * It is meant for testing in a node environment, where it is difficult to have
+ * key events.
+ *
  * @constructor
  */
 function Fake_Input() {
@@ -96,11 +109,15 @@ function Fake_Input() {
 
 
 /**
- * `Fake_Input.set_key` sets or unsets values depending on the key given.
+ * <tt>Fake_Input.set_key</tt> sets or unsets values depending on the key given.
  * The key must be one of:
  * - CTRL, SHIFT, SPACE, ENTER, ESCAPE, LEFT[01], RIGHT[01], UP[01], DOWN[01]
- * @param {string} key - The name of the key
- * @param {boolean} status - If true, the value will be set, if false, the value will be unset.
+ *
+ * @param {string} key
+ * 		The name of the key
+ * @param {boolean} status
+ * 		If <tt>true</tt>, the value will be set, if <tt>false</tt>, the value
+ * 		will be unset.
  */
 Fake_Input.prototype.set_key = function(key, status) {
 	this.pressed_keys[key] = status;
@@ -108,12 +125,16 @@ Fake_Input.prototype.set_key = function(key, status) {
 
 
 /**
- * `Fake_Input.is_down` returns whether a certain key was pressed.
+ * <tt>Fake_Input.is_down</tt> returns whether a certain key was pressed.
  * The given key must be an abstraction understood by this class. Currently,
  * these are:
  * - CTRL, SHIFT, SPACE, ENTER, ESCAPE, LEFT[01], RIGHT[01], UP[01], DOWN[01]
- * @param {string} key - The key (or rather, its abstraction) to ask for.
- * @returns {boolean|undefined} True if the key is currently pressed, false or undefined otherwise (undefined if it was never pressed)
+ *
+ * @param {string} key
+ * 		The key (or rather, its abstraction) to ask for.
+ * @returns {boolean|undefined}
+ * 		<tt>true</tt> if the key is currently pressed, <tt>false</tt> or
+ * 		<tt>undefined</tt> otherwise (<tt>undefined</tt> if it was never pressed)
  */
 Fake_Input.prototype.is_down = function(key) {
 	return this.pressed_keys[key];

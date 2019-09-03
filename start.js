@@ -5,9 +5,10 @@ import {Text} from './text.js';
 
 
 /**
- * `Start` is the start screen.
+ * <tt>Start</tt> is the start screen.
+ *
  * @constructor
- * @param {Object} window_size - The window size
+ * @param {object} window_size - The window size
  * @param {number} window_size.w - Width in pixels
  * @param {number} window_size.h - Height in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
@@ -23,7 +24,7 @@ function Start(window_size, num_players) {
 
 
 /**
- * `Start.setup` initializes the start screen.
+ * <tt>Start.setup</tt> initializes the start screen.
  */
 Start.prototype.setup = function() {
 	this.finished = false;
@@ -45,7 +46,9 @@ Start.prototype.setup = function() {
 
 
 /**
- * `Start.handle_input` handles input. (- sincerely, Captain Obvious :) )
+ * <tt>Start.handle_input</tt> handles input.
+ * (<i>- sincerely, Captain Obvious</i>)
+ *
  * @param {number} dt - The time delta since last update in seconds
  */
 Start.prototype.handle_input = function(dt) {
@@ -69,8 +72,11 @@ Start.prototype.handle_input = function(dt) {
 
 
 /**
- * `Start.update` checks if the next stage can be called.
+ * <tt>Start.update</tt> checks if the next stage can be called. If so, return
+ * an object for the next stage, otherwise return <tt>null</tt>.
+ *
  * @param {number} dt - The time delta since last update in seconds
+ * @returns {object|null} See description.
  */
 Start.prototype.update = function(dt) {
 	if(this.finished) {
@@ -86,8 +92,10 @@ Start.prototype.update = function(dt) {
 
 
 /**
- * `Start.select_next` Selects the next menu point.
- * @param {number} direction - If 1, select the next, if -1, select the previous item
+ * <tt>Start.select_next</tt> Selects the next menu point.
+ *
+ * @param {number} direction
+ * 		If 1, select the next, if -1, select the previous item
  */
 Start.prototype.select_next = function(direction) {
 	// I currently don't need the direction, but I'll keep it in the code in
@@ -100,8 +108,9 @@ Start.prototype.select_next = function(direction) {
 
 
 /**
- * `Start.get_entities` returns all entities for the screen to draw.
- * @returns {Object[]} An array with all entities
+ * <tt>Start.get_entities</tt> returns all entities for the screen to draw.
+ *
+ * @returns {object[]} An array with all entities
  */
 Start.prototype.get_entities = function() {
 	return [this.selector];
@@ -109,7 +118,8 @@ Start.prototype.get_entities = function() {
 
 
 /**
- * `Start.get_texts` returns all text elements for the screen to draw.
+ * <tt>Start.get_texts</tt> returns all text elements for the screen to draw.
+ *
  * @returns {Text[]} An array with all text elements
  */
 Start.prototype.get_texts = function() {

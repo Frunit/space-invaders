@@ -5,11 +5,17 @@ import {Sprite} from './sprite.js';
 
 
 /**
- * `GUI_Element` is an object for a gui element holding a sprite.
+ * <tt>GUI_Element</tt> is an object for a gui element holding a sprite.
+ *
  * @constructor
- * @param {number} x - The x coordinate (from left) of the object pointing to its upper left corner
- * @param {number} y - The y coordinate (from top) of the object pointing to its upper left corner
- * @param {string} type - The type of the element. 'life' or 'selector'
+ * @param {number} x
+ * 		The x coordinate (from left) of the object pointing to its upper left
+ * 		corner
+ * @param {number} y
+ * 		The y coordinate (from top) of the object pointing to its upper left
+ * 		corner
+ * @param {string} type
+ * 		The type of the element. 'life' or 'selector'
  */
 function GUI_Element(x, y, type) {
 	switch(type) {

@@ -8,13 +8,14 @@ import {Text} from './text.js';
 // TODO: Sometimes, bullet stay hanging around
 
 /**
- * `Engine` is the actual game engine. It *should* work without any screen,
- * making, it more easily testable.
+ * <tt>Engine</tt> is the actual game engine. It *should* work without any
+ * screen, making, it more easily testable.
+ *
  * @constructor
- * @param {Object} window_size - The window size
+ * @param {object} window_size - The window size
  * @param {number} window_size.w - Width in pixels
  * @param {number} window_size.h - Height in pixels
- * @param {number} window_border - The border width in pixels
+ * @param {number} border - The window border width in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
  * @param {Level[]} levels - The available levels
  * @param {number} level - The level to start at
@@ -60,7 +61,7 @@ function Engine(window_size, border, num_players, levels, level) {
 
 
 /**
- * `Engine.next_level` loads the next level.
+ * <tt>Engine.next_level</tt> loads the next level.
  */
 Engine.prototype.next_level = function() {
 	this.level++;
@@ -72,10 +73,16 @@ Engine.prototype.next_level = function() {
 
 // TODO: Engine.setup is too long. Especially level setup and GUI setup should be put into another function
 /**
- * `Engine.setup` initializes the game with the player and enemies.
- * @param {Level} level=null - The level to set up. If no level is given, the first level will be used.
- * @param {number} recurrence=0 - How often was this level played (0 for first time, 1 for second time, ...)
- * @param {boolean} fresh=false - If true, forces new player objects (instead of using the existing ones). If no player objects are present, they are created in any case.
+ * <tt>Engine.setup</tt> initializes the game with the player and enemies.
+ *
+ * @param {Level} [level=null]
+ * 		The level to set up. If no level is given, the first level will be used.
+ * @param {number} [recurrence=0]
+ * 		How often was this level played (0 for first time, 1 for second time, ...)
+ * @param {boolean} [fresh=false]
+ * 		If <tt>true</tt>, forces new player objects (instead of using the
+ * 		existing ones). If no player objects are present, they are created in
+ * 		any case.
  */
 Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	this.enemies = [];
@@ -182,7 +189,8 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 
 
 /**
- * `Engine.handle_input` handles player input.
+ * <tt>Engine.handle_input</tt> handles player input.
+ *
  * @param {number} dt - The time delta since last update in seconds
  */
 Engine.prototype.handle_input = function(dt) {
@@ -238,9 +246,13 @@ Engine.prototype.handle_input = function(dt) {
 
 
 /**
- * `Engine.update` updates all objects in the game.
- * @param {number} dt - The time delta since last update in seconds
- * @returns {Object|null} If the game is over, this returns an object with the next stage, score(s), and level. Otherwise, null is returned.
+ * <tt>Engine.update</tt> updates all objects in the game.
+ *
+ * @param {number} dt
+ * 		The time delta since last update in seconds
+ * @returns {object|null}
+ * 		If the game is over, this returns an object with the next stage,
+ * 		score(s), and level. Otherwise, <tt>null</tt> is returned.
  */
 Engine.prototype.update = function(dt) {
 	let living_players = 0;
@@ -358,11 +370,14 @@ Engine.prototype.collide_all = function(a, b) {
 
 
 /**
- * `Engine.collide_bullets` compares all bullets of the first list with all
- * entities of the second list and tests if they collide. If so, depending on
- * the target, effects happen.
- * @param {Bullet[]} bullets - The first array of entities. Bullets or Goodies
- * @param {Entity[]} others - The second array of entities. Bullets, Enemies, Players, or Walls
+ * <tt>Engine.collide_bullets</tt> compares all bullets of the first list with
+ * all entities of the second list and tests if they collide. If so, depending
+ * on the target, effects happen.
+ *
+ * @param {Bullet[]} bullets
+ * 		The first array of entities. Bullets or Goodies
+ * @param {Entity[]} others
+ * 		The second array of entities. Bullets, Enemies, Players, or Walls
  */
 Engine.prototype.collide_bullets = function(bullets, others) {
 	const colliding = this.collide_all(bullets, others);
@@ -389,9 +404,10 @@ Engine.prototype.collide_bullets = function(bullets, others) {
 
 
 /**
- * `Engine.collide_goodies` compares all goodies of the first list with all
- * players of the second list and tests if they collide. If so, the goody is
+ * <tt>Engine.collide_goodies</tt> compares all goodies of the first list with
+ * all players of the second list and tests if they collide. If so, the goody is
  * applied on the player.
+ *
  * @param {Goody[]} goodies - An array of goodies
  * @param {Player[]} players - An array of players
  */
@@ -407,7 +423,8 @@ Engine.prototype.collide_goodies = function(goodies, players) {
 
 
 /**
- * `Engine.collider` checks if the bounding boxes of a and b overlap.
+ * <tt>Engine.collider</tt> checks if the bounding boxes of a and b overlap.
+ *
  * @param {Entity} a - The first object
  * @param {Entity} b - The second object
  * @returns {boolean} Whether or not the bounding boxes overlap.
@@ -424,8 +441,10 @@ Engine.prototype.collider = function(a, b) {
 
 
 /**
- * `Engine.remove_multiple_elements` removes all elements from array with the
- * indices given in to_remove in place. to_remove must be sorted!
+ * <tt>Engine.remove_multiple_elements</tt> removes all elements from array with
+ * the indices given in <tt>to_remove</tt> in place. <tt>to_remove</tt> must be
+ * sorted!
+ *
  * @param {Array} array - The array to change
  * @param {number[]} to_remove - The list of indices to remove from array
  */
@@ -436,8 +455,9 @@ Engine.prototype.remove_multiple_elements = function(array, to_remove) {
 
 
 /**
- * `Engine.apply_goody` applies a goody to a player. Depending on the goody, the
- * player gets an advantage (or maybe also a disadvantage).
+ * <tt>Engine.apply_goody</tt> applies a goody to a player. Depending on the
+ * goody, the player gets an advantage (or maybe also a disadvantage).
+ *
  * @param {number} type - The type of the goody.
  * @param {Player} player - The player to apply the goody on.
  */
@@ -479,8 +499,9 @@ Engine.prototype.apply_goody = function(type, player) {
 
 
 /**
- * `Engine.start_break_out` puts a ball on the player's fighter that will start
- * right away upwards.
+ * <tt>Engine.start_break_out</tt> puts a ball on the player's fighter that will
+ * start right away upwards.
+ *
  * @param {Player} player - The player to place the ball on.
  */
 Engine.prototype.start_break_out = function(player) {
@@ -489,17 +510,25 @@ Engine.prototype.start_break_out = function(player) {
 
 
 /**
- * `Engine.get_entities` returns all entities in the game for the screen to draw.
+ * <tt>Engine.get_entities</tt> returns all entities in the game for the screen
+ * to draw.
+ *
  * @returns {Entity[]} An array with all entities (players, enemies, ...)
  */
 Engine.prototype.get_entities = function() {
-	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets, this.walls, this.goodies, this.gui);
+	return this.players.concat(
+		this.enemies,
+		this.enemy_bullets,
+		this.player_bullets,
+		this.walls, this.goodies,
+		this.gui);
 };
 
 
 /**
- * `Engine.get_texts` returns all text elements in the game for the screen to
- * draw.
+ * <tt>Engine.get_texts</tt> returns all text elements in the game for the
+ * screen to draw.
+ *
  * @returns {Text[]} An array with all text elements
  */
 Engine.prototype.get_texts = function() {
@@ -508,11 +537,22 @@ Engine.prototype.get_texts = function() {
 
 
 /**
- * @typedef {Object} Bounds
+ * @typedef {object} Bounds
  * @property {number} top    - The uppermost pixel
  * @property {number} right  - The rightmost pixel
  * @property {number} left   - The leftmost pixel
  * @property {number} bottom - The lowermost pixel
+ */
+
+
+/**
+ * @typedef {object} Level
+ * @property {string[]} fort
+ * 		Lines of a fort, where "X" is a Wall and "_" is empty.
+ * @property {number} forts
+ * 		Number of forts in the level
+ * @property {string[]} enemies
+ * 		Lines of enemies with numbers [0-2] representing the respective enemy
  */
 
 

@@ -7,7 +7,7 @@
  *
  * https://www.it-talents.de/foerderung/code-competition/airbus-code-competition-09-2019
  *
- * More information is given in the `readme.md`.
+ * More information is given in the <tt>readme.md</tt>.
  */
 
 // TODO: Implement special UFO on top that traverses the screen
@@ -40,8 +40,9 @@ import Screen from './screen.js';
 
 
 /**
- * `Game` is the master object for the Space Invaders game. It manages timing,
- * the stages and the screen.
+ * <tt>Game</tt> is the master object for the Space Invaders game. It manages
+ * timing, the stages and the screen.
+ *
  * @constructor
  */
 function Game() {
@@ -88,7 +89,7 @@ function Game() {
 	this.screen = null;
 
 
-	// The global object `input` takes care of key presses that are fed into it by
+	// The global object <tt>input</tt> takes care of key presses that are fed into it by
 	// keydown and keyup events.
 	// The global objects game and resources are defined last.
 	// Both are defined differently, depending on the context (browser vs. node.js)
@@ -119,7 +120,7 @@ function Game() {
 
 
 /**
- * `Game.loop` is the actual game loop. It lets itself being called by
+ * <tt>Game.loop</tt> is the actual game loop. It lets itself being called by
  * Javascript, updates the game, and renders it.
  * Currently, also the frames per second are shown for debug purposes.
  */
@@ -156,8 +157,9 @@ Game.prototype.loop = function() {
 
 
 /**
- * `Game.update_fps` is a debugging function to show the current frames per
- * second.
+ * <tt>Game.update_fps</tt> is a debugging function to show the current frames
+ * per second.
+ *
  * @param {number} now - The current Javascript timestamp (i.e. in milliseconds)
  */
 Game.prototype.update_fps = function(now) {
@@ -172,10 +174,14 @@ Game.prototype.update_fps = function(now) {
 
 
 /**
- * `Game.update` updates all aspects of the game.
+ * <tt>Game.update</tt> updates all aspects of the game.
  * Currently, it only updates the current stage.
- * @param {number} dt - The time delta since the last update in seconds
- * @returns {Object|null} If the stage is finished, an object with information for the next stage is returned. Otherwise, null is returned.
+ *
+ * @param {number} dt
+ * 		The time delta since the last update in seconds
+ * @returns {object|null}
+ * 		If the stage is finished, an object with information for the next stage
+ * 		is returned. Otherwise, <tt>null</tt> is returned.
  */
 Game.prototype.update = function(dt) {
 	this.stage.handle_input(dt);
@@ -185,7 +191,7 @@ Game.prototype.update = function(dt) {
 
 
 /**
- * `Game.start` starts the game. That is, it creates and setups the stage,
+ * <tt>Game.start</tt> starts the game. That is, it creates and setups the stage,
  * creates the screen, and starts the game loop.
  */
 Game.prototype.start = function() {
@@ -201,10 +207,13 @@ Game.prototype.start = function() {
 
 
 /**
- * `Game.next_stage` changes the stage to the given stage. It will try to use
- * information given in the payload to initialize the new stage.
- * @param {Object} payload - An object with stage-specific information.
- * @param {string} payload.next_stage - The name of the stage to switch to (one of 'start', 'game', or 'highscore')
+ * <tt>Game.next_stage</tt> changes the stage to the given stage. It will try to
+ * use information given in the payload to initialize the new stage.
+ *
+ * @param {object} payload
+ * 		An object with stage-specific information.
+ * @param {string} payload.next_stage
+ * 		The name of the stage to switch to (one of 'start', 'game', 'highscore')
  */
 Game.prototype.next_stage = function(payload) {
 	switch(payload.next_stage) {

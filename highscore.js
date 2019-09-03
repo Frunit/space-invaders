@@ -5,13 +5,19 @@ import {Text} from './text.js';
 
 
 /**
- * `Highscore` is the highscore screen.
+ * <tt>Highscore</tt> is the highscore screen.
+ *
  * @constructor
- * @param {Object} window_size - The window size
- * @param {number} window_size.w - Width in pixels
- * @param {number} window_size.h - Height in pixels
- * @param {number[]} scores - The final scores of the player(s). Should contain one or two numbers.
- * @param {number} level - The level that was reached
+ * @param {object} window_size
+ * 		The window size
+ * @param {number} window_size.w
+ * 		Width in pixels
+ * @param {number} window_size.h
+ * 		Height in pixels
+ * @param {number[]} scores
+ * 		The final scores of the player(s). Should contain one or two numbers.
+ * @param {number} level
+ * 		The level that was reached
  */
 function Highscore(window_size, scores, level) {
 	this.window_size = window_size;
@@ -26,7 +32,7 @@ function Highscore(window_size, scores, level) {
 
 
 /**
- * `Highscore.setup` initializes the highscore screen.
+ * <tt>Highscore.setup</tt> initializes the highscore screen.
  */
 Highscore.prototype.setup = function() {
 	this.finished = false;
@@ -35,7 +41,8 @@ Highscore.prototype.setup = function() {
 
 
 /**
- * `Highscore.handle_input` handles input.
+ * <tt>Highscore.handle_input</tt> handles input.
+ *
  * @param {number} dt - The time delta since last update in seconds
  */
 Highscore.prototype.handle_input = function(dt) {
@@ -46,8 +53,11 @@ Highscore.prototype.handle_input = function(dt) {
 
 
 /**
- * `Highscore.update` checks if the next stage can be called.
+ * <tt>Highscore.update</tt> checks if the next stage can be called. If so,
+ * return an object for the next stage, otherwise return <tt>null</tt>.
+ *
  * @param {number} dt - The time delta since last update in seconds
+ * @returns {object|null} See description.
  */
 Highscore.prototype.update = function(dt) {
 	if(this.finished) {
@@ -63,8 +73,9 @@ Highscore.prototype.update = function(dt) {
 
 
 /**
- * `Highscore.get_entities` returns all entities for the screen to draw.
- * @returns {Object[]} An array with all entities (players, enemies, ...)
+ * <tt>Highscore.get_entities</tt> returns all entities for the screen to draw.
+ *
+ * @returns {object[]} An array with all entities (players, enemies, ...)
  */
 Highscore.prototype.get_entities = function() {
 	return this.entities;
@@ -72,7 +83,8 @@ Highscore.prototype.get_entities = function() {
 
 
 /**
- * `Highscore.get_texts` returns all text elements for the screen to draw.
+ * <tt>Highscore.get_texts</tt> returns all text elements for the screen to draw.
+ *
  * @returns {Text[]} An array with all text elements
  */
 Highscore.prototype.get_texts = function() {
