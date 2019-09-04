@@ -304,8 +304,8 @@ Engine.prototype.update = function(dt) {
 
 	for(let enemy of this.enemies) {
 		const bullet = enemy.fire();
-		if(bullet !== null) {
-			this.enemy_bullets.push(bullet);
+		if(bullet !== []) {
+			this.enemy_bullets.push(bullet[0]);
 		}
 	}
 

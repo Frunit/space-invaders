@@ -4,6 +4,10 @@ import Resources from '../resources.js';
 import {Player, Bullet} from '../entities.js';
 
 
+// TODO: Missing test: Killing the player (cooldown, off_time, sprite)
+// TODO: Missing test: Sprite change upon goody pick-up
+
+
 // This allows the resources to 'load' the graphics and just then start the
 // tests. Otherwise, the tests would start automatically and a potential race
 // condition might occur.
@@ -18,7 +22,7 @@ resources.load([
 
 
 QUnit.test('initial Player properties', function(assert) {
-	const player = new Player(100, 100);
+	let player = new Player(100, 100, 0);
 	assert.strictEqual(player.w, 60, 'w');
 	assert.strictEqual(player.h, 32, 'h');
 	assert.strictEqual(player.x, 70, 'x');
@@ -29,12 +33,13 @@ QUnit.test('initial Player properties', function(assert) {
 	assert.deepEqual(player.bullet_speed, {x: 0, y: -300}, 'bullet_speed');
 	assert.strictEqual(player.score, 0, 'score');
 	assert.strictEqual(player.lives, 3, 'lives');
+	assert.strictEqual(player.num, 0, 'player number');
 });
 
 
 QUnit.test('Player reset functionality', function(assert) {
-	const player = new Player(100, 100);
-	const player2 = new Player(100, 100);
+	const player = new Player(100, 100, 0);
+	const player2 = new Player(100, 100, 0);
 
 	const bounds = {
 		left: 50,
@@ -59,8 +64,8 @@ QUnit.test('Player reset functionality', function(assert) {
 
 
 QUnit.test('Player properties after some time', function(assert) {
-	const player = new Player(100, 100);
-	const player2 = new Player(100, 100);
+	const player = new Player(100, 100, 0);
+	const player2 = new Player(100, 100, 0);
 
 	player.update(0.5);
 	player.sprite.idx = 0; // The sprite index changes. This is taken care of here.
@@ -70,8 +75,8 @@ QUnit.test('Player properties after some time', function(assert) {
 
 
 QUnit.test('Player movement and bounds', function(assert) {
-	const player = new Player(100, 100);
-	const player2 = new Player(100, 100);
+	const player = new Player(100, 100, 0);
+	const player2 = new Player(100, 100, 0);
 	const bounds = {
 		left: 50,
 		right: 850,
@@ -103,7 +108,7 @@ QUnit.test('Player movement and bounds', function(assert) {
 
 
 QUnit.test('Player initial position bounds', function(assert) {
-	const player = new Player(1000, 1000);
+	const player = new Player(1000, 1000, 1);
 	const bounds = {
 		left: 50,
 		right: 850,
@@ -111,6 +116,7 @@ QUnit.test('Player initial position bounds', function(assert) {
 		bottom: 550,
 	};
 
+	assert.strictEqual(player.num, 1, 'Player number');
 	assert.strictEqual(player.x, 970, 'Initial x');
 	assert.strictEqual(player.y, 984, 'Initial y');
 
@@ -124,13 +130,14 @@ QUnit.test('Player initial position bounds', function(assert) {
 
 
 QUnit.test('Player shooting', function(assert) {
-	const player = new Player(500, 300);
+	const player = new Player(500, 300, 0);
 	let bullets;
 
 	bullets = player.fire();
 	assert.strictEqual(bullets.length, 1, 'First shot');
 	assert.strictEqual(bullets[0].x, 500-2, 'Bullet x');
 	assert.strictEqual(bullets[0].y, 300-8-16, 'Bullet y');
+	assert.strictEqual(bullets[0].owner, 0, 'Bullet owner');
 
 	player.update(0.5);
 
@@ -166,6 +173,8 @@ QUnit.test('Player shooting', function(assert) {
 	assert.strictEqual(bullets.length, 2, 'Double shot');
 	assert.strictEqual(bullets[0].x, 500-2-20, 'Bullet 1 x');
 	assert.strictEqual(bullets[0].y, 300-8-16, 'Bullet 1 y');
+	assert.strictEqual(bullets[0].owner, 0, 'Bullet 1 owner');
 	assert.strictEqual(bullets[1].x, 500-2+20, 'Bullet 2 x');
 	assert.strictEqual(bullets[1].y, 300-8-16, 'Bullet 2 y');
+	assert.strictEqual(bullets[1].owner, 0, 'Bullet 2 owner');
 });
