@@ -253,20 +253,37 @@ Player.prototype.choose_sprite = function() {
 
 
 /**
- * <tt>Player.make_invulnerable</tt> makes the player invulnerable for some
+ * <tt>Player.apply_rapid_fire</tt> yields the player a higher firing rate for
+ * some seconds.
+ */
+Player.prototype.apply_rapid_fire = function() {
+	// If the rapid fire is new (not only prolonged), the cooldown is reduced to
+	// make the effect happen instantly.
+	if(this.rapid_fire === 0 && this.cooldown > this.rapid_cooldown) {
+		this.cooldown -= this.max_cooldown - this.rapid_cooldown;
+		if(this.cooldown < 0) {
+			this.cooldown = 0;
+		}
+	}
+	this.rapid_fire += 7;
+};
+
+
+/**
+ * <tt>Player.apply_invulnerability</tt> makes the player invulnerable for some
  * seconds.
  */
-Player.prototype.make_invulnerable = function() {
+Player.prototype.apply_invulnerability = function() {
 	this.invulnerable += 7;
 	this.choose_sprite();
 };
 
 
 /**
- * <tt>Player.make_double_laser</tt> gives the player a double laser for some
+ * <tt>Player.apply_double_laser</tt> gives the player a double laser for some
  * seconds.
  */
-Player.prototype.make_double_laser = function() {
+Player.prototype.apply_double_laser = function() {
 	this.double_laser += 7;
 	this.choose_sprite();
 };
@@ -358,7 +375,7 @@ function Enemy(x, y, type) {
 			console.warn('Unknown Enemy type received: ' + type);
 	}
 
-	this.bullet_offset = {x: this.w/2, y: 0};
+	this.bullet_offset = {x: this.w/2, y: this.h};
 
 	// Coordinates are generally measured from top left, not center.
 	this.x = Math.floor(x - this.w/2);

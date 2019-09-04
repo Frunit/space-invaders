@@ -472,7 +472,7 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		case 2: {
-			player.make_invulnerable();
+			player.apply_invulnerability();
 			break;
 		}
 		case 3: {
@@ -480,11 +480,11 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		case 4: {
-			player.make_double_laser();
+			player.apply_double_laser();
 			break;
 		}
 		case 5: {
-			player.rapid_fire += 7;
+			player.apply_rapid_fire();
 			break;
 		}
 		case 6: {
