@@ -104,7 +104,7 @@ Resources.prototype._load = function(url) {
 				break;
 			}
 			default:
-				console.warn('Unknown file type', url);
+				throw 'Unknown file type: ' + url;
 		}
 	}
 };

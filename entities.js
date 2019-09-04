@@ -372,7 +372,7 @@ function Enemy(x, y, type) {
 			break;
 		}
 		default:
-			console.warn('Unknown Enemy type received: ' + type);
+			throw 'Unknown Enemy type received: ' + type;
 	}
 
 	this.bullet_offset = {x: this.w/2, y: this.h};
@@ -531,7 +531,7 @@ function Bullet(x, y, speed, type, owner=-1) {
 			break;
 		}
 		default:
-			console.warn('Unknown Bullet type received: ' + type);
+			throw 'Unknown Bullet type received: ' + type;
 	}
 
 	this.x = Math.floor(x - this.w/2);
@@ -613,7 +613,7 @@ function Goody(x, y, speed, type) {
 		this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 260, y: 0}, [{x: 0, y: this.h*type}]);
 	}
 	else {
-		console.warn('Unknown Goody type received: ' + type);
+		throw 'Unknown Goody type received: ' + type;
 	}
 
 	this.speed = speed;

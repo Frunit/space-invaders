@@ -235,7 +235,7 @@ Game.prototype.next_stage = function(payload) {
 			break;
 		}
 		default:
-			console.warn('Unknown next stage', payload.next_stage);
+			throw 'Unknown next stage: ' + payload.next_stage;
 	}
 
 	this.stage.setup();

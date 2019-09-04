@@ -493,7 +493,7 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		default:
-			console.warn('Unknown Goody type received: ' + type);
+			throw 'Unknown Goody type received: ' + type;
 	}
 };
 

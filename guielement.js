@@ -33,7 +33,7 @@ function GUI_Element(x, y, type) {
 			break;
 		}
 		default:
-			console.warn('Unknown GUI_Element type', type);
+			throw 'Unknown GUI_Element type: ' + type;
 	}
 
 
