@@ -19,7 +19,7 @@
  * 		Text alignment (may be left, right, or center)
  * @param {string} [color='#000000']
  * 		Text color (may be any HTML color string)
- * @param {number} [size=12]
+ * @param {number} [size=24]
  * 		The font size
  * @param {string} [family='monospace']
  * 		The font family
@@ -56,10 +56,11 @@ Text.prototype.update = function(dt) {
  * <tt>Text.set_score</tt> is a conveniance function to format and set the
  * score. It turns the integer to a string and left-pads it with zeros.
  *
- * @param {number|string} score - The score to save
+ * @param {number|string} [score=0] - The score to save
+ * @param {number} [padding=6] - How many zeros to left-pad to the score
  */
-Text.prototype.set_score = function(score) {
-	this.text = String(score).padStart(6, '0');
+Text.prototype.set_score = function(score=0, padding=6) {
+	this.text = String(score).padStart(padding, '0');
 };
 
 

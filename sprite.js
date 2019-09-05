@@ -21,6 +21,11 @@
 function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}]) {
 	// add standard path to graphics file name
 	this.pic = resources.get('gfx/' + url);
+
+	if(typeof this.pic === 'undefined') {
+		throw 'URL not found: gfx/' + url;
+	}
+
 	this.offset = offset;
 	this.size = size;
 	this.delay = delay;
@@ -38,11 +43,14 @@ function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}]) 
  * @param {number} dt - The time delta since last update in seconds
  */
 Sprite.prototype.update = function(dt) {
-	this.delay_counter += dt;
+	if(this.delay) {
+		this.delay_counter += dt;
 
-	if(this.delay_counter >= this.delay) {
-		this.delay_counter = 0;
-		this.idx++;
+		if(this.delay_counter >= this.delay) {
+			this.idx += Math.floor(this.delay_counter / this.delay);
+			this.delay_counter %= this.delay;
+			this.fresh = true;
+		}
 	}
 };
 
@@ -74,7 +82,7 @@ Sprite.prototype.is_new_frame = function() {
 		return true;
 	}
 
-	return this.delay_counter === 0 && this.frames.length > 1;
+	return false;
 };
 
 

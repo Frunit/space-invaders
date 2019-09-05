@@ -21,8 +21,9 @@ resources.load([
 ]);
 
 
-QUnit.test('initial Player properties', function(assert) {
+QUnit.test('Player initial properties', function(assert) {
 	let player = new Player(100, 100, 0);
+	assert.strictEqual(player.object, 'player', 'object name');
 	assert.strictEqual(player.w, 60, 'w');
 	assert.strictEqual(player.h, 32, 'h');
 	assert.strictEqual(player.x, 70, 'x');

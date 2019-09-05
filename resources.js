@@ -125,7 +125,8 @@ Resources.prototype._is_ready = function() {
  * <tt>Fake_Resources</tt> pretends to load all needed resources.
  * It will call the callback as soon as everything is "loaded".
  * It is meant for testing in a node environment, where no <tt>Image</tt>
- * object exists.
+ * object exists. As opposed to the "real" Resources, it will *never* call the
+ * <tt>ready_callback</tt> set by Fake_Resources.on_ready .
  *
  * @constructor
  */

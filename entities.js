@@ -700,8 +700,8 @@ Wall.prototype.update = function(dt, bounds) {
  * @returns {null} To conform with the other <tt>kill</tt> functions.
  */
 Wall.prototype.kill = function() {
-	this.speed.x = Math.random() * 120 - 60; // [ -60 ..  +60]
-	this.speed.y = Math.random() * -200;     // [-200 .. +200]
+	this.speed.x = Math.random() * 120 - 60; // [ -60 .. +60]
+	this.speed.y = Math.random() * -200;     // [-200 ..   0]
 	this.collidable = false;
 
 	return null;

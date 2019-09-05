@@ -152,7 +152,10 @@ Game.prototype.loop = function() {
 	// Ask Javascript to call this function again when suitable.
 	// Advantage over a timeout is that it automatically pauses the game when
 	// the window is, for example, minimized.
-	requestAnimationFrame(() => this.loop());
+	// This will not work in nodejs!
+	if(typeof window !== 'undefined') {
+		requestAnimationFrame(() => this.loop());
+	}
 };
 
 

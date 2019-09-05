@@ -20,8 +20,9 @@ resources.load([
 ]);
 
 
-QUnit.test('initial Enemy properties', function(assert) {
+QUnit.test('Enemy initial properties', function(assert) {
 	let enemy = new Enemy(100, 100, 0);
+	assert.strictEqual(enemy.object, 'enemy', 'object name');
 	assert.strictEqual(enemy.w, 32, 'w');
 	assert.strictEqual(enemy.h, 32, 'h');
 	assert.strictEqual(enemy.x, 84, 'x');
@@ -32,6 +33,7 @@ QUnit.test('initial Enemy properties', function(assert) {
 	assert.strictEqual(enemy.score_value, 30, 'score_value');
 
 	enemy = new Enemy(100, 100, 1);
+	assert.strictEqual(enemy.object, 'enemy', 'object name');
 	assert.strictEqual(enemy.w, 44, 'w');
 	assert.strictEqual(enemy.h, 32, 'h');
 	assert.strictEqual(enemy.x, 78, 'x');
@@ -42,6 +44,7 @@ QUnit.test('initial Enemy properties', function(assert) {
 	assert.strictEqual(enemy.score_value, 20, 'score_value');
 
 	enemy = new Enemy(100, 100, 2);
+	assert.strictEqual(enemy.object, 'enemy', 'object name');
 	assert.strictEqual(enemy.w, 48, 'w');
 	assert.strictEqual(enemy.h, 32, 'h');
 	assert.strictEqual(enemy.x, 76, 'x');
@@ -51,7 +54,7 @@ QUnit.test('initial Enemy properties', function(assert) {
 	assert.deepEqual(enemy.bullet_speed, {x: 0, y: 300}, 'bullet_speed');
 	assert.strictEqual(enemy.score_value, 10, 'score_value');
 
-	assert.throws(() => {new Enemy(100, 100, 3);},'Should throw upon unknown enemy type');
+	assert.throws(() => {new Enemy(100, 100, 3);}, 'Should throw upon unknown enemy type');
 });
 
 
