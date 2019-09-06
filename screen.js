@@ -20,7 +20,6 @@ function Screen(target, expected_size) {
 
 	this.expected_size = expected_size;
 	this.scale = 1;
-	this.canvas_pos = null;
 	this._set_canvas_size();
 
 	// Disable the right-click context menu in the game
@@ -50,18 +49,19 @@ Screen.prototype._set_canvas_size = function() {
 
 	if(expected_aspect_ratio > window_aspect_ratio) {
 		if(window_width < this.expected_size.w) {
-			this.scale = this.expected_size.w / window_width;
+			this.scale = window_width / this.expected_size.w;
 		}
 	}
 	else {
 		if(window_height < this.expected_size.h) {
-			this.scale = this.expected_size.h / window_height;
+			this.scale = window_height / this.expected_size.h;
 		}
 	}
 
 	this.canvas.width = this.expected_size.w * this.scale;
 	this.canvas.height = this.expected_size.h * this.scale;
-	this.canvas_pos = this.canvas.getBoundingClientRect();
+
+	this.ctx.scale(this.scale, this.scale);
 };
 
 
