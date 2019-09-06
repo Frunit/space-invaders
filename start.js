@@ -19,7 +19,7 @@ function Start(window_size, num_players) {
 	this.finished = false;
 
 	this.selector = null;
-	this.texts = [];
+	this.texts = {};
 }
 
 
@@ -29,7 +29,7 @@ function Start(window_size, num_players) {
 Start.prototype.setup = function() {
 	this.finished = false;
 
-	this.texts = [];
+	this.texts = {fixed: []};
 
 	// TODO: Add some kind of logo or the like
 
@@ -40,8 +40,8 @@ Start.prototype.setup = function() {
 	this.selector = new GUI_Element(300, 200, 'selector');
 	this.selector.y = 200 + this.selector.h * this.num_players;
 
-	this.texts.push(new Text('One player', 305 + this.selector.w, 224 + this.selector.h, Infinity));
-	this.texts.push(new Text('Two players', 305 + this.selector.w, 224 + this.selector.h * 2, Infinity));
+	this.texts.fixed.push(new Text('One player', 305 + this.selector.w, 224 + this.selector.h, Infinity));
+	this.texts.fixed.push(new Text('Two players', 305 + this.selector.w, 224 + this.selector.h * 2, Infinity));
 };
 
 

@@ -83,17 +83,19 @@ Screen.prototype.render = function(entities, texts) {
 		this.ctx.drawImage(params.pic,
 			params.x, params.y,
 			params.w, params.h,
-			entity.x * this.scale, entity.y * this.scale,
-			params.w * this.scale, params.h * this.scale);
+			entity.x, entity.y,
+			params.w, params.h);
 	}
 
-	for(let text of texts) {
-		this.ctx.save();
-		this.ctx.font = `${text.size}px ${text.family}`;
-		this.ctx.textAlign = text.alignment;
-		this.ctx.fillStyle = text.color;
-		this.ctx.fillText(text.text, text.x, text.y);
-		this.ctx.restore();
+	for(let text_group of texts.values()) {
+		for(let text of text_group) {
+			this.ctx.save();
+			this.ctx.font = `${text.size}px ${text.family}`;
+			this.ctx.textAlign = text.alignment;
+			this.ctx.fillStyle = text.color;
+			this.ctx.fillText(text.text, text.x, text.y);
+			this.ctx.restore();
+		}
 	}
 };
 
@@ -126,20 +128,34 @@ function Fake_Screen(target, expected_size, scale=1) {
  * 		An array of entities to be drawn/rendered on screen
  * @param {Sprite} entities[].sprite
  * 		The sprite of the entity to render
+ * @param {Text[]} texts
+ * 		An array of <tt>Texts</tt> to be drawn on screen
  * @returns {Array[]}
  * 		Array of arrays with the parameters that would have been used for
  * 		rendering.
  */
-Fake_Screen.prototype.render = function(entities) {
+Fake_Screen.prototype.render = function(entities, texts) {
 	const render_elements = [];
 	for(let entity of entities) {
 		const params = entity.sprite.render();
 
-		render_elements.push([params.pic,
+		render_elements.push(['PIC',
+			params.pic,
 			params.x, params.y,
 			params.w, params.h,
-			entity.x * this.scale, entity.y * this.scale,
-			params.w * this.scale, params.h * this.scale]);
+			entity.x, entity.y,
+			params.w, params.h]);
+	}
+
+	for(let text_group of texts.values()) {
+		console.log(text_group);
+		for(let text of text_group) {
+			render_elements.push(['TEXT',
+				text.text,
+				text.x, text.y,
+				text.size, text.family,
+				text.alignment, text.color]);
+		}
 	}
 
 	return render_elements;

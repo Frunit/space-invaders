@@ -29,7 +29,7 @@ function Engine(window_size, border, num_players, levels, level) {
 	this.walls = [];
 	this.goodies = [];
 	this.gui = [];
-	this.texts = [];
+	this.texts = {};
 
 	// Some status variables that are valid for all enemies (since enemies move
 	// in a synchronized way.
@@ -91,7 +91,12 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	this.walls = [];
 	this.goodies = [];
 	this.gui = [];
-	this.texts = [];
+	this.texts = {
+		player_scores: [],
+		player_lives: [],
+		level: [],
+		floating: [],
+	};
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
@@ -106,6 +111,9 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	}
 
 	// TODO: Bounds calculation assumes that left bound is zero. This is not guaranteed!
+	// Possible solution (not tested!):
+	// x = (i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left;
+	// x = ((i+1) * this.outer_bounds.right - this.outer_bounds.left * (i + this.num_players + 2)) / (this.num_players + 1);
 	if(this.players.length) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
@@ -121,23 +129,30 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	}
 
 	// GUI
-	// TODO: Show lifes
 
 	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 30, 'life'));
 	const life_width = this.gui[this.gui.length - 1].w;
+	this.texts.player_lives.push(new Text(this.players[0].lives, this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
 
-	this.texts.push(new Text('', this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
-	this.texts[this.texts.length-1].set_score(this.players[0].score);
+	this.gui.push(new GUI_Element(this.outer_bounds.left + 95, this.outer_bounds.top + 30, 'score'));
+	const score_width = this.gui[this.gui.length - 1].w;
+
+	this.texts.player_scores.push(new Text('', this.outer_bounds.left + 100 + score_width, this.outer_bounds.top + 30, Infinity));
+	this.texts.player_scores[0].set_score(this.players[0].score);
 
 	if(this.num_players === 2) {
 		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 30, 'life'));
 
-		this.texts.push(new Text('', this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
+		this.texts.player_lives.push(new Text(this.players[1].lives, this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
+
+		this.gui.push(new GUI_Element(this.outer_bounds.right - 95, this.outer_bounds.top + 30, 'score'));
+
+		this.texts.push(new Text('', this.outer_bounds.right - 100 - score_width, this.outer_bounds.top + 30, Infinity, 'right'));
 		this.texts[this.texts.length-1].set_score(this.players[1].score);
 	}
 
-	this.texts.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
-	this.texts.push(new Text(String(this.level + 1), (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
+	this.texts.level.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
+	this.texts.level.push(new Text(this.level + 1, (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
 
 	// Level
 
@@ -388,14 +403,17 @@ Engine.prototype.collide_bullets = function(bullets, others) {
 
 		if(bullet.owner >= 0) {
 			this.players[bullet.owner].score += other.score_value;
-			// TODO: This is very error-prone!!!
-			this.texts[bullet.owner].set_score(this.players[bullet.owner].score);
+			this.texts.player_scores[bullet.owner].set_score(this.players[bullet.owner].score);
 		}
 
 		// Initiate specific "killing" animation
 		const goody = other.kill();
 		if(goody !== null) {
 			this.goodies.push(goody);
+		}
+
+		if(other.object === 'player') {
+			this.texts.player_lives[other.num].text = other.lives;
 		}
 	}
 
@@ -489,7 +507,7 @@ Engine.prototype.apply_goody = function(type, player) {
 		}
 		case 6: {
 			player.score += 500;
-			// TODO: Update score string
+			this.texts.player_scores[player.num].set_score(player.score);
 			break;
 		}
 		default:
