@@ -354,21 +354,21 @@ function Enemy(x, y, type) {
 			this.w = 32;
 			this.h = 32;
 			this.score_value = 30;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 300, {x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 2, {x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
 			break;
 		}
 		case 1: {
 			this.w = 44;
 			this.h = 32;
 			this.score_value = 20;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 300, {x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 2, {x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
 			break;
 		}
 		case 2: {
 			this.w = 48;
 			this.h = 32;
 			this.score_value = 10;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 300, {x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 2, {x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
 			break;
 		}
 		default:
@@ -516,19 +516,19 @@ function Bullet(x, y, speed, type, owner=-1) {
 		case 1: {
 			this.w = 12;
 			this.h = 28;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 100, {x: 0, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0.1, {x: 0, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]);
 			break;
 		}
 		case 2: {
 			this.w = 12;
 			this.h = 28;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 100, {x: 52, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0.1, {x: 52, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]);
 			break;
 		}
 		case 3: {
 			this.w = 12;
 			this.h = 24;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 100, {x: 92, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]);
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0.1, {x: 92, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]);
 			break;
 		}
 		default:
@@ -572,9 +572,9 @@ Bullet.prototype.update = function(dt, bounds) {
  */
 Bullet.prototype.kill = function() {
 	this.off_time = 2;
-	this.speed.y = 0;
+	this.speed = {x: 0, y: 0};
 	this.collidable = false;
-	this.sprite = new Sprite('sprites.png', {w: 12, h: 24}, 500, {x: 172, y: 36}, [{x: 0, y: 0}]);
+	this.sprite = new Sprite('sprites.png', {w: 12, h: 24}, 0, {x: 172, y: 36}, [{x: 0, y: 0}]);
 
 	return null;
 };
