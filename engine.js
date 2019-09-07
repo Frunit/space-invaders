@@ -319,7 +319,7 @@ Engine.prototype.update = function(dt) {
 
 	for(let enemy of this.enemies) {
 		const bullet = enemy.fire();
-		if(bullet !== []) {
+		if(bullet.length > 0) {
 			this.enemy_bullets.push(bullet[0]);
 		}
 	}
@@ -340,8 +340,12 @@ Engine.prototype.update = function(dt) {
 		wall.update(dt, this.outer_bounds);
 	}
 
-	for(let text of this.texts) {
-		text.update(dt);
+	for(let text_group in this.texts) {
+		for(let text of this.texts[text_group]) {
+			text.update(dt);
+		}
+
+		this.texts[text_group] = this.texts[text_group].filter(text => text.active);
 	}
 
 	// Remove entities that are inactive. They may have either left the screen
@@ -351,7 +355,6 @@ Engine.prototype.update = function(dt) {
 	this.goodies = this.goodies.filter(goody => goody.active);
 	this.walls = this.walls.filter(wall => wall.active);
 	this.enemies = this.enemies.filter(enemy => enemy.active);
-	this.texts = this.texts.filter(text => text.active);
 
 	this.collide_bullets(this.player_bullets, this.enemy_bullets);
 	this.collide_bullets(this.player_bullets, this.enemies);

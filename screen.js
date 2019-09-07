@@ -87,8 +87,8 @@ Screen.prototype.render = function(entities, texts) {
 			params.w, params.h);
 	}
 
-	for(let text_group of texts.values()) {
-		for(let text of text_group) {
+	for(let text_group in texts) {
+		for(let text of texts[text_group]) {
 			this.ctx.save();
 			this.ctx.font = `${text.size}px ${text.family}`;
 			this.ctx.textAlign = text.alignment;
