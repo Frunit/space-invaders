@@ -110,45 +110,41 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 		this.players = [];
 	}
 
-	// TODO: Bounds calculation assumes that left bound is zero. This is not guaranteed!
-	// Possible solution (not tested!):
-	// x = (i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left;
-	// x = ((i+1) * this.outer_bounds.right - this.outer_bounds.left * (i + this.num_players + 2)) / (this.num_players + 1);
 	if(this.players.length) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players[i].reset();
-			this.players[i].x = (this.outer_bounds.right * (i+1))/(this.num_players + 1);
+			this.players[i].x = (i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left;
 		}
 	}
 	else {
 		// Create players
 		for(let i = 0; i < this.num_players; i++) {
-			this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom - 20, i));
+			this.players.push(new Player((i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left, this.inner_bounds.bottom - 20, i));
 		}
 	}
 
 	// GUI
 
-	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 30, 'life'));
+	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 10, 'life'));
 	const life_width = this.gui[this.gui.length - 1].w;
 	this.texts.player_lives.push(new Text(this.players[0].lives, this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
 
-	this.gui.push(new GUI_Element(this.outer_bounds.left + 95, this.outer_bounds.top + 30, 'score'));
+	this.gui.push(new GUI_Element(this.outer_bounds.left + 95, this.outer_bounds.top + 10, 'score'));
 	const score_width = this.gui[this.gui.length - 1].w;
 
 	this.texts.player_scores.push(new Text('', this.outer_bounds.left + 100 + score_width, this.outer_bounds.top + 30, Infinity));
 	this.texts.player_scores[0].set_score(this.players[0].score);
 
 	if(this.num_players === 2) {
-		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 30, 'life'));
+		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 10, 'life'));
 
 		this.texts.player_lives.push(new Text(this.players[1].lives, this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
 
-		this.gui.push(new GUI_Element(this.outer_bounds.right - 95, this.outer_bounds.top + 30, 'score'));
+		this.gui.push(new GUI_Element(this.outer_bounds.right - 95, this.outer_bounds.top + 10, 'score'));
 
-		this.texts.push(new Text('', this.outer_bounds.right - 100 - score_width, this.outer_bounds.top + 30, Infinity, 'right'));
-		this.texts[this.texts.length-1].set_score(this.players[1].score);
+		this.texts.player_scores.push(new Text('', this.outer_bounds.right - 100, this.outer_bounds.top + 30, Infinity, 'right'));
+		this.texts.player_scores[1].set_score(this.players[1].score);
 	}
 
 	this.texts.level.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));

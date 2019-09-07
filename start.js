@@ -35,13 +35,12 @@ Start.prototype.setup = function() {
 
 	// Selector
 
-	// TODO: Align the selector to the window size.
-
 	this.selector = new GUI_Element(300, 200, 'selector');
-	this.selector.y = 200 + this.selector.h * this.num_players;
+	this.selector.x = this.window_size.w / 2 - this.selector.w - 10;
+	this.selector.y = this.window_size.h / 2 + this.selector.h * (this.num_players - 2);
 
-	this.texts.fixed.push(new Text('One player', 305 + this.selector.w, 224 + this.selector.h, Infinity));
-	this.texts.fixed.push(new Text('Two players', 305 + this.selector.w, 224 + this.selector.h * 2, Infinity));
+	this.texts.fixed.push(new Text('One player', this.window_size.w / 2 + 5, this.window_size.h / 2, Infinity));
+	this.texts.fixed.push(new Text('Two players', this.window_size.w / 2 + 5, this.window_size.h / 2 + this.selector.h, Infinity));
 };
 
 
@@ -103,7 +102,7 @@ Start.prototype.select_next = function(direction) {
 	// one or two players.
 	this.num_players = this.num_players === 1 ? 2: 1;
 
-	this.selector.y = 200 + this.selector.h * this.num_players;
+	this.selector.y = this.window_size.h / 2 + this.selector.h * (this.num_players - 2);
 };
 
 

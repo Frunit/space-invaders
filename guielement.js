@@ -20,17 +20,15 @@ import {Sprite} from './sprite.js';
 function GUI_Element(x, y, type) {
 	switch(type) {
 		case 'life': {
-			// TODO: Must add sprite for this!
-			this.w = 16;
-			this.h = 16;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 152, y: 36}, [{x: 0, y: 0}]);
+			this.w = 26;
+			this.h = 22;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 176}, [{x: 0, y: 0}]);
 			break;
 		}
 		case 'score': {
-			// TODO: Must add sprite for this!
 			this.w = 16;
-			this.h = 16;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 152, y: 36}, [{x: 0, y: 0}]);
+			this.h = 22;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 28, y: 176}, [{x: 0, y: 0}]);
 			break;
 		}
 		case 'selector': {
