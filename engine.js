@@ -412,7 +412,7 @@ Engine.prototype.collide_bullets = function(bullets, others) {
 		}
 
 		if(other.object === 'player') {
-			this.texts.player_lives[other.num].text = other.lives;
+			this.update_lives(other);
 		}
 	}
 
@@ -482,10 +482,12 @@ Engine.prototype.apply_goody = function(type, player) {
 	switch(type) {
 		case 0: {
 			player.kill();
+			this.update_lives(player);
 			break;
 		}
 		case 1: {
 			player.lives++;
+			this.update_lives(player);
 			break;
 		}
 		case 2: {
@@ -523,6 +525,27 @@ Engine.prototype.apply_goody = function(type, player) {
  */
 Engine.prototype.start_break_out = function(player) {
 	// TODO: Add Break-out mode!
+};
+
+
+/**
+ * <tt>Engine.update_lives</tt> updates the shown number of remaining lives. It
+ * will not show negative numbers to prevent an ugly "-1" when the player lost
+ * the last life. It will also not show numbers with more than one digit. A 9
+ * will be shown in this case.
+ *
+ * @param {Player} player - The player whose life is to be shown.
+ */
+Engine.prototype.update_lives = function(player) {
+	let to_show = player.lives;
+	if(to_show < 0) {
+		to_show = 0;
+	}
+	else if(to_show >= 10) {
+		to_show = 9;
+	}
+
+	this.texts.player_lives[player.num].text = to_show;
 };
 
 

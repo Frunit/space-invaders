@@ -304,7 +304,7 @@ Player.prototype.kill = function(force=false) {
 		this.off_time = 2;
 		this.cooldown = 2;
 		this.collidable = false;
-		this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 500, {x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+		this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 0.5, {x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]);
 	}
 
 	return null;
@@ -323,6 +323,7 @@ Player.prototype.resurrect = function() {
 		this.is_dead = true;
 		this.h = 0;
 		this.w = 0;
+		this.sprite = new Sprite('sprites.png', {w: 1, h: 1}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
 	}
 	else {
 		this.reset()
