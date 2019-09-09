@@ -147,9 +147,9 @@ Fake_Screen.prototype.render = function(entities, texts) {
 			params.w, params.h]);
 	}
 
-	for(let text_group of texts.values()) {
-		console.log(text_group);
-		for(let text of text_group) {
+
+	for(let text_group in texts) {
+		for(let text of texts[text_group]) {
 			render_elements.push(['TEXT',
 				text.text,
 				text.x, text.y,

@@ -8,13 +8,13 @@ QUnit.test('GUI Element', function(assert) {
 
 	element = new GUI_Element(400, 1, 'life');
 
-	assert.strictEqual(element.w, 16, 'life width');
-	assert.strictEqual(element.h, 16, 'life height');
+	assert.strictEqual(element.w, 26, 'life width');
+	assert.strictEqual(element.h, 22, 'life height');
 
 	element = new GUI_Element(105345, -15684, 'score');
 
 	assert.strictEqual(element.w, 16, 'score width');
-	assert.strictEqual(element.h, 16, 'score height');
+	assert.strictEqual(element.h, 22, 'score height');
 
 	element = new GUI_Element(-9.71234, 1.542, 'selector');
 
