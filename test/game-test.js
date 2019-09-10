@@ -12,7 +12,6 @@ import {Game} from '../game.js';
 QUnit.test('Game starting', function(assert) {
 	const game = new Game();
 
-	assert.ok(typeof input !== 'undefined', 'Global variable input exists');
 	assert.ok(typeof resources !== 'undefined', 'Global variable resources exists');
 
 	game.start();

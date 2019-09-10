@@ -35,6 +35,8 @@ QUnit.test('Player initial properties', function(assert) {
 	assert.strictEqual(player.score, 0, 'score');
 	assert.strictEqual(player.lives, 3, 'lives');
 	assert.strictEqual(player.num, 0, 'player number');
+	assert.strictEqual(player.moving, 0, 'moving');
+	assert.strictEqual(player.firing, false, 'firing');
 });
 
 
@@ -51,11 +53,11 @@ QUnit.test('Player reset functionality', function(assert) {
 
 	player2.apply_rapid_fire();
 	player2.apply_invulnerability();
-	player2.fire();
-	player2.update(0.75);
+	player2.firing = true;
+	player2.update(0.75, bounds);
 	player2.kill(); // This should not have an effect, since the player is invulnerable
 	player2.kill(true); // This should kill it anyway
-	player2.update(4.123);
+	player2.update(4.123, bounds);
 	player2.lives++; // This weighs one kill. If the not-forced kill works, deepEqual will be false
 
 	player2.reset();
@@ -67,8 +69,14 @@ QUnit.test('Player reset functionality', function(assert) {
 QUnit.test('Player properties after some time', function(assert) {
 	const player = new Player(100, 100, 0);
 	const player2 = new Player(100, 100, 0);
+	const bounds = {
+		left: 50,
+		right: 850,
+		top: 50,
+		bottom: 550,
+	};
 
-	player.update(0.5);
+	player.update(0.5, bounds);
 	player.sprite.idx = 0; // The sprite index changes. This is taken care of here.
 
 	assert.deepEqual(player, player2);
@@ -132,15 +140,25 @@ QUnit.test('Player initial position bounds', function(assert) {
 
 QUnit.test('Player shooting', function(assert) {
 	const player = new Player(500, 300, 0);
+	const bounds = {
+		left: 50,
+		right: 850,
+		top: 50,
+		bottom: 550,
+	};
 	let bullets;
 
+	bullets = player.fire();
+	assert.strictEqual(bullets.length, 0, 'First non-shot');
+
+	player.firing = true;
 	bullets = player.fire();
 	assert.strictEqual(bullets.length, 1, 'First shot');
 	assert.strictEqual(bullets[0].x, 500-2, 'Bullet x');
 	assert.strictEqual(bullets[0].y, 300-8-16, 'Bullet y');
 	assert.strictEqual(bullets[0].owner, 0, 'Bullet owner');
 
-	player.update(0.5);
+	player.update(0.5, bounds);
 
 	bullets = player.fire();
 	assert.ok(Math.abs(player.cooldown - 0.5) < 0.00001, 'Current cooldown');
@@ -153,22 +171,24 @@ QUnit.test('Player shooting', function(assert) {
 	assert.strictEqual(bullets.length, 1, 'Not blocked anymore');
 
 	bullets = player.fire();
-	assert.ok(Math.abs(player.cooldown - 0.3) < 0.00001, 'Current cooldown');
-	assert.strictEqual(bullets.length, 0, 'Blocked by cooldown');
+	assert.ok(Math.abs(player.cooldown - 0.3) < 0.00001, 'Initial cooldown');
+	assert.strictEqual(bullets.length, 0, 'Blocked by initial cooldown');
 
-	player.update(0.1);
+	player.update(0.1, bounds);
 
 	bullets = player.fire();
-	assert.ok(Math.abs(player.cooldown - 0.2) < 0.00001, 'Current cooldown');
-	assert.strictEqual(bullets.length, 0, 'Blocked by cooldown');
+	assert.ok(Math.abs(player.cooldown - 0.2) < 0.00001, 'Cooldown after 0.1 s');
+	assert.strictEqual(bullets.length, 0, 'Blocked by cooldown after 0.1 s');
 
 	player.apply_double_laser();
 
 	bullets = player.fire();
-	assert.ok(Math.abs(player.cooldown - 0.2) < 0.00001, 'Current cooldown');
-	assert.strictEqual(bullets.length, 0, 'Blocked by cooldown');
+	assert.ok(Math.abs(player.cooldown - 0.2) < 0.00001, 'Double current cooldown');
+	assert.strictEqual(bullets.length, 0, 'Double blocked by cooldown');
 
-	player.update(0.2);
+	player.firing = false;
+	player.update(0.2, bounds);
+	player.firing = true;
 
 	bullets = player.fire();
 	assert.strictEqual(bullets.length, 2, 'Double shot');
