@@ -3,6 +3,20 @@
 // TODO: Could be rewritten with a Promise instead of callback
 
 
+if(typeof window === 'undefined') {
+	global.Image = {
+		_src: '',
+		onload: () => {},
+
+		set src(url) {
+			this._src = url;
+			this.onload();
+		}
+	};
+}
+
+
+
 /**
  * <tt>Resources</tt> keeps all resources needed in the game (currently images
  * and fonts). It loads everything and calls the callback as soon as everything

@@ -140,7 +140,7 @@ Fake_Screen.prototype.render = function(entities, texts) {
 		const params = entity.sprite.render();
 
 		render_elements.push(['PIC',
-			params.pic,
+			params.pic._src,
 			params.x, params.y,
 			params.w, params.h,
 			entity.x, entity.y,
