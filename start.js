@@ -48,25 +48,31 @@ Start.prototype.setup = function() {
  * <tt>Start.handle_input</tt> handles input.
  * (<i>- sincerely, Captain Obvious</i>)
  *
- * @param {number} dt - The time delta since last update in seconds
+ * @param {string} key - The key that was pressed
+ * @param {boolean} key_down - Whether the key is down or up
  */
-Start.prototype.handle_input = function(dt) {
-	if(input.is_down('UP0') || input.is_down('UP1')) {
-		input.reset('UP0');
-		input.reset('UP1');
-		this.select_next(-1);
-	}
-	else if(input.is_down('DOWN0') || input.is_down('DOWN1')) {
-		input.reset('DOWN0');
-		input.reset('DOWN1');
-		this.select_next(1);
+Start.prototype.handle_input = function(key, key_down) {
+	// On the start screen, nothing happens, if any key is unpressed.
+	if(!key_down) {
+		return;
 	}
 
-	if(input.is_down('SPACE') || input.is_down('ENTER')) {
-		input.reset('SPACE');
-		input.reset('ENTER');
-		this.finished = true;
+	switch(key) {
+		case 'UP0':
+		case 'UP1':
+			this.select_next(-1);
+			break;
+		case 'DOWN0':
+		case 'DOWN1':
+			this.select_next(1);
+			break;
+		case 'SPACE':
+		case 'ENTER':
+			this.finished = true; // This will trigger a stage change upon next update
+			break;
 	}
+
+	// Other keys are ignored
 }
 
 

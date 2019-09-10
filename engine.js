@@ -202,55 +202,50 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 /**
  * <tt>Engine.handle_input</tt> handles player input.
  *
- * @param {number} dt - The time delta since last update in seconds
+ * @param {string} key - The key that was pressed
+ * @param {boolean} key_down - Whether the key is down or up
  */
-Engine.prototype.handle_input = function(dt) {
+Engine.prototype.handle_input = function(key, key_down) {
 	if(this.num_players === 1) {
-		if(input.is_down('LEFT0') ||
-				input.is_down('LEFT1')) {
-			this.players[0].move(dt * -1, this.inner_bounds);
-		}
-		else if(input.is_down('RIGHT0') ||
-				input.is_down('RIGHT1')) {
-			this.players[0].move(dt, this.inner_bounds);
-		}
-
-		if(input.is_down('SPACE') ||
-				input.is_down('CTRL') ||
-				input.is_down('SHIFT') ||
-				input.is_down('UP0') ||
-				input.is_down('UP1')) {
-			const bullets = this.players[0].fire();
-			this.player_bullets.push(...bullets);
+		switch(key) {
+			case 'LEFT0':
+			case 'LEFT1':
+				this.players[0].moving = -1 * key_down;
+				break;
+			case 'RIGHT0':
+			case 'RIGHT1':
+				this.players[0].moving = 1 * key_down;
+				break;
+			case 'SPACE':
+			case 'ENTER':
+			case 'UP0':
+			case 'UP1':
+				this.players[0].firing = key_down;
+				break;
 		}
 	}
 	else {
-		if(input.is_down('LEFT0')) {
-			this.players[0].move(dt * -1, this.inner_bounds);
-		}
-		else if(input.is_down('RIGHT0')) {
-			this.players[0].move(dt, this.inner_bounds);
-		}
-
-		if(input.is_down('LEFT1')) {
-			this.players[1].move(dt * -1, this.inner_bounds);
-		}
-		else if(input.is_down('RIGHT1')) {
-			this.players[1].move(dt, this.inner_bounds);
-		}
-
-		if(input.is_down('SHIFT') ||
-				input.is_down('SPACE') ||
-				input.is_down('UP0')) {
-			const bullets = this.players[0].fire();
-			this.player_bullets.push(...bullets);
-		}
-
-		if(input.is_down('CTRL') ||
-				input.is_down('ENTER') ||
-				input.is_down('UP1')) {
-			const bullets = this.players[1].fire();
-			this.player_bullets.push(...bullets);
+		switch(key) {
+			case 'LEFT0':
+				this.players[0].moving = -1 * key_down;
+				break;
+			case 'LEFT1':
+				this.players[1].moving = -1 * key_down;
+				break;
+			case 'RIGHT0':
+				this.players[0].moving = 1 * key_down;
+				break;
+			case 'RIGHT1':
+				this.players[1].moving = 1 * key_down;
+				break;
+			case 'SPACE':
+			case 'UP0':
+				this.players[0].firing = key_down;
+				break;
+			case 'ENTER':
+			case 'UP1':
+				this.players[1].firing = key_down;
+				break;
 		}
 	}
 }
@@ -272,7 +267,8 @@ Engine.prototype.update = function(dt) {
 			continue;
 		}
 		living_players++;
-		player.update(dt);
+		const bullets = player.update(dt, this.inner_bounds);
+		this.player_bullets.push(...bullets);
 	}
 
 	if(living_players === 0) {
@@ -525,6 +521,7 @@ Engine.prototype.apply_goody = function(type, player) {
  */
 Engine.prototype.start_break_out = function(player) {
 	// TODO: Add Break-out mode!
+	console.log(player.num, 'BREAK OUT!');
 };
 
 

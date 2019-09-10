@@ -13,7 +13,6 @@
 // TODO: Implement special UFO on top that traverses the screen
 // TODO: Maybe implement music and sound
 
-
 // Depending on whether the browser or node.js is used, offer a different debug
 // function
 if(typeof window === 'undefined') {
@@ -35,7 +34,6 @@ import {Highscore} from './highscore.js';
 // Attention! No curly brackets. This uses the default export that is dependent
 // on whether this runs in a browser or not (for testing in node.js).
 import Resources from './resources.js';
-import Input from './input.js';
 import Screen from './screen.js';
 
 
@@ -89,24 +87,26 @@ function Game() {
 	this.screen = null;
 
 
-	// The global object <tt>input</tt> takes care of key presses that are fed into it by
-	// keydown and keyup events.
-	// The global objects game and resources are defined last.
-	// Both are defined differently, depending on the context (browser vs. node.js)
+	// The global object resources is defined differently, depending on the
+	// context (browser vs. node.js)
 	if(typeof window === 'undefined') {
-		global.input = new Input();
 		global.resources = new Resources();
 	}
 	else {
-		window.input = new Input();
 		window.resources = new Resources();
 
+		// The meaning of `this` is dependent on the context. To keep the scope
+		// of the `game` object, the current `this` is saved in `self`. If I
+		// would use `this` in the event listeners, `this` would refer to the
+		// event and not the `game` object.
+		const self = this;
+
 		document.addEventListener('keydown', function(e) {
-			input.set_key(e, true);
+			self.handle_input(e, true);
 		});
 
 		document.addEventListener('keyup', function(e) {
-			input.set_key(e, false);
+			self.handle_input(e, false);
 		});
 	}
 
@@ -160,6 +160,66 @@ Game.prototype.loop = function() {
 
 
 /**
+ * <tt>Game.handle_input</tt> determines the key pressed or lifted and sends the
+ * right abstract key description to the current stage.
+ *
+ * @param {event} event
+ * 		The keydown or keyup event
+ * @param {boolean} key_down
+ * 		<tt>true</tt>, if it is a keydown event, <tt>false</tt> if it is a
+ * 		keyup event
+ */
+Game.prototype.handle_input = function(event, key_down) {
+	if(this.stage === null) {
+		return;
+	}
+
+	const code = event.code || event.key;
+	let key;
+
+	switch(code) {
+		case 'ControlRight':
+		case 'Control':
+			key = 'CTRL'; break
+		case 'ShiftLeft':
+		case 'Shift':
+			key = 'SHIFT'; break
+		case 'Space':
+		case 'Spacebar':
+		case ' ':
+			key = 'SPACE'; break;
+		case 'Enter':
+			key = 'ENTER'; break;
+		case 'Escape':
+		case 'Esc':
+			key = 'ESCAPE'; break;
+		case 'KeyA':
+		case 'a':
+			key = 'LEFT0'; break;
+		case 'ArrowLeft':
+			key = 'LEFT1'; break;
+		case 'KeyD':
+		case 'd':
+			key = 'RIGHT0'; break;
+		case 'ArrowRight':
+			key = 'RIGHT1'; break;
+		case 'KeyW':
+		case 'w':
+			key = 'UP0'; break;
+		case 'ArrowUp':
+			key = 'UP1'; break;
+		case 'KeyS':
+			key = 'DOWN0'; break;
+		case 's':
+		case 'ArrowDown':
+			key = 'DOWN1'; break;
+	}
+
+	this.stage.handle_input(key, key_down);
+};
+
+
+/**
  * <tt>Game.update_fps</tt> is a debugging function to show the current frames
  * per second.
  *
@@ -169,7 +229,7 @@ Game.prototype.update_fps = function(now) {
 	// FPS will be shown as 1/s (== Hz)
 	this.frames++;
 	if(now - this.last_fps > 1000) {
-		debug(4, 'FPS: ' + this.frames);
+		debug(4, 'FPS: ' + this.frames); // eslint-disable-line
 		this.frames = 0;
 		this.last_fps = now;
 	}
@@ -187,8 +247,6 @@ Game.prototype.update_fps = function(now) {
  * 		is returned. Otherwise, <tt>null</tt> is returned.
  */
 Game.prototype.update = function(dt) {
-	this.stage.handle_input(dt);
-
 	return this.stage.update(dt);
 };
 
@@ -198,7 +256,6 @@ Game.prototype.update = function(dt) {
  * creates the screen, and starts the game loop.
  */
 Game.prototype.start = function() {
-	//this.stage = new Engine(this.options.total_size, this.options.border, 1, this.levels, 0);
 	this.stage = new Start(this.options.total_size, 1);
 	this.stage.setup();
 
@@ -222,7 +279,7 @@ Game.prototype.next_stage = function(payload) {
 	switch(payload.next_stage) {
 		case 'start': {
 			const num_players = 'num_players' in payload ? payload.num_players : this.options.num_players;
-			this.stage = new Start(num_players);
+			this.stage = new Start(this.options.total_size, num_players);
 			break;
 		}
 		case 'game': {
@@ -234,7 +291,7 @@ Game.prototype.next_stage = function(payload) {
 		case 'highscore': {
 			const scores = 'scores' in payload ? payload.scores : [];
 			const level = 'level' in payload ? payload.level : 0;
-			this.stage = new Highscore(scores, level);
+			this.stage = new Highscore(this.options.total_size, scores, level);
 			break;
 		}
 		default:

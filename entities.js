@@ -67,6 +67,9 @@ function Player(x, y, num) {
 	this.rapid_cooldown = 0.3;
 	this.cooldown = 0;
 
+	this.moving = 0;
+	this.firing = false;
+
 	this.is_dead = false;
 
 	this.invulnerable = 0;
@@ -95,6 +98,9 @@ Player.prototype.reset = function() {
 	this.off_time = -1;
 	this.collidable = true;
 
+	this.moving = 0;
+	this.firing = false;
+
 	this.invulnerable = 0;
 	this.double_laser = 0;
 	this.rapid_fire = 0;
@@ -112,7 +118,7 @@ Player.prototype.reset = function() {
 Player.prototype.fire = function() {
 	// TODO: The cooldown should be ignored, if no bullet of the player is present anywhere.
 	// Still, an inactive player (hidden or dead) should not shoot!
-	if(this.cooldown) {
+	if(!this.firing || this.cooldown) {
 		return [];
 	}
 
@@ -163,7 +169,7 @@ Player.prototype.fire = function() {
  * 		A vector depending on direction and time delta. Negative for going left,
  * 		positive for going right.
  * @param {Bounds} bounds
- * 		The boundaries in whicht the fighter can move
+ * 		The boundaries in whicht the player can move
  */
 Player.prototype.move = function(direction, bounds) {
 	if(this.off_time >= 0) {
@@ -186,8 +192,12 @@ Player.prototype.move = function(direction, bounds) {
  * cooldown.
  *
  * @param {number} dt - The time delta since last update in seconds
+ * @param {Bounds} bounds - The boundaries in whicht the player can move
+ * @returns {Bullet[]}
+ * 		A list of Bullet objects if the ship fired. The list is empty if the
+ * 		ship did not fire.
  */
-Player.prototype.update = function(dt) {
+Player.prototype.update = function(dt, bounds) {
 	this.sprite.update(dt);
 	if(this.cooldown) {
 		this.cooldown -= dt;
@@ -225,6 +235,9 @@ Player.prototype.update = function(dt) {
 			this.rapid_fire = 0;
 		}
 	}
+
+	this.move(this.moving * dt, bounds);
+	return this.fire();
 };
 
 
