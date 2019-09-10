@@ -1,6 +1,9 @@
 Space Invaders
 ==============
 
+**master**: [![Build Status](https://travis-ci.com/Frunit/space-invaders.svg?branch=master)](https://travis-ci.com/Frunit/space-invaders),
+**dev**: [![Build Status](https://travis-ci.com/Frunit/space-invaders.svg?branch=dev)](https://travis-ci.com/Frunit/space-invaders)
+
 Space Invaders is a game written by Mathias Bockwoldt in Javascript
 (ECMAScript 2018) without any frameworks for the
 [it-talents.de competition September 2019](https://www.it-talents.de/foerderung/code-competition/airbus-code-competition-09-2019)
