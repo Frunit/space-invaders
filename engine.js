@@ -491,7 +491,7 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		case 3: {
-			this.start_break_out();
+			this.start_break_out(player);
 			break;
 		}
 		case 4: {

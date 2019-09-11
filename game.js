@@ -102,7 +102,9 @@ function Game() {
 		const self = this;
 
 		document.addEventListener('keydown', function(e) {
-			self.handle_input(e, true);
+			if(!e.repeat) {
+				self.handle_input(e, true);
+			}
 		});
 
 		document.addEventListener('keyup', function(e) {
@@ -175,7 +177,7 @@ Game.prototype.handle_input = function(event, key_down) {
 	}
 
 	const code = event.code || event.key;
-	let key;
+	let key = '';
 
 	switch(code) {
 		case 'ControlRight':
@@ -215,7 +217,9 @@ Game.prototype.handle_input = function(event, key_down) {
 			key = 'DOWN1'; break;
 	}
 
-	this.stage.handle_input(key, key_down);
+	if(key !== '') {
+		this.stage.handle_input(key, key_down);
+	}
 };
 
 
