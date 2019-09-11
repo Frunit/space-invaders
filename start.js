@@ -19,6 +19,7 @@ function Start(window_size, num_players) {
 	this.finished = false;
 
 	this.selector = null;
+	this.keys = [];
 	this.texts = {};
 }
 
@@ -41,6 +42,11 @@ Start.prototype.setup = function() {
 
 	this.texts.fixed.push(new Text('One player', this.window_size.w / 2 + 5, this.window_size.h / 2, Infinity));
 	this.texts.fixed.push(new Text('Two players', this.window_size.w / 2 + 5, this.window_size.h / 2 + this.selector.h, Infinity));
+
+	// Keys
+
+	this.keys.push(new GUI_Element(70, 445, 'keys1'));
+	this.keys.push(new GUI_Element(590, 445, 'keys2'));
 };
 
 
@@ -97,15 +103,9 @@ Start.prototype.update = function(dt) {
 
 
 /**
- * <tt>Start.select_next</tt> Selects the next menu point.
- *
- * @param {number} direction
- * 		If 1, select the next, if -1, select the previous item
+ * <tt>Start.select_next</tt> Selects the other menu point.
  */
-Start.prototype.select_next = function(direction) {
-	// I currently don't need the direction, but I'll keep it in the code in
-	// case, the selection gets more sophisticated than just switching between
-	// one or two players.
+Start.prototype.select_next = function() {
 	this.num_players = this.num_players === 1 ? 2: 1;
 
 	this.selector.y = this.window_size.h / 2 + this.selector.h * (this.num_players - 2);
@@ -118,7 +118,9 @@ Start.prototype.select_next = function(direction) {
  * @returns {object[]} An array with all entities
  */
 Start.prototype.get_entities = function() {
-	return [this.selector];
+	return [this.selector].concat(
+		this.keys,
+		);
 };
 
 

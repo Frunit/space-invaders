@@ -37,6 +37,18 @@ function GUI_Element(x, y, type) {
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 			break;
 		}
+		case 'keys1': {
+			this.w = 399;
+			this.h = 116;
+			this.sprite = new Sprite('keys.png', {w: this.w, h: this.h}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
+			break;
+		}
+		case 'keys2': {
+			this.w = 273;
+			this.h = 116;
+			this.sprite = new Sprite('keys.png', {w: this.w, h: this.h}, 0, {x: 0, y: 118}, [{x: 0, y: 0}]);
+			break;
+		}
 		default:
 			throw 'Unknown GUI_Element type: ' + type;
 	}

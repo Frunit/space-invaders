@@ -117,6 +117,7 @@ function Game() {
 	resources.on_ready(() => {this.start()});
 	resources.load([
 		'gfx/sprites.png',
+		'gfx/keys.png',
 	]);
 }
 
