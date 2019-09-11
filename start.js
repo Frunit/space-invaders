@@ -15,11 +15,12 @@ import {Text} from './text.js';
  */
 function Start(window_size, num_players) {
 	this.window_size = window_size;
-	this.num_players = num_players;
+	this.num_players = num_players || 1;
 	this.finished = false;
 
 	this.selector = null;
 	this.keys = [];
+	this.enemies = [];
 	this.texts = {};
 }
 
@@ -31,8 +32,6 @@ Start.prototype.setup = function() {
 	this.finished = false;
 
 	this.texts = {fixed: []};
-
-	// TODO: Add some kind of logo or the like
 
 	// Selector
 
@@ -47,6 +46,15 @@ Start.prototype.setup = function() {
 
 	this.keys.push(new GUI_Element(70, 445, 'keys1'));
 	this.keys.push(new GUI_Element(590, 445, 'keys2'));
+
+	// Enemies
+
+	this.enemies.push(new GUI_Element(75, 50, 'enemy2'));
+	this.enemies.push(new GUI_Element(312, 10, 'enemy1'));
+	this.enemies.push(new GUI_Element(492, 150, 'enemy3'));
+	this.enemies.push(new GUI_Element(638, 196, 'enemy2'));
+	this.enemies.push(new GUI_Element(823, 43, 'enemy1'));
+	this.enemies.push(new GUI_Element(224, 163, 'enemy3'));
 };
 
 
@@ -96,9 +104,12 @@ Start.prototype.update = function(dt) {
 			num_players: this.num_players,
 		};
 	}
-	else {
-		return null;
+
+	for(let enemy of this.enemies) {
+		enemy.sprite.update(dt);
 	}
+
+	return null;
 };
 
 
@@ -120,7 +131,7 @@ Start.prototype.select_next = function() {
 Start.prototype.get_entities = function() {
 	return [this.selector].concat(
 		this.keys,
-		);
+		this.enemies);
 };
 
 
