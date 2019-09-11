@@ -1,5 +1,7 @@
 'use strict';
 
+/* eslint-disable */ // TODO!
+
 import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
 
@@ -44,7 +46,7 @@ if(typeof window === 'undefined') {
 function Highscore(window_size, scores, level) {
 	this.window_size = window_size;
 	this.scores = scores;
-	this.level = level;
+	this.level = level + 1;
 
 	this.finished = false;
 
@@ -148,6 +150,8 @@ Highscore.prototype.handle_input = function(key, key_down) {
 	switch(key) {
 		case 'SPACE':
 		case 'ENTER':
+		case 'UP0':
+		case 'UP1':
 			this.finished = true; // This will trigger a stage change upon next update
 			break;
 	}
