@@ -5,19 +5,30 @@ import {Sprite} from './sprite.js';
 
 
 /**
- * `GUI_Element` is an object for a gui element holding a sprite.
+ * <tt>GUI_Element</tt> is an object for a gui element holding a sprite.
+ *
  * @constructor
- * @param {number} x - The x coordinate (from left) of the object pointing to its upper left corner
- * @param {number} y - The y coordinate (from top) of the object pointing to its upper left corner
- * @param {string} type - The type of the element. 'life' or 'selector'
+ * @param {number} x
+ * 		The x coordinate (from left) of the object pointing to its upper left
+ * 		corner
+ * @param {number} y
+ * 		The y coordinate (from top) of the object pointing to its upper left
+ * 		corner
+ * @param {string} type
+ * 		The type of the element. life, selector, or selector
  */
 function GUI_Element(x, y, type) {
 	switch(type) {
 		case 'life': {
-			// TODO: Must add sprite for this!
+			this.w = 26;
+			this.h = 22;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 176}, [{x: 0, y: 0}]);
+			break;
+		}
+		case 'score': {
 			this.w = 16;
-			this.h = 16;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 152, y: 36}, [{x: 0, y: 0}]);
+			this.h = 22;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 28, y: 176}, [{x: 0, y: 0}]);
 			break;
 		}
 		case 'selector': {
@@ -26,8 +37,38 @@ function GUI_Element(x, y, type) {
 			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
 			break;
 		}
+		case 'keys1': {
+			this.w = 399;
+			this.h = 116;
+			this.sprite = new Sprite('keys.png', {w: this.w, h: this.h}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
+			break;
+		}
+		case 'keys2': {
+			this.w = 273;
+			this.h = 116;
+			this.sprite = new Sprite('keys.png', {w: this.w, h: this.h}, 0, {x: 0, y: 118}, [{x: 0, y: 0}]);
+			break;
+		}
+		case 'enemy1': {
+			this.w = 32;
+			this.h = 32;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 2, {x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+			break;
+		}
+		case 'enemy2': {
+			this.w = 44;
+			this.h = 32;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 2, {x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+			break;
+		}
+		case 'enemy3': {
+			this.w = 48;
+			this.h = 32;
+			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 2, {x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+			break;
+		}
 		default:
-			console.warn('Unknown GUI_Element type', type);
+			throw 'Unknown GUI_Element type: ' + type;
 	}
 
 

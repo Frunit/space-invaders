@@ -8,13 +8,14 @@ import {Text} from './text.js';
 // TODO: Sometimes, bullet stay hanging around
 
 /**
- * `Engine` is the actual game engine. It *should* work without any screen,
- * making, it more easily testable.
+ * <tt>Engine</tt> is the actual game engine. It *should* work without any
+ * screen, making, it more easily testable.
+ *
  * @constructor
- * @param {Object} window_size - The window size
+ * @param {object} window_size - The window size
  * @param {number} window_size.w - Width in pixels
  * @param {number} window_size.h - Height in pixels
- * @param {number} window_border - The border width in pixels
+ * @param {number} border - The window border width in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
  * @param {Level[]} levels - The available levels
  * @param {number} level - The level to start at
@@ -28,7 +29,7 @@ function Engine(window_size, border, num_players, levels, level) {
 	this.walls = [];
 	this.goodies = [];
 	this.gui = [];
-	this.texts = [];
+	this.texts = {};
 
 	// Some status variables that are valid for all enemies (since enemies move
 	// in a synchronized way.
@@ -60,7 +61,7 @@ function Engine(window_size, border, num_players, levels, level) {
 
 
 /**
- * `Engine.next_level` loads the next level.
+ * <tt>Engine.next_level</tt> loads the next level.
  */
 Engine.prototype.next_level = function() {
 	this.level++;
@@ -72,10 +73,16 @@ Engine.prototype.next_level = function() {
 
 // TODO: Engine.setup is too long. Especially level setup and GUI setup should be put into another function
 /**
- * `Engine.setup` initializes the game with the player and enemies.
- * @param {Level} level=null - The level to set up. If no level is given, the first level will be used.
- * @param {number} recurrence=0 - How often was this level played (0 for first time, 1 for second time, ...)
- * @param {boolean} fresh=false - If true, forces new player objects (instead of using the existing ones). If no player objects are present, they are created in any case.
+ * <tt>Engine.setup</tt> initializes the game with the player and enemies.
+ *
+ * @param {Level} [level=null]
+ * 		The level to set up. If no level is given, the first level will be used.
+ * @param {number} [recurrence=0]
+ * 		How often was this level played (0 for first time, 1 for second time, ...)
+ * @param {boolean} [fresh=false]
+ * 		If <tt>true</tt>, forces new player objects (instead of using the
+ * 		existing ones). If no player objects are present, they are created in
+ * 		any case.
  */
 Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	this.enemies = [];
@@ -84,7 +91,12 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	this.walls = [];
 	this.goodies = [];
 	this.gui = [];
-	this.texts = [];
+	this.texts = {
+		player_scores: [],
+		player_lives: [],
+		level: [],
+		floating: [],
+	};
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
@@ -98,39 +110,45 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 		this.players = [];
 	}
 
-	// TODO: Bounds calculation assumes that left bound is zero. This is not guaranteed!
 	if(this.players.length) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players[i].reset();
-			this.players[i].x = (this.outer_bounds.right * (i+1))/(this.num_players + 1);
+			this.players[i].x = (i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left;
 		}
 	}
 	else {
 		// Create players
 		for(let i = 0; i < this.num_players; i++) {
-			this.players.push(new Player((this.outer_bounds.right * (i+1))/(this.num_players + 1), this.inner_bounds.bottom - 20, i));
+			this.players.push(new Player((i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left, this.inner_bounds.bottom - 20, i));
 		}
 	}
 
 	// GUI
-	// TODO: Show lifes
 
-	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 30, 'life'));
+	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 10, 'life'));
 	const life_width = this.gui[this.gui.length - 1].w;
+	this.texts.player_lives.push(new Text(this.players[0].lives, this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
 
-	this.texts.push(new Text('', this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
-	this.texts[this.texts.length-1].set_score(this.players[0].score);
+	this.gui.push(new GUI_Element(this.outer_bounds.left + 95, this.outer_bounds.top + 10, 'score'));
+	const score_width = this.gui[this.gui.length - 1].w;
+
+	this.texts.player_scores.push(new Text('', this.outer_bounds.left + 100 + score_width, this.outer_bounds.top + 30, Infinity));
+	this.texts.player_scores[0].set_score(this.players[0].score);
 
 	if(this.num_players === 2) {
-		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 30, 'life'));
+		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 10, 'life'));
 
-		this.texts.push(new Text('', this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
-		this.texts[this.texts.length-1].set_score(this.players[1].score);
+		this.texts.player_lives.push(new Text(this.players[1].lives, this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
+
+		this.gui.push(new GUI_Element(this.outer_bounds.right - 95, this.outer_bounds.top + 10, 'score'));
+
+		this.texts.player_scores.push(new Text('', this.outer_bounds.right - 100, this.outer_bounds.top + 30, Infinity, 'right'));
+		this.texts.player_scores[1].set_score(this.players[1].score);
 	}
 
-	this.texts.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
-	this.texts.push(new Text(String(this.level + 1), (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
+	this.texts.level.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
+	this.texts.level.push(new Text(this.level + 1, (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
 
 	// Level
 
@@ -182,65 +200,65 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 
 
 /**
- * `Engine.handle_input` handles player input.
- * @param {number} dt - The time delta since last update in seconds
+ * <tt>Engine.handle_input</tt> handles player input.
+ *
+ * @param {string} key - The key that was pressed
+ * @param {boolean} key_down - Whether the key is down or up
  */
-Engine.prototype.handle_input = function(dt) {
+Engine.prototype.handle_input = function(key, key_down) {
 	if(this.num_players === 1) {
-		if(input.is_down('LEFT0') ||
-				input.is_down('LEFT1')) {
-			this.players[0].move(dt * -1, this.inner_bounds);
-		}
-		else if(input.is_down('RIGHT0') ||
-				input.is_down('RIGHT1')) {
-			this.players[0].move(dt, this.inner_bounds);
-		}
-
-		if(input.is_down('SPACE') ||
-				input.is_down('CTRL') ||
-				input.is_down('SHIFT') ||
-				input.is_down('UP0') ||
-				input.is_down('UP1')) {
-			const bullets = this.players[0].fire();
-			this.player_bullets.push(...bullets);
+		switch(key) {
+			case 'LEFT0':
+			case 'LEFT1':
+				this.players[0].moving = -1 * key_down;
+				break;
+			case 'RIGHT0':
+			case 'RIGHT1':
+				this.players[0].moving = 1 * key_down;
+				break;
+			case 'SPACE':
+			case 'ENTER':
+			case 'UP0':
+			case 'UP1':
+				this.players[0].firing = key_down;
+				break;
 		}
 	}
 	else {
-		if(input.is_down('LEFT0')) {
-			this.players[0].move(dt * -1, this.inner_bounds);
-		}
-		else if(input.is_down('RIGHT0')) {
-			this.players[0].move(dt, this.inner_bounds);
-		}
-
-		if(input.is_down('LEFT1')) {
-			this.players[1].move(dt * -1, this.inner_bounds);
-		}
-		else if(input.is_down('RIGHT1')) {
-			this.players[1].move(dt, this.inner_bounds);
-		}
-
-		if(input.is_down('SHIFT') ||
-				input.is_down('SPACE') ||
-				input.is_down('UP0')) {
-			const bullets = this.players[0].fire();
-			this.player_bullets.push(...bullets);
-		}
-
-		if(input.is_down('CTRL') ||
-				input.is_down('ENTER') ||
-				input.is_down('UP1')) {
-			const bullets = this.players[1].fire();
-			this.player_bullets.push(...bullets);
+		switch(key) {
+			case 'LEFT0':
+				this.players[0].moving = -1 * key_down;
+				break;
+			case 'LEFT1':
+				this.players[1].moving = -1 * key_down;
+				break;
+			case 'RIGHT0':
+				this.players[0].moving = 1 * key_down;
+				break;
+			case 'RIGHT1':
+				this.players[1].moving = 1 * key_down;
+				break;
+			case 'SPACE':
+			case 'UP0':
+				this.players[0].firing = key_down;
+				break;
+			case 'ENTER':
+			case 'UP1':
+				this.players[1].firing = key_down;
+				break;
 		}
 	}
 }
 
 
 /**
- * `Engine.update` updates all objects in the game.
- * @param {number} dt - The time delta since last update in seconds
- * @returns {Object|null} If the game is over, this returns an object with the next stage, score(s), and level. Otherwise, null is returned.
+ * <tt>Engine.update</tt> updates all objects in the game.
+ *
+ * @param {number} dt
+ * 		The time delta since last update in seconds
+ * @returns {object|null}
+ * 		If the game is over, this returns an object with the next stage,
+ * 		score(s), and level. Otherwise, <tt>null</tt> is returned.
  */
 Engine.prototype.update = function(dt) {
 	let living_players = 0;
@@ -249,7 +267,8 @@ Engine.prototype.update = function(dt) {
 			continue;
 		}
 		living_players++;
-		player.update(dt);
+		const bullets = player.update(dt, this.inner_bounds);
+		this.player_bullets.push(...bullets);
 	}
 
 	if(living_players === 0) {
@@ -292,8 +311,8 @@ Engine.prototype.update = function(dt) {
 
 	for(let enemy of this.enemies) {
 		const bullet = enemy.fire();
-		if(bullet !== null) {
-			this.enemy_bullets.push(bullet);
+		if(bullet.length > 0) {
+			this.enemy_bullets.push(bullet[0]);
 		}
 	}
 
@@ -313,8 +332,12 @@ Engine.prototype.update = function(dt) {
 		wall.update(dt, this.outer_bounds);
 	}
 
-	for(let text of this.texts) {
-		text.update(dt);
+	for(let text_group in this.texts) {
+		for(let text of this.texts[text_group]) {
+			text.update(dt);
+		}
+
+		this.texts[text_group] = this.texts[text_group].filter(text => text.active);
 	}
 
 	// Remove entities that are inactive. They may have either left the screen
@@ -324,7 +347,6 @@ Engine.prototype.update = function(dt) {
 	this.goodies = this.goodies.filter(goody => goody.active);
 	this.walls = this.walls.filter(wall => wall.active);
 	this.enemies = this.enemies.filter(enemy => enemy.active);
-	this.texts = this.texts.filter(text => text.active);
 
 	this.collide_bullets(this.player_bullets, this.enemy_bullets);
 	this.collide_bullets(this.player_bullets, this.enemies);
@@ -358,11 +380,14 @@ Engine.prototype.collide_all = function(a, b) {
 
 
 /**
- * `Engine.collide_bullets` compares all bullets of the first list with all
- * entities of the second list and tests if they collide. If so, depending on
- * the target, effects happen.
- * @param {Bullet[]} bullets - The first array of entities. Bullets or Goodies
- * @param {Entity[]} others - The second array of entities. Bullets, Enemies, Players, or Walls
+ * <tt>Engine.collide_bullets</tt> compares all bullets of the first list with
+ * all entities of the second list and tests if they collide. If so, depending
+ * on the target, effects happen.
+ *
+ * @param {Bullet[]} bullets
+ * 		The first array of entities. Bullets or Goodies
+ * @param {Entity[]} others
+ * 		The second array of entities. Bullets, Enemies, Players, or Walls
  */
 Engine.prototype.collide_bullets = function(bullets, others) {
 	const colliding = this.collide_all(bullets, others);
@@ -373,14 +398,17 @@ Engine.prototype.collide_bullets = function(bullets, others) {
 
 		if(bullet.owner >= 0) {
 			this.players[bullet.owner].score += other.score_value;
-			// TODO: This is very error-prone!!!
-			this.texts[bullet.owner].set_score(this.players[bullet.owner].score);
+			this.texts.player_scores[bullet.owner].set_score(this.players[bullet.owner].score);
 		}
 
 		// Initiate specific "killing" animation
 		const goody = other.kill();
 		if(goody !== null) {
 			this.goodies.push(goody);
+		}
+
+		if(other.object === 'player') {
+			this.update_lives(other);
 		}
 	}
 
@@ -389,9 +417,10 @@ Engine.prototype.collide_bullets = function(bullets, others) {
 
 
 /**
- * `Engine.collide_goodies` compares all goodies of the first list with all
- * players of the second list and tests if they collide. If so, the goody is
+ * <tt>Engine.collide_goodies</tt> compares all goodies of the first list with
+ * all players of the second list and tests if they collide. If so, the goody is
  * applied on the player.
+ *
  * @param {Goody[]} goodies - An array of goodies
  * @param {Player[]} players - An array of players
  */
@@ -407,7 +436,8 @@ Engine.prototype.collide_goodies = function(goodies, players) {
 
 
 /**
- * `Engine.collider` checks if the bounding boxes of a and b overlap.
+ * <tt>Engine.collider</tt> checks if the bounding boxes of a and b overlap.
+ *
  * @param {Entity} a - The first object
  * @param {Entity} b - The second object
  * @returns {boolean} Whether or not the bounding boxes overlap.
@@ -424,8 +454,10 @@ Engine.prototype.collider = function(a, b) {
 
 
 /**
- * `Engine.remove_multiple_elements` removes all elements from array with the
- * indices given in to_remove in place. to_remove must be sorted!
+ * <tt>Engine.remove_multiple_elements</tt> removes all elements from array with
+ * the indices given in <tt>to_remove</tt> in place. <tt>to_remove</tt> must be
+ * sorted!
+ *
  * @param {Array} array - The array to change
  * @param {number[]} to_remove - The list of indices to remove from array
  */
@@ -436,8 +468,9 @@ Engine.prototype.remove_multiple_elements = function(array, to_remove) {
 
 
 /**
- * `Engine.apply_goody` applies a goody to a player. Depending on the goody, the
- * player gets an advantage (or maybe also a disadvantage).
+ * <tt>Engine.apply_goody</tt> applies a goody to a player. Depending on the
+ * goody, the player gets an advantage (or maybe also a disadvantage).
+ *
  * @param {number} type - The type of the goody.
  * @param {Player} player - The player to apply the goody on.
  */
@@ -445,61 +478,94 @@ Engine.prototype.apply_goody = function(type, player) {
 	switch(type) {
 		case 0: {
 			player.kill();
+			this.update_lives(player);
 			break;
 		}
 		case 1: {
 			player.lives++;
+			this.update_lives(player);
 			break;
 		}
 		case 2: {
-			player.make_invulnerable();
+			player.apply_invulnerability();
 			break;
 		}
 		case 3: {
-			this.start_break_out();
+			this.start_break_out(player);
 			break;
 		}
 		case 4: {
-			player.make_double_laser();
+			player.apply_double_laser();
 			break;
 		}
 		case 5: {
-			player.rapid_fire += 7;
+			player.apply_rapid_fire();
 			break;
 		}
 		case 6: {
 			player.score += 500;
-			// TODO: Update score string
+			this.texts.player_scores[player.num].set_score(player.score);
 			break;
 		}
 		default:
-			console.warn('Unknown Goody type received: ' + type);
+			throw 'Unknown Goody type received: ' + type;
 	}
 };
 
 
 /**
- * `Engine.start_break_out` puts a ball on the player's fighter that will start
- * right away upwards.
+ * <tt>Engine.start_break_out</tt> puts a ball on the player's fighter that will
+ * start right away upwards.
+ *
  * @param {Player} player - The player to place the ball on.
  */
 Engine.prototype.start_break_out = function(player) {
 	// TODO: Add Break-out mode!
+	console.log(player.num, 'BREAK OUT!');
 };
 
 
 /**
- * `Engine.get_entities` returns all entities in the game for the screen to draw.
+ * <tt>Engine.update_lives</tt> updates the shown number of remaining lives. It
+ * will not show negative numbers to prevent an ugly "-1" when the player lost
+ * the last life. It will also not show numbers with more than one digit. A 9
+ * will be shown in this case.
+ *
+ * @param {Player} player - The player whose life is to be shown.
+ */
+Engine.prototype.update_lives = function(player) {
+	let to_show = player.lives;
+	if(to_show < 0) {
+		to_show = 0;
+	}
+	else if(to_show >= 10) {
+		to_show = 9;
+	}
+
+	this.texts.player_lives[player.num].text = to_show;
+};
+
+
+/**
+ * <tt>Engine.get_entities</tt> returns all entities in the game for the screen
+ * to draw.
+ *
  * @returns {Entity[]} An array with all entities (players, enemies, ...)
  */
 Engine.prototype.get_entities = function() {
-	return this.players.concat(this.enemies, this.enemy_bullets, this.player_bullets, this.walls, this.goodies, this.gui);
+	return this.players.concat(
+		this.enemies,
+		this.enemy_bullets,
+		this.player_bullets,
+		this.walls, this.goodies,
+		this.gui);
 };
 
 
 /**
- * `Engine.get_texts` returns all text elements in the game for the screen to
- * draw.
+ * <tt>Engine.get_texts</tt> returns all text elements in the game for the
+ * screen to draw.
+ *
  * @returns {Text[]} An array with all text elements
  */
 Engine.prototype.get_texts = function() {
@@ -508,11 +574,22 @@ Engine.prototype.get_texts = function() {
 
 
 /**
- * @typedef {Object} Bounds
+ * @typedef {object} Bounds
  * @property {number} top    - The uppermost pixel
  * @property {number} right  - The rightmost pixel
  * @property {number} left   - The leftmost pixel
  * @property {number} bottom - The lowermost pixel
+ */
+
+
+/**
+ * @typedef {object} Level
+ * @property {string[]} fort
+ * 		Lines of a fort, where "X" is a Wall and "_" is empty.
+ * @property {number} forts
+ * 		Number of forts in the level
+ * @property {string[]} enemies
+ * 		Lines of enemies with numbers [0-2] representing the respective enemy
  */
 
 

@@ -1,12 +1,16 @@
 Space Invaders
 ==============
 
+**master**: [![Build Status](https://travis-ci.com/Frunit/space-invaders.svg?branch=master)](https://travis-ci.com/Frunit/space-invaders)
+
+**dev**: [![Build Status](https://travis-ci.com/Frunit/space-invaders.svg?branch=dev)](https://travis-ci.com/Frunit/space-invaders)
+
 Space Invaders is a game written by Mathias Bockwoldt in Javascript
 (ECMAScript 2018) without any frameworks for the
 [it-talents.de competition September 2019](https://www.it-talents.de/foerderung/code-competition/airbus-code-competition-09-2019)
 sponsored by Airbus.
 
-A mostly up-to-date version can be played here: <https://www.frunit.de/si>
+A mostly up-to-date version can be played here: [frunit.de/si](https://www.frunit.de/si)
 
 
 Features
@@ -47,7 +51,7 @@ opening a specially prepared test page. This in turn might be possible using a
 headless browser with some modifications, but that was too much effort for this
 competition project.
 
-Due to these limitations, `GUI`, `Input`, and `Resources` are not covered by
+Due to these limitations, `Screen` and `Resources` are not covered by
 tests. I created "fake" classes to replace these three classes as closely as
 possible in the tests. The class to import is chosen automatically at runtime
 depending on the presence of the `window` object (which is only present in
@@ -57,7 +61,7 @@ For testing, you need the following (assuming that an up-to-date version of
 node.js and npm are installed):
 
 ```sh
-npm install --global qunit  # Of course, you may install it locally as well
+npm install --save qunit
 npm install --save esm
 node -r esm $(which qunit)
 ```
@@ -66,6 +70,9 @@ The last line is so quirky, because node does not understand ECMA 2016 `import`
 statement. These need to be loaded by the `esm` module and then, qunit must be
 started with `esm` active. Very annoying! Maybe it will work out of the box in a
 few years.
+
+TravisCI also runs a code linter, ESLint, as a kind of simple static code
+analyser. For instructions, please check the [.travis.yml](.travis.yml).
 
 
 Programmatic organisation
@@ -76,9 +83,8 @@ an engine and a graphical user interface (gui). The engine should work without
 any gui, modifying objects following certain rules. The objects can be sent to
 the gui for rendering.
 
-The game has three global objects, that are:
+The game has two global objects, that are:
 - `game`: The actual game, holding the engine and the gui.
-- `input`: Organizes key presses that can be pulled by the game.
 - `resources`: Organizes graphics used by the gui. This is defined globally
     to be able to load graphics before the game is initialized.
 
@@ -92,7 +98,7 @@ current frames per second.
 Issues, bugs, proposals, and things to do
 -----------------------------------------
 
-Issues, bugs, and proposals can be send using the
+Issues, bugs, and proposals can be sent using the
 [Github issue tracker](https://github.com/Frunit/space-invaders/issues)
 
 I don't keep a central to-do list, but write them as comments directly into the

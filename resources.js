@@ -3,10 +3,25 @@
 // TODO: Could be rewritten with a Promise instead of callback
 
 
+if(typeof window === 'undefined') {
+	global.Image = {
+		_src: '',
+		onload: () => {},
+
+		set src(url) {
+			this._src = url;
+			this.onload();
+		}
+	};
+}
+
+
+
 /**
- * `Resources` keeps all resources needed in the game (currently images and
- * fonts). It loads everything and calls the callback as soon as everything
+ * <tt>Resources</tt> keeps all resources needed in the game (currently images
+ * and fonts). It loads everything and calls the callback as soon as everything
  * loaded.
+ *
  * @constructor
  */
 function Resources() {
@@ -18,7 +33,8 @@ function Resources() {
 
 
 /**
- * `Resources.load` loads all files given in the array of urls.
+ * <tt>Resources.load</tt> loads all files given in the array of urls.
+ *
  * @param {string[]} urls - The list of urls to load.
  */
 Resources.prototype.load = function load(urls) {
@@ -27,11 +43,15 @@ Resources.prototype.load = function load(urls) {
 
 
 /**
- * `Resources.get` returns the object for the given url or `undefined` if
- * the resource was never requested or `false` if the resource was requested but
- * did not finish loading.
- * @param {string} url - The url of the resource to get
- * @returns {Object|undefined|boolean} The resource object or undefined or false (see description)
+ * <tt>Resources.get</tt> returns the object for the given url or
+ * <tt>undefined</tt> if the resource was never requested or <tt>false</tt> if
+ * the resource was requested but did not finish loading.
+ *
+ * @param {string} url
+ * 		The url of the resource to get
+ * @returns {object|undefined|boolean}
+ * 		The resource object or <tt>undefined</tt> or <tt>false</tt> (see
+ * 		description)
  */
 Resources.prototype.get = function(url) {
 	return this.resource_cache[url];
@@ -39,9 +59,11 @@ Resources.prototype.get = function(url) {
 
 
 /**
- * `Resources.on_ready` sets the callback function that shall be called when all
- * resources were loaded.
- * @param {function} The function to be called when all resources were loaded
+ * <tt>Resources.on_ready</tt> sets the callback function that shall be called
+ * when all resources were loaded.
+ *
+ * @param {Function} func
+ * 		The function to be called when all resources were loaded
  */
 Resources.prototype.on_ready = function(func) {
 	this.ready_callback = func;
@@ -49,9 +71,10 @@ Resources.prototype.on_ready = function(func) {
 
 
 /**
- * `Resources._load` loads a given resource based on the url.
+ * <tt>Resources._load</tt> loads a given resource based on the url.
  * If the loaded resource was the last resource in the list of resources to be
- * loaded, the `ready_callback` is called.
+ * loaded, the <tt>ready_callback</tt> is called.
+ *
  * @private
  * @param {string} url - The url of the resource to load
  */
@@ -95,16 +118,17 @@ Resources.prototype._load = function(url) {
 				break;
 			}
 			default:
-				console.warn('Unknown file type', url);
+				throw 'Unknown file type: ' + url;
 		}
 	}
 };
 
 
 /**
- * `Resources._is_ready` checks whether all resources were loaded.
+ * <tt>Resources._is_ready</tt> checks whether all resources were loaded.
+ *
  * @private
- * @returns {boolean} True if everything loaded, false if not
+ * @returns {boolean} <tt>true</tt> if everything loaded, <tt>false</tt> if not
  */
 Resources.prototype._is_ready = function() {
 	return this.loaded === this.expected;
@@ -112,8 +136,12 @@ Resources.prototype._is_ready = function() {
 
 
 /**
- * `Fake_Resources` pretends to load all needed resources.
+ * <tt>Fake_Resources</tt> pretends to load all needed resources.
  * It will call the callback as soon as everything is "loaded".
+ * It is meant for testing in a node environment, where no <tt>Image</tt>
+ * object exists. As opposed to the "real" Resources, it will *never* call the
+ * <tt>ready_callback</tt> set by Fake_Resources.on_ready .
+ *
  * @constructor
  */
 function Fake_Resources() {
@@ -123,7 +151,8 @@ function Fake_Resources() {
 
 
 /**
- * `Fake_Resources.load` "loads" all resources given in the array of urls.
+ * <tt>Fake_Resources.load</tt> "loads" all resources given in the array of urls.
+ *
  * @param {string[]} urls - The list of urls to load.
  */
 Fake_Resources.prototype.load = function(urls) {
@@ -134,10 +163,11 @@ Fake_Resources.prototype.load = function(urls) {
 
 
 /**
- * `Fake_Resources.get` returns the string of the given url or `undefined` if
- * the resources was never requested.
+ * <tt>Fake_Resources.get</tt> returns the string of the given url or
+ * <tt>false</tt> if the resources was never requested.
+ *
  * @param {string} url - The url of the resource to get
- * @returns {string|boolean} The url or false (see description)
+ * @returns {string|boolean} The url or <tt>false</tt> (see description)
  */
 Fake_Resources.prototype.get = function(url) {
 	return this.resource_cache[url]
@@ -145,9 +175,11 @@ Fake_Resources.prototype.get = function(url) {
 
 
 /**
- * `Fake_Resources.on_ready` sets the callback function that shall be called
- * when all resources were "loaded".
- * @param {function} The function to be called when all resources were "loaded"
+ * <tt>Fake_Resources.on_ready</tt> sets the callback function that shall be
+ * called when all resources were "loaded".
+ *
+ * @param {Function} func
+ * 		The function to be called when all resources were "loaded"
  */
 Fake_Resources.prototype.on_ready = function(func) {
 	this.ready_callback = func;
