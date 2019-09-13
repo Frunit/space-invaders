@@ -4,10 +4,6 @@ import Resources from '../resources.js';
 import {Player, Bullet} from '../entities.js';
 
 
-// TODO: Missing test: Killing the player (cooldown, off_time, sprite)
-// TODO: Missing test: Sprite change upon goody pick-up
-
-
 // This allows the resources to 'load' the graphics and just then start the
 // tests. Otherwise, the tests would start automatically and a potential race
 // condition might occur.
@@ -198,4 +194,154 @@ QUnit.test('Player shooting', function(assert) {
 	assert.strictEqual(bullets[1].x, 500-2+20, 'Bullet 2 x');
 	assert.strictEqual(bullets[1].y, 300-8-16, 'Bullet 2 y');
 	assert.strictEqual(bullets[1].owner, 0, 'Bullet 2 owner');
+});
+
+
+QUnit.test('Player sprite changes', function(assert) {
+	const player = new Player(200, 500, 0);
+	const player2 = new Player(400, 500, 1);
+	const player3 = new Player(123, 456, 0);
+	const bounds = {
+		left: 50,
+		right: 850,
+		top: 50,
+		bottom: 550,
+	};
+
+	assert.deepEqual(player.sprite, player2.sprite, 'p1 and p2 have the same sprite');
+	assert.deepEqual(player.sprite, player3.sprite, 'p1 and p3 have the same sprite');
+
+	player.apply_rapid_fire();
+
+	assert.deepEqual(player.sprite, player3.sprite, 'rapid fire does not change the sprite');
+
+	player.apply_double_laser();
+
+	assert.ok(player.sprite.offset.x !== player3.sprite.offset.x || player.sprite.offset.y !== player3.sprite.offset.y, 'double laser changes sprite');
+
+	player2.apply_invulnerability();
+
+	assert.ok(player2.sprite.offset.x !== player3.sprite.offset.x || player2.sprite.offset.y !== player3.sprite.offset.y, 'invulnerability changes sprite');
+
+	player.apply_invulnerability();
+	player2.apply_double_laser();
+
+	assert.deepEqual(player.sprite, player2.sprite, 'combination results in same sprite');
+	assert.ok(player.sprite.offset.x !== player3.sprite.offset.x || player.sprite.offset.y !== player3.sprite.offset.y, 'combination is not original sprite 1');
+	assert.ok(player2.sprite.offset.x !== player3.sprite.offset.x || player2.sprite.offset.y !== player3.sprite.offset.y, 'combination is not original sprite 2');
+
+	player.kill(true); // force kill the player (ignoring invulnerability)
+
+	assert.ok(player.sprite.offset.x !== player2.sprite.offset.x || player.sprite.offset.y !== player2.sprite.offset.y, 'killing changes sprite 1');
+	assert.ok(player.sprite.offset.x !== player3.sprite.offset.x || player.sprite.offset.y !== player3.sprite.offset.y, 'killing changes sprite 2');
+	assert.strictEqual(player.sprite.frames.length, 2, 'Explosion has two frames');
+
+});
+
+
+QUnit.test('Player kill', function(assert) {
+	const player = new Player(10, 100, 1);
+	const bounds = {
+		left: 50,
+		right: 850,
+		top: 50,
+		bottom: 550,
+	};
+
+	assert.ok(player.active, 'initial active');
+	assert.ok(!player.is_dead, 'initial is_dead');
+	assert.ok(player.collidable, 'initial collidable');
+	assert.strictEqual(player.cooldown, 0, 'initial cooldown');
+	assert.strictEqual(player.off_time, -1, 'initial off_time');
+	assert.strictEqual(player.lives, 3, 'initial lives');
+
+	player.kill();
+
+	assert.ok(player.active, 'active after kill');
+	assert.ok(!player.is_dead, 'is_dead after kill');
+	assert.ok(!player.collidable, 'collidable after kill');
+	assert.strictEqual(player.cooldown, 2, 'cooldown after kill');
+	assert.strictEqual(player.off_time, 2, 'off_time after kill');
+	assert.strictEqual(player.lives, 2, 'lives after kill');
+
+	player.update(1, bounds);
+
+	assert.ok(player.active, 'active after kill');
+	assert.ok(!player.is_dead, 'is_dead after 1.0 s');
+	assert.ok(!player.collidable, 'collidable after kill after 1.0 s');
+	assert.strictEqual(player.cooldown, 1, 'cooldown after 1.0 s');
+	assert.strictEqual(player.off_time, 1, 'off_time after 1.0 s');
+	assert.strictEqual(player.lives, 2, 'lives after 1.0 s');
+
+	player.update(1, bounds);
+
+	assert.ok(player.active, 'active after kill');
+	assert.ok(!player.is_dead, 'is_dead after 2.0 s');
+	assert.ok(!player.collidable, 'collidable after kill after 2.0 s');
+	assert.strictEqual(player.cooldown, 0, 'cooldown after 2.0 s');
+	assert.strictEqual(player.off_time, 0, 'off_time after 2.0 s');
+	assert.strictEqual(player.lives, 2, 'lives after 2.0 s');
+
+	player.update(0.0001, bounds);
+
+	assert.ok(player.active, 'active after kill');
+	assert.ok(!player.is_dead, 'is_dead after 2.0001 s');
+	assert.ok(player.collidable, 'collidable after kill after 2.0001 s');
+	assert.strictEqual(player.cooldown, 0, 'cooldown after 2.0001 s');
+	assert.strictEqual(player.off_time, -1, 'off_time after 2.0001 s');
+	assert.strictEqual(player.lives, 2, 'lives after 2.0001 s');
+
+	player.kill();
+
+	assert.ok(player.active, 'active after 2nd kill');
+	assert.ok(!player.is_dead, 'is_dead after 2nd kill');
+	assert.ok(!player.collidable, 'collidable after 2nd kill');
+	assert.strictEqual(player.cooldown, 2, 'cooldown after 2nd kill');
+	assert.strictEqual(player.off_time, 2, 'off_time after 2nd kill');
+	assert.strictEqual(player.lives, 1, 'lives after 2nd kill');
+
+	player.update(2.0001, bounds);
+
+	assert.ok(player.active, 'active after 2nd kill after 2.0001 s');
+	assert.ok(!player.is_dead, 'is_dead after 2nd kill after 2.0001 s');
+	assert.ok(player.collidable, 'collidable after 2nd kill after 2.0001 s');
+	assert.strictEqual(player.cooldown, 0, 'cooldown after 2nd kill after 2.0001 s');
+	assert.strictEqual(player.off_time, -1, 'off_time after 2nd kill after 2.0001 s');
+	assert.strictEqual(player.lives, 1, 'lives after 2nd kill after 2.0001 s');
+
+	player.kill();
+
+	assert.ok(player.active, 'active after 3rd kill');
+	assert.ok(!player.is_dead, 'is_dead after 3rd kill');
+	assert.ok(!player.collidable, 'collidable after 3rd kill');
+	assert.strictEqual(player.cooldown, 2, 'cooldown after 3rd kill');
+	assert.strictEqual(player.off_time, 2, 'off_time after 3rd kill');
+	assert.strictEqual(player.lives, 0, 'lives after 3rd kill');
+
+	player.update(2.0001, bounds);
+
+	assert.ok(player.active, 'active after 3rd kill after 2.0001 s');
+	assert.ok(!player.is_dead, 'is_dead after 3rd kill after 2.0001 s');
+	assert.ok(player.collidable, 'collidable after 3rd kill after 2.0001 s');
+	assert.strictEqual(player.cooldown, 0, 'cooldown after 3rd kill after 2.0001 s');
+	assert.strictEqual(player.off_time, -1, 'off_time after 3rd kill after 2.0001 s');
+	assert.strictEqual(player.lives, 0, 'lives after 3rd kill after 2.0001 s');
+
+	player.kill();
+
+	assert.ok(player.active, 'active after 4th kill');
+	assert.ok(!player.is_dead, 'is_dead after 4th kill');
+	assert.ok(!player.collidable, 'collidable after 4th kill');
+	assert.strictEqual(player.cooldown, 2, 'cooldown after 4th kill');
+	assert.strictEqual(player.off_time, 2, 'off_time after 4th kill');
+	assert.strictEqual(player.lives, -1, 'lives after 4th kill');
+
+	player.update(2.0001, bounds);
+
+	assert.ok(player.active, 'active after 4th kill after 2.0001 s');
+	assert.ok(player.is_dead, 'is_dead after 4th kill after 2.0001 s');
+	assert.ok(!player.collidable, 'collidable after 4th kill after 2.0001 s');
+	assert.strictEqual(player.cooldown, 0, 'cooldown after 4th kill after 2.0001 s');
+	assert.strictEqual(player.off_time, Infinity, 'off_time after 4th kill after 2.0001 s');
+	assert.strictEqual(player.lives, -1, 'lives after 4th kill after 2.0001 s');
 });

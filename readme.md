@@ -10,7 +10,7 @@ Space Invaders is a game written by Mathias Bockwoldt in Javascript
 [it-talents.de competition September 2019](https://www.it-talents.de/foerderung/code-competition/airbus-code-competition-09-2019)
 sponsored by Airbus.
 
-A mostly up-to-date version can be played here: [frunit.de/si](https://www.frunit.de/si)
+The latest version on the master branch can be played here: [frunit.github.io/space-invaders](https://frunit.github.io/space-invaders)
 
 
 Features
@@ -79,13 +79,13 @@ Programmatic organisation
 -------------------------
 
 The game is written in an object-oriented way. The master game object handles
-an engine and a graphical user interface (gui). The engine should work without
-any gui, modifying objects following certain rules. The objects can be sent to
-the gui for rendering.
+an engine and a screen. The engine should work without any screen, modifying
+objects following certain rules. The objects can be sent to the screen for
+rendering.
 
 The game has two global objects, that are:
-- `game`: The actual game, holding the engine and the gui.
-- `resources`: Organizes graphics used by the gui. This is defined globally
+- `game`: The actual game, holding the engine and the screen.
+- `resources`: Organizes graphics used by the screen. This is defined globally
     to be able to load graphics before the game is initialized.
 
 In addition, there are four debugging outputs (in addition to the omnipresent

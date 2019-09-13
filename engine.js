@@ -288,24 +288,29 @@ Engine.prototype.update = function(dt) {
 		};
 	}
 
-	if(this.enemy_moves_down) {
-		for(let enemy of this.enemies) {
-			enemy.update(dt, 0, dt * this.enemy_speed_factor, this.inner_bounds);
-		}
-		this.enemy_moves_down--;
+	const dx = !this.enemy_moves_down ? this.enemy_direction * dt * this.enemy_speed_factor : 0;
+	const dy = this.enemy_moves_down ? dt * this.enemy_speed_factor : 0;
+
+	let reached_boundary = false;
+	for(let enemy of this.enemies) {
+		reached_boundary = enemy.update(dt, dx, dy, this.inner_bounds) || reached_boundary;
 	}
-	else {
-		let reached_boundary = false;
-		const dir = this.enemy_direction * dt * this.enemy_speed_factor;
 
-		for(let enemy of this.enemies) {
-			reached_boundary = enemy.update(dt, dir, 0, this.inner_bounds) || reached_boundary;
+	if(reached_boundary) {
+		if(this.enemy_moves_down) {
+			this.game_is_over = true;
 		}
-
-		if(reached_boundary) {
-			this.enemy_moves_down = 10;
+		else {
+			this.enemy_moves_down = 1;
 			this.enemy_direction *= -1;
 			this.enemy_speed_factor += 0.05
+		}
+	}
+
+	if(this.enemy_moves_down) {
+		this.enemy_moves_down -= dt;
+		if(this.enemy_moves_down < 0) {
+			this.enemy_moves_down = 0;
 		}
 	}
 
