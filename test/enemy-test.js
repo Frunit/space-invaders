@@ -4,9 +4,6 @@ import Resources from '../resources.js';
 import {Enemy, Bullet} from '../entities.js';
 
 
-// TODO: Missing test: Killing the enemy (cooldown, off_time, sprite)
-
-
 // This allows the resources to 'load' the graphics and just then start the
 // tests. Otherwise, the tests would start automatically and a potential race
 // condition might occur.
@@ -75,9 +72,9 @@ QUnit.test('Enemy properties after some time', function(assert) {
 });
 
 
-/*TODO QUnit.test('Enemy movement and bounds', function(assert) {
-	const enemy = new Enemy(100, 100);
-	const enemy2 = new Enemy(100, 100);
+/* TODO QUnit.test('Enemy movement and bounds', function(assert) {
+	const enemy = new Enemy(100, 100, 0);
+	const enemy2 = new Enemy(100, 100, 0);
 	const bounds = {
 		left: 50,
 		right: 850,
@@ -85,9 +82,11 @@ QUnit.test('Enemy properties after some time', function(assert) {
 		bottom: 550,
 	};
 
-	enemy.move(-100, bounds);
+	let reached_border = false;
 
-	assert.strictEqual(enemy.x, bounds.left, 'Left bound');
+	reached_border = enemy.update(1, -10, 0, bounds);
+
+	assert.ok(reached_border, 'Left bound');
 
 	enemy.move(100000, bounds);
 	enemy2.move(7.82, bounds);
@@ -137,4 +136,63 @@ QUnit.test('Enemy shooting', function(assert) {
 	assert.strictEqual(bullets[0].x, 564-bullets[0].w/2, 'Bullet x');
 	//TODO:assert.strictEqual(bullets[0].y, 364-8+bullets[0].h/2, 'Bullet y');
 	assert.strictEqual(bullets[0].owner, -1, 'Bullet owner');
+});
+
+
+QUnit.test('Enemy kill', function(assert) {
+	const enemy = new Enemy(500, 300, 1);
+	const enemy2 = new Enemy(500, 300, 1);
+	const bounds = {
+		left: 50,
+		right: 850,
+		top: 50,
+		bottom: 550,
+	};
+
+	assert.ok(enemy.active, 'initial active');
+	assert.ok(enemy.collidable, 'initial collidable');
+	assert.strictEqual(enemy.cooldown, 0, 'initial cooldown');
+	assert.strictEqual(enemy.off_time, -1, 'initial off_time');
+
+	assert.deepEqual(enemy.sprite, enemy2.sprite, 'initial sprites');
+	assert.strictEqual(enemy.x, enemy2.x, 'position must be the same x');
+	assert.strictEqual(enemy.y, enemy2.y, 'position must be the same y');
+
+	enemy.kill();
+
+	assert.ok(enemy.active, 'active after kill');
+	assert.ok(!enemy.collidable, 'collidable after kill');
+	assert.strictEqual(enemy.cooldown, 2, 'cooldown after kill');
+	assert.strictEqual(enemy.off_time, 2, 'off_time after kill');
+	assert.ok(enemy.sprite.offset.x !== enemy2.sprite.offset.x || enemy.sprite.offset.y !== enemy2.sprite.offset.y, 'killing changes sprite');
+	assert.strictEqual(enemy.x + 4, enemy2.x, 'position changes with sprite change');
+	assert.strictEqual(enemy.y, enemy2.y, 'position must not change when dead y after kill');
+
+	enemy.update(1, 1, 1, bounds);
+
+	assert.ok(enemy.active, 'active after 1.0 s');
+	assert.ok(!enemy.collidable, 'collidable after 1.0 s');
+	assert.strictEqual(enemy.cooldown, 1, 'cooldown after 1.0 s');
+	assert.strictEqual(enemy.off_time, 1, 'off_time after 1.0 s');
+	assert.strictEqual(enemy.x + 4, enemy2.x, 'position must not change when dead x after 1.0 s');
+	assert.strictEqual(enemy.y, enemy2.y, 'position must not change when dead y after 1.0 s');
+
+	enemy.update(1, 1, 1, bounds);
+
+	assert.ok(enemy.active, 'active after 2.0 s');
+	assert.ok(!enemy.collidable, 'collidable after 2.0 s');
+	assert.strictEqual(enemy.cooldown, 0, 'cooldown after 2.0 s');
+	assert.strictEqual(enemy.off_time, 0, 'off_time after 2.0 s');
+	assert.strictEqual(enemy.x + 4, enemy2.x, 'position must not change when dead x after 2.0 s');
+	assert.strictEqual(enemy.y, enemy2.y, 'position must not change when dead y after 2.0 s');
+
+	enemy.update(0.0001, 1, 1, bounds);
+
+	assert.ok(!enemy.active, 'active after 2.0001 s');
+	assert.ok(!enemy.collidable, 'collidable after 2.0001 s');
+	assert.strictEqual(enemy.cooldown, 0, 'cooldown after 2.0001 s');
+	assert.ok(enemy.off_time < 0, 'off_time after 2.0001 s');
+	assert.strictEqual(enemy.x + 4, enemy2.x, 'position must not change when dead x after 2.0001 s');
+	assert.strictEqual(enemy.y, enemy2.y, 'position must not change when dead y after 2.0001 s');
+
 });

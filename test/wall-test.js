@@ -4,9 +4,6 @@ import Resources from '../resources.js';
 import {Wall} from '../entities.js';
 
 
-// TODO: Wall bounds left and right
-
-
 // This allows the resources to 'load' the graphics and just then start the
 // tests. Otherwise, the tests would start automatically and a potential race
 // condition might occur.
@@ -102,4 +99,70 @@ QUnit.test('Wall properties after some time', function(assert) {
 	assert.strictEqual(Math.floor(wall.x), 169, 'x after 3.6 s');
 	assert.strictEqual(Math.floor(wall.y), 560, 'y after 3.6 s');
 	assert.strictEqual(Math.floor(wall.speed.y), 605, 'speed.y after 3.6 s');
+});
+
+
+QUnit.test('Wall bounds left and right', function(assert) {
+	const wall = new Wall(20, 48);
+	const wall2 = new Wall(80, 48);
+	const bounds = {
+		left: 0,
+		right: 100,
+		top: 0,
+		bottom: 1000,
+	};
+
+	wall.kill();
+
+	wall.speed.x = -30;
+	wall.speed.y = -100;
+
+	wall.update(0.1, bounds);
+	assert.ok(wall.active, 'active 1 after 0.1 s');
+	assert.strictEqual(Math.floor(wall.x), 9, 'x 1 after 0.1 s');
+	assert.strictEqual(Math.floor(wall.y), 30, 'y 1 after 0.1 s');
+	assert.strictEqual(Math.floor(wall.speed.y), -70, 'speed.y 1 after 0.1 s');
+
+	for(let i = 0; i < 8; i++) {
+		wall.update(0.1, bounds);
+	}
+
+	assert.ok(wall.active, 'active 1 after 0.9 s');
+	assert.strictEqual(Math.floor(wall.x), -15, 'x 1 after 0.9 s');
+	assert.strictEqual(Math.floor(wall.y), 58, 'y 1 after 0.9 s');
+	assert.strictEqual(Math.floor(wall.speed.y), 170, 'speed.y 1 after 0.9 s');
+
+	wall.update(0.1, bounds);
+
+	assert.ok(!wall.active, 'inactive 1 after 1.0 s');
+	assert.strictEqual(Math.floor(wall.x), -18, 'x 1 after 1.0 s');
+	assert.strictEqual(Math.floor(wall.y), 75, 'y 1 after 1.0 s');
+	assert.strictEqual(Math.floor(wall.speed.y), 200, 'speed.y 1 after 1.0 s');
+
+	wall2.kill();
+
+	wall2.speed.x = 25;
+	wall2.speed.y = -125;
+
+	wall2.update(0.1, bounds);
+	assert.ok(wall2.active, 'active 2 after 0.1 s');
+	assert.strictEqual(Math.floor(wall2.x), 74, 'x 2 after 0.1 s');
+	assert.strictEqual(Math.floor(wall2.y), 27, 'y 2 after 0.1 s');
+	assert.strictEqual(Math.floor(wall2.speed.y), -95, 'speed.y 2 after 0.1 s');
+
+	for(let i = 0; i < 10; i++) {
+		wall2.update(0.1, bounds);
+	}
+
+	assert.ok(wall2.active, 'active 2 after 1.1 s');
+	assert.strictEqual(Math.floor(wall2.x), 99, 'x 2 after 1.1 s');
+	assert.strictEqual(Math.floor(wall2.y), 67, 'y 2 after 1.1 s');
+	assert.strictEqual(Math.floor(wall2.speed.y), 205, 'speed.y 2 after 1.1 s');
+
+	wall2.update(0.1, bounds);
+
+	assert.ok(!wall2.active, 'inactive 2 after 1.2 s');
+	assert.strictEqual(Math.floor(wall2.x), 102, 'x 2 after 1.2 s');
+	assert.strictEqual(Math.floor(wall2.y), 88, 'y 2 after 1.2 s');
+	assert.strictEqual(Math.floor(wall2.speed.y), 235, 'speed.y 2 after 1.2 s');
 });
