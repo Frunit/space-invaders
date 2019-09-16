@@ -594,6 +594,82 @@ Bullet.prototype.kill = function() {
 };
 
 
+/**
+ * <tt>Mystery</tt> is an object for an enemy space ship/monster.
+ *
+ * @constructor
+ * @extends Entity
+ * @param {boolean} from_left
+ * 		If true, the mystery enters from left, otherwise, it enters from right
+ * @param {Bounds} bounds
+ * 		Screen boundaries
+ */
+function Mystery(from_left, bounds) {
+	Entity.call(this);
+	this.object = 'mystery';
+	 // pixel per second
+	this.w = 64;
+	this.h = 28;
+	this.score_value = 500;
+	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 68}, [{x: 0, y: 0}]);
+
+	if(from_left) {
+		this.x = -this.w;
+		this.speed.x = 64;
+	}
+	else {
+		this.x = bounds.right;
+		this.speed.x = -64;
+	}
+
+	// The mystery will follow a sine curve. speed.y will be interpreted as
+	// amplitude of the curve
+	this.speed.y = 10;
+
+	this.base_y = 20;
+	this.y = this.base_y;
+}
+
+
+/**
+ * <tt>Mystery.update</tt> moves the mystery, respecting boundaries.
+ *
+ * @param {number} dt - The time delta since last update in seconds
+ * @param {Bounds} bounds - Screen boundaries
+ */
+Mystery.prototype.update = function(dt, bounds) {
+	this.x += dt * this.speed.x;
+	this.y = this.speed.y * Math.sin(this.x * 0.05) + this.base_y;
+
+	if(this.off_time >= 0) {
+		this.off_time -= dt;
+		if(this.off_time < 0) {
+			this.active = false;
+		}
+	}
+
+	this.sprite.update(dt);
+
+	this.active = this.x < bounds.left || this.x + this.w > bounds.right;
+};
+
+
+/**
+ * <tt>Mystery.kill</tt> kills the mystery. It turns into an explosion for some
+ * seconds.
+ */
+Mystery.prototype.kill = function() {
+	this.off_time = 2;
+	this.collidable = false;
+	this.speed.x = 0;
+	this.w = 52;
+	this.h = 32;
+	this.x += 6;
+	this.y += 2;
+	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 68, y: 68}, [{x: 0, y: 0}]);
+};
+
+
 // TODO: Goody-ideas: Faster movement
 /**
  * <tt>Goody</tt> is an object for a goody that is released by a killed enemy.
