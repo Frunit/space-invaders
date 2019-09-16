@@ -1,6 +1,6 @@
 'use strict';
 
-// TODO: Could be rewritten with a Promise instead of callback
+// MAYBE: Could be rewritten with a Promise instead of callback
 
 
 if(typeof window === 'undefined') {
@@ -11,6 +11,10 @@ if(typeof window === 'undefined') {
 		set src(url) {
 			this._src = url;
 			this.onload();
+		},
+
+		get src() {
+			return this._src;
 		}
 	};
 }

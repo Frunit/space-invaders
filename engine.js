@@ -5,7 +5,8 @@ import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
 
 
-// TODO: Sometimes, bullet stay hanging around
+// MAYBE: Show achieved score when killing an enemy or getting the coin goody
+
 
 /**
  * <tt>Engine</tt> is the actual game engine. It *should* work without any
@@ -158,7 +159,7 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 
 	// Create enemies
 	const enemy_offset = this.inner_bounds.left + (this.inner_bounds.right - this.inner_bounds.left) / 2 - level.enemies[0].length / 2 * 60;
-	const enemy_upper = 30;
+	const enemy_upper = 50;
 
 	for(let y = 0; y < level.enemies.length; y++) {
 		for(let x = 0; x < level.enemies[0].length; x++) {
@@ -301,7 +302,7 @@ Engine.prototype.update = function(dt) {
 			this.game_is_over = true;
 		}
 		else {
-			this.enemy_moves_down = 1;
+			this.enemy_moves_down = 0.2;
 			this.enemy_direction *= -1;
 			this.enemy_speed_factor += 0.05
 		}
@@ -448,7 +449,7 @@ Engine.prototype.collide_goodies = function(goodies, players) {
  * @returns {boolean} Whether or not the bounding boxes overlap.
  */
 Engine.prototype.collider = function(a, b) {
-	// TODO: If the bounding boxes hit, this might continue doing some kind of pixel-perfect detection.
+	// MAYBE: If the bounding boxes hit, this might continue doing some kind of pixel-perfect detection.
 	return a.collidable && b. collidable && !(
 		a.x       > b.x + b.w ||
 		a.y       > b.y + b.h ||
@@ -525,7 +526,7 @@ Engine.prototype.apply_goody = function(type, player) {
  * @param {Player} player - The player to place the ball on.
  */
 Engine.prototype.start_break_out = function(player) {
-	// TODO: Add Break-out mode!
+	// MAYBE: Add Break-out mode! If not, update readme!
 	console.log(player.num, 'BREAK OUT!');
 };
 

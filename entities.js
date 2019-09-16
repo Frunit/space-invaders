@@ -51,7 +51,7 @@ function Player(x, y, num) {
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
 
-	this.speed.x = 96; // pixel per second
+	this.speed.x = 128; // pixel per second
 
 	this.bullet_offset = {x: this.w/2, y: 0};
 	this.bullet_double_x_offset = 20;
@@ -116,7 +116,7 @@ Player.prototype.reset = function() {
  * 		cooldown prevented firing.
  */
 Player.prototype.fire = function() {
-	// TODO: The cooldown should be ignored, if no bullet of the player is present anywhere.
+	// MAYBE: The cooldown should be ignored, if no bullet of the player is present anywhere.
 	// Still, an inactive player (hidden or dead) should not shoot!
 	if(!this.firing || this.cooldown) {
 		return [];
@@ -686,7 +686,7 @@ function Wall(x, y) {
  * @param {Bounds} bounds - Hard boundaries for the wall piece
  */
 Wall.prototype.update = function(dt, bounds) {
-	// TODO: Might be cool, if the block could rotate :)
+	// MAYBE: Might be cool, if the block could rotate :)
 
 	// As long as the block is collidable, it does not move, so no update is needed
 	if(this.collidable) {
