@@ -27,8 +27,9 @@ document.getElementById('highscore').addEventListener('input', function(e) {
 
 <script type="module">
 import { Game } from './game.js';
+import { options, levels } from './options.js';
 
-const game = new Game();
+const game = new Game(options, levels);
 </script>
 </body>
 </html>

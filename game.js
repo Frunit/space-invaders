@@ -11,7 +11,7 @@
  */
 
 // TODO: Implement special UFO on top that traverses the screen
-// TODO: Maybe implement music and sound
+// MAYBE: Implement music and sound
 
 // Depending on whether the browser or node.js is used, offer a different debug
 // function
@@ -43,36 +43,9 @@ import Screen from './screen.js';
  *
  * @constructor
  */
-function Game() {
-
-	// TODO: The options and the version may be externalized using json or the like.
-	this.options = {
-		total_size: {w: 900, h: 600},
-		border: 20,
-		num_players: 1,
-		start_level: 0,
-	};
-
-	// TODO: Load levels from levels.json!
-	this.levels = [
-		{
-			fort: [
-				"__XXXX__",
-				"XXXXXXXX",
-				"XXXXXXXX",
-				"XXXXXXXX",
-				"XX____XX"
-			],
-			forts: 4,
-			enemies: [
-				"0000000000",
-				"1111111111",
-				"1111111111",
-				"2222222222",
-				"2222222222"
-			]
-		}
-	];
+function Game(options, levels) {
+	this.options = options;
+	this.levels = levels;
 
 	this.version = 'pre-alpha';
 
