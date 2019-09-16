@@ -21,6 +21,8 @@ function Screen(target, expected_size) {
 
 	this.expected_size = expected_size;
 	this.scale = 1;
+	this.canvas.width = expected_size.w;
+	this.canvas.height = expected_size.h;
 	this._set_canvas_size(target_element.clientWidth, target_element.clientHeight);
 
 	// Disable the right-click context menu in the game
@@ -52,8 +54,6 @@ Screen.prototype._set_canvas_size = function(target_width, target_height) {
 
 	this.canvas.width = this.expected_size.w * this.scale;
 	this.canvas.height = this.expected_size.h * this.scale;
-
-	console.log(this.scale);
 };
 
 
