@@ -1,10 +1,25 @@
 body {
 	background-color: grey;
+	height: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+
+html {
+	height: 100%;
 }
 
 canvas {
 	margin: 10px;
 	border: 1px solid blue;
+	margin: 0px;
+}
+
+#game {
+	width: 95%;
+	height: 95%;
+	border: 1px solid red;
+	padding: 0px;
 }
 
 input {

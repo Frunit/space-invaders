@@ -16,11 +16,12 @@ function Screen(target, expected_size) {
 	// Create the canvas
 	this.canvas = document.createElement('canvas');
 	this.ctx = this.canvas.getContext('2d');
-	document.getElementById(target).appendChild(this.canvas);
+	const target_element = document.getElementById(target)
+	target_element.appendChild(this.canvas);
 
 	this.expected_size = expected_size;
 	this.scale = 1;
-	this._set_canvas_size();
+	this._set_canvas_size(target_element.clientWidth, target_element.clientHeight);
 
 	// Disable the right-click context menu in the game
 	this.canvas.addEventListener('contextmenu', function(e) {
@@ -37,31 +38,22 @@ function Screen(target, expected_size) {
  *
  * @private
  */
-Screen.prototype._set_canvas_size = function() {
-	// TODO: set_canvas_size does not seem to work!
-	const window_width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-	const window_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-
+Screen.prototype._set_canvas_size = function(target_width, target_height) {
+	// MAYBE: Change canvas size upon browser resize
 	const expected_aspect_ratio = this.expected_size.w / this.expected_size.h;
-	const window_aspect_ratio = window_width / window_height;
+	const target_aspect_ratio = target_width / target_height;
 
-	this.scale = 1;
-
-	if(expected_aspect_ratio > window_aspect_ratio) {
-		if(window_width < this.expected_size.w) {
-			this.scale = window_width / this.expected_size.w;
-		}
+	if(expected_aspect_ratio > target_aspect_ratio) {
+		this.scale = target_width / this.expected_size.w;
 	}
 	else {
-		if(window_height < this.expected_size.h) {
-			this.scale = window_height / this.expected_size.h;
-		}
+		this.scale = target_height / this.expected_size.h;
 	}
 
 	this.canvas.width = this.expected_size.w * this.scale;
 	this.canvas.height = this.expected_size.h * this.scale;
 
-	this.ctx.scale(this.scale, this.scale);
+	console.log(this.scale);
 };
 
 
@@ -77,6 +69,8 @@ Screen.prototype._set_canvas_size = function() {
  */
 Screen.prototype.render = function(entities, texts) {
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.save();
+	this.ctx.scale(this.scale, this.scale);
 	for(let entity of entities) {
 		const params = entity.sprite.render();
 
@@ -97,6 +91,7 @@ Screen.prototype.render = function(entities, texts) {
 			this.ctx.restore();
 		}
 	}
+	this.ctx.restore();
 };
 
 
