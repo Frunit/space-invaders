@@ -4,6 +4,9 @@ import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
 
 
+// TODO: Proper design. Determine, whether player names should be entered here already
+
+
 /**
  * <tt>Start</tt> is the start screen.
  *
