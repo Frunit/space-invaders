@@ -114,7 +114,7 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 	if(this.players.length) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
-			this.players[i].reset();
+			this.players[i].resurrect();
 			this.players[i].x = (i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left;
 		}
 	}
@@ -127,23 +127,30 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 
 	// GUI
 
+	// Life icon for player 1
 	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 10, 'life'));
 	const life_width = this.gui[this.gui.length - 1].w;
+	// Life counter text player 1
 	this.texts.player_lives.push(new Text(this.players[0].lives, this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
+	this.update_lives(this.players[0]);
 
+	// Score icon for player 1
 	this.gui.push(new GUI_Element(this.outer_bounds.left + 95, this.outer_bounds.top + 10, 'score'));
 	const score_width = this.gui[this.gui.length - 1].w;
-
+	// Score counter text player 1
 	this.texts.player_scores.push(new Text('', this.outer_bounds.left + 100 + score_width, this.outer_bounds.top + 30, Infinity));
 	this.texts.player_scores[0].set_score(this.players[0].score);
 
 	if(this.num_players === 2) {
+		// Life icon for player 2
 		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 10, 'life'));
-
+		// Life counter text player 2
 		this.texts.player_lives.push(new Text(this.players[1].lives, this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
+		this.update_lives(this.players[1]);
 
+		// Score icon for player 2
 		this.gui.push(new GUI_Element(this.outer_bounds.right - 95, this.outer_bounds.top + 10, 'score'));
-
+		// Score counter text player 2
 		this.texts.player_scores.push(new Text('', this.outer_bounds.right - 100, this.outer_bounds.top + 30, Infinity, 'right'));
 		this.texts.player_scores[1].set_score(this.players[1].score);
 	}
