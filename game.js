@@ -267,9 +267,10 @@ Game.prototype.next_stage = function(payload) {
 			break;
 		}
 		case 'highscore': {
+			const current_date = new Date();
 			const scores = 'scores' in payload ? payload.scores : [];
 			const level = 'level' in payload ? payload.level : 0;
-			this.stage = new Highscore(this.options.total_size, scores, level);
+			this.stage = new Highscore(this.options.total_size, scores, level, current_date);
 			break;
 		}
 		default:
