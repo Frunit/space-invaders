@@ -44,8 +44,16 @@ Start.prototype.setup = function() {
 	this.selector.x = this.window_size.w / 2 - this.selector.w - 10;
 	this.selector.y = this.window_size.h / 2 + this.selector.h * (this.num_players - 2);
 
-	this.texts.fixed.push(new Text('One player', this.window_size.w / 2 + 5, this.window_size.h / 2, Infinity));
-	this.texts.fixed.push(new Text('Two players', this.window_size.w / 2 + 5, this.window_size.h / 2 + this.selector.h, Infinity));
+	this.texts.fixed.push(new Text(
+		'One player',
+		this.window_size.w / 2 + 5,
+		this.window_size.h / 2
+	));
+	this.texts.fixed.push(new Text(
+		'Two players',
+		this.window_size.w / 2 + 5,
+		this.window_size.h / 2 + this.selector.h
+	));
 
 	// Keys
 
@@ -63,7 +71,15 @@ Start.prototype.setup = function() {
 
 	// Version
 
-	this.texts.fixed.push(new Text(this.version, this.window_size.w - 5, 15, Infinity, 'right', '#000000', 10));
+	this.texts.fixed.push(new Text(
+		this.version,
+		this.window_size.w - 5, // x
+		15,                     // y
+		Infinity,               // duration
+		'right',                // alignment
+		'#000000',              // color
+		10                      // size
+	));
 };
 
 

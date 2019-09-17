@@ -13,7 +13,7 @@
  * 		The x position of the text
  * @param {number} y
  * 		The y position of the text
- * @param {number} duration
+ * @param {number} [duration=Infinity]
  * 		How many seconds until the text becomes inactive
  * @param {string} [alignment='left']
  * 		Text alignment (may be left, right, or center)
@@ -22,7 +22,7 @@
  * @param {number} [size=24]
  * 		The font size
  */
-function Text(text, x, y, duration, alignment='left', color='#000000', size=24) {
+function Text(text, x, y, duration=Infinity, alignment='left', color='#000000', size=24) {
 	this.text = text;
 	this.x = x;
 	this.y = y;

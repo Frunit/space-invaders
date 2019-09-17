@@ -16,11 +16,13 @@
 // Depending on whether the browser or node.js is used, offer a different debug
 // function
 if(typeof window === 'undefined') {
+	// eslint-disable-next-line
 	global.debug = function(num, message) {
 		console.log(num, message);
 	};
 }
 else {
+	// eslint-disable-next-line
 	window.debug = function(num, message) {
 		document.getElementById('debug' + num).value = message;
 	};
@@ -260,14 +262,22 @@ Game.prototype.start = function() {
 Game.prototype.next_stage = function(payload) {
 	switch(payload.next_stage) {
 		case 'start': {
-			const num_players = 'num_players' in payload ? payload.num_players : this.options.num_players;
+			const num_players = 'num_players' in payload ?
+				payload.num_players :
+				this.options.num_players;
 			this.stage = new Start(this.options.total_size, num_players, this.version);
 			break;
 		}
 		case 'game': {
-			const num_players = 'num_players' in payload ? payload.num_players : this.options.num_players;
-			const start_level = 'start_level' in payload ? payload.start_level : this.options.start_level;
-			this.stage = new Engine(this.options.total_size, this.options.border, num_players, this.levels, start_level);
+			const num_players = 'num_players' in payload ?
+				payload.num_players :
+				this.options.num_players;
+			const start_level = 'start_level' in payload ?
+				payload.start_level :
+				this.options.start_level;
+			this.stage = new Engine(
+				this.options.total_size, this.options.border, num_players, this.levels, start_level
+			);
 			break;
 		}
 		case 'highscore': {

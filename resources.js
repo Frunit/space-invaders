@@ -3,16 +3,19 @@
 // MAYBE: Could be rewritten with a Promise instead of callback
 
 
+// Fake Image object for use in automated tests in nodejs
 if(typeof window === 'undefined') {
 	global.Image = {
 		_src: '',
 		onload: () => {},
 
+		// eslint-disable-next-line
 		set src(url) {
 			this._src = url;
 			this.onload();
 		},
 
+		// eslint-disable-next-line
 		get src() {
 			return this._src;
 		}

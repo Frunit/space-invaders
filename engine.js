@@ -128,17 +128,24 @@ Engine.prototype.setup_players = function(fresh) {
 		this.players = [];
 	}
 
+	const ob_left = this.outer_bounds.left;
+	const ob_right = this.outer_bounds.right;
+
 	if(this.players.length) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players[i].resurrect();
-			this.players[i].x = (i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left;
+			this.players[i].x = (i+1) * (ob_right - ob_left) / (this.num_players+1) + this.ob_left;
 		}
 	}
 	else {
 		// Create players
 		for(let i = 0; i < this.num_players; i++) {
-			this.players.push(new Player((i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left, this.inner_bounds.bottom - 20, i));
+			this.players.push(new Player(
+				(i+1) * (ob_right - ob_left) / (this.num_players + 1) + ob_left,
+				this.inner_bounds.bottom - 20,
+				i
+			));
 		}
 	}
 };
@@ -149,35 +156,89 @@ Engine.prototype.setup_players = function(fresh) {
  */
 Engine.prototype.setup_gui = function() {
 	// Life icon for player 1
-	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 10, 'life'));
+	this.gui.push(new GUI_Element(
+		this.outer_bounds.left + 5,
+		this.outer_bounds.top + 10,
+		'life'
+	));
+
 	const life_width = this.gui[this.gui.length - 1].w;
+
 	// Life counter text player 1
-	this.texts.player_lives.push(new Text(this.players[0].lives, this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
+	this.texts.player_lives.push(new Text(
+		this.players[0].lives,
+		this.outer_bounds.left + 10 + life_width,
+		this.outer_bounds.top + 30
+	));
+
 	this.update_lives(this.players[0]);
 
 	// Score icon for player 1
-	this.gui.push(new GUI_Element(this.outer_bounds.left + 95, this.outer_bounds.top + 10, 'score'));
+	this.gui.push(new GUI_Element(
+		this.outer_bounds.left + 95,
+		this.outer_bounds.top + 10,
+		'score'
+	));
+
 	const score_width = this.gui[this.gui.length - 1].w;
+
 	// Score counter text player 1
-	this.texts.player_scores.push(new Text('', this.outer_bounds.left + 100 + score_width, this.outer_bounds.top + 30, Infinity));
+	this.texts.player_scores.push(new Text(
+		'',
+		this.outer_bounds.left + 100 + score_width,
+		this.outer_bounds.top + 30,
+	));
 	this.texts.player_scores[0].set_score(this.players[0].score);
 
 	if(this.num_players === 2) {
 		// Life icon for player 2
-		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 10, 'life'));
+		this.gui.push(new GUI_Element(
+			this.outer_bounds.right - 5 - life_width,
+			this.outer_bounds.top + 10,
+			'life'
+		));
+
 		// Life counter text player 2
-		this.texts.player_lives.push(new Text(this.players[1].lives, this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
+		this.texts.player_lives.push(new Text(
+			this.players[1].lives,
+			this.outer_bounds.right - 10 - life_width,
+			this.outer_bounds.top + 30,
+			Infinity,
+			'right'
+		));
+
 		this.update_lives(this.players[1]);
 
 		// Score icon for player 2
-		this.gui.push(new GUI_Element(this.outer_bounds.right - 95, this.outer_bounds.top + 10, 'score'));
+		this.gui.push(new GUI_Element(
+			this.outer_bounds.right - 95,
+			this.outer_bounds.top + 10,
+			'score')
+		);
+
 		// Score counter text player 2
-		this.texts.player_scores.push(new Text('', this.outer_bounds.right - 100, this.outer_bounds.top + 30, Infinity, 'right'));
+		this.texts.player_scores.push(new Text(
+			'',
+			this.outer_bounds.right - 100,
+			this.outer_bounds.top + 30,
+			Infinity,
+			'right'
+		));
 		this.texts.player_scores[1].set_score(this.players[1].score);
 	}
 
-	this.texts.level.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
-	this.texts.level.push(new Text(this.level + 1, (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
+	this.texts.level.push(new Text(
+		'Level ',
+		(this.outer_bounds.right + this.outer_bounds.left)/2,
+		this.outer_bounds.top + 30,
+		Infinity,
+		'right'
+	));
+	this.texts.level.push(new Text(
+		this.level + 1,
+		(this.outer_bounds.right + this.outer_bounds.left)/2,
+		this.outer_bounds.top + 30,
+	));
 };
 
 
@@ -187,7 +248,9 @@ Engine.prototype.setup_gui = function() {
  * @param {string[]} enemies - The enemy pattern as described in {@link Level}
  */
 Engine.prototype.setup_enemies = function(enemies) {
-	const enemy_offset = this.inner_bounds.left + (this.inner_bounds.right - this.inner_bounds.left) / 2 - enemies[0].length / 2 * 60;
+	const ib_right = this.inner_bounds.right;
+	const ib_left = this.inner_bounds.leftt;
+	const enemy_offset = ib_left + (ib_right - ib_left) / 2 - enemies[0].length / 2 * 60;
 	const enemy_upper = 50;
 
 	for(let y = 0; y < enemies.length; y++) {
@@ -289,7 +352,6 @@ Engine.prototype.handle_input = function(key, key_down) {
 }
 
 
-// TODO: Engine.update is too long and should be split up.
 /**
  * <tt>Engine.update</tt> updates all objects in the game.
  *
@@ -327,6 +389,30 @@ Engine.prototype.update = function(dt) {
 		};
 	}
 
+	this.enemy_movement(dt);
+	this.update_entities(dt);
+
+	this.collide_bullets(this.player_bullets, this.enemy_bullets);
+	this.collide_bullets(this.player_bullets, this.enemies);
+	this.collide_bullets(this.enemy_bullets, this.players);
+	this.collide_bullets(this.player_bullets, this.walls);
+	this.collide_bullets(this.enemy_bullets, this.walls);
+	this.collide_goodies(this.goodies, this.players);
+
+	if(this.enemies.length === 0) {
+		this.next_level();
+	}
+
+	return null;
+};
+
+
+/**
+ * <tt>Engine.enemy_movement</tt> udpates all enemies.
+ *
+ * @param {number} dt - The time delta since last update in seconds
+ */
+Engine.prototype.enemy_movement = function(dt) {
 	const dx = !this.enemy_moves_down ? this.enemy_direction * dt * this.enemy_speed_factor : 0;
 	const dy = this.enemy_moves_down ? dt * this.enemy_speed_factor : 0;
 
@@ -359,7 +445,16 @@ Engine.prototype.update = function(dt) {
 			this.enemy_bullets.push(bullet[0]);
 		}
 	}
+};
 
+
+/**
+ * <tt>Engine.update_entities</tt> udpates all bullets, goodies, walls and
+ * texts. It also removes entities that are not active anymore.
+ *
+ * @param {number} dt - The time delta since last update in seconds
+ */
+Engine.prototype.update_entities = function(dt) {
 	for(let bullet of this.enemy_bullets) {
 		bullet.update(dt, this.outer_bounds);
 	}
@@ -391,22 +486,23 @@ Engine.prototype.update = function(dt) {
 	this.goodies = this.goodies.filter(goody => goody.active);
 	this.walls = this.walls.filter(wall => wall.active);
 	this.enemies = this.enemies.filter(enemy => enemy.active);
-
-	this.collide_bullets(this.player_bullets, this.enemy_bullets);
-	this.collide_bullets(this.player_bullets, this.enemies);
-	this.collide_bullets(this.enemy_bullets, this.players);
-	this.collide_bullets(this.player_bullets, this.walls);
-	this.collide_bullets(this.enemy_bullets, this.walls);
-	this.collide_goodies(this.goodies, this.players);
-
-	if(this.enemies.length === 0) {
-		this.next_level();
-	}
-
-	return null;
 };
 
 
+/**
+ * <tt>Engine.collide_all</tt> test if any element of <tt>a</tt> overlaps with
+ * any element of <tt>b</tt>. If an element of <tt>a</tt> collides with multiple
+ * elements of <tt>b</tt>, only the first element <tt>b</tt> will be returned.
+ *
+ * @param {object[]} a
+ * 		First array of objects to test
+ * @param {object[]} b
+ * 		Second array of objects to test
+ * @returns {Array[]}
+ * 		An array of tuples containing the indices of colliding objects. It is in
+ * 		the form: <tt>[[idx_a, idx_b], ...]</tt>.
+ *
+ */
 Engine.prototype.collide_all = function(a, b) {
 	const colliding = [];
 
@@ -483,7 +579,15 @@ Engine.prototype.collide_goodies = function(goodies, players) {
  * <tt>Engine.collider</tt> checks if the bounding boxes of a and b overlap.
  *
  * @param {Entity} a - The first object
+ * @param {number} a.x - The x coordinate (from left) in pixel
+ * @param {number} a.y - The y coordinate (from top) in pixel
+ * @param {number} a.w - The width in pixel
+ * @param {number} a.h - The height in pixel
  * @param {Entity} b - The second object
+ * @param {number} b.x - The x coordinate (from left) in pixel
+ * @param {number} b.y - The y coordinate (from top) in pixel
+ * @param {number} b.w - The width in pixel
+ * @param {number} b.h - The height in pixel
  * @returns {boolean} Whether or not the bounding boxes overlap.
  */
 Engine.prototype.collider = function(a, b) {
@@ -506,8 +610,9 @@ Engine.prototype.collider = function(a, b) {
  * @param {number[]} to_remove - The list of indices to remove from array
  */
 Engine.prototype.remove_multiple_elements = function(array, to_remove) {
-	for(let i = to_remove.length -1; i >= 0; i--)
+	for(let i = to_remove.length -1; i >= 0; i--) {
 		array.splice(to_remove[i],1);
+	}
 };
 
 

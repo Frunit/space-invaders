@@ -13,6 +13,7 @@ if(typeof window === 'undefined') {
 	global.localStorage = {
 		store: {},
 
+		// eslint-disable-next-line
 		getItem: function(name) {
 			if(!(name in this.store)) {
 				return null;
@@ -21,6 +22,7 @@ if(typeof window === 'undefined') {
 			return this.store[name];
 		},
 
+		// eslint-disable-next-line
 		setItem: function(name, content) {
 			this.store[name] = content;
 		}
@@ -102,16 +104,40 @@ Highscore.prototype.setup = function() {
 		footer: []
 	};
 
+	// The high score table
+
 	for(let i = 0; i < this.highscore.length; i++) {
 		const score = this.highscore[i];
-		this.texts.dates.push(new Text(score.date, this.window_size.w * 0.25, 100 + i*30, Infinity));
-		this.texts.scores.push(new Text(score.score, this.window_size.w * 0.6, 100 + i*30, Infinity));
+		this.texts.dates.push(new Text(
+			score.date,
+			this.window_size.w * 0.25,
+			100 + i*30
+		));
+		this.texts.scores.push(new Text(
+			score.score,
+			this.window_size.w * 0.6,
+			100 + i*30
+		));
 		this.texts.scores[i].set_score(score.score); // To ensure the same number of digits
 	}
 
-	this.texts.level.push(new Text('You reached level ' + this.level, this.window_size.w / 2, 50, Infinity, 'center'));
-	this.texts.footer.push(new Text('Fire to continue', this.window_size.w / 2, this.window_size.h - 50, Infinity, 'center'));
+	// Info texts
+	this.texts.level.push(new Text(
+		'You reached level ' + this.level,
+		this.window_size.w / 2,
+		50,
+		Infinity,
+		'center'
+	));
+	this.texts.footer.push(new Text(
+		'Fire to continue',
+		this.window_size.w / 2,
+		this.window_size.h - 50,
+		Infinity,
+		'center'
+	));
 
+	// Decoration enemies
 	this.enemies.push(new GUI_Element(50, 50, 'enemy1'));
 	this.enemies.push(new GUI_Element(50, 250, 'enemy2'));
 	this.enemies.push(new GUI_Element(50, 450, 'enemy3'));

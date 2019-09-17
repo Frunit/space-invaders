@@ -9,7 +9,6 @@ QUnit.test('Text parameters', function(assert) {
 	assert.strictEqual(text.alignment, 'left', 'default value alignment');
 	assert.strictEqual(text.color, '#000000', 'default value color');
 	assert.strictEqual(text.size, 24, 'default value size');
-	assert.strictEqual(text.family, 'monospace', 'default value family');
 	assert.ok(text.active, 'text is active');
 
 	let text2 = new Text('', 100, 200, Infinity);
