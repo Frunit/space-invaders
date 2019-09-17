@@ -78,6 +78,7 @@ function Player(x, y, num) {
 	this.invulnerable = 0;
 	this.double_laser = 0;
 	this.rapid_fire = 0;
+	this.speed_up = 0;
 }
 
 
@@ -110,6 +111,7 @@ Player.prototype.reset = function() {
 	this.invulnerable = 0;
 	this.double_laser = 0;
 	this.rapid_fire = 0;
+	this.speed_up = 0;
 };
 
 
@@ -242,6 +244,14 @@ Player.prototype.update = function(dt, bounds) {
 		}
 	}
 
+	if(this.speed_up) {
+		this.speed_up -= dt;
+		if(this.speed_up < 0) {
+			this.speed_up = 0;
+			this.speed.x /= 2;
+		}
+	}
+
 	this.move(this.moving * dt, bounds);
 	return this.fire();
 };
@@ -297,6 +307,19 @@ Player.prototype.apply_rapid_fire = function() {
 		}
 	}
 	this.rapid_fire += 7;
+};
+
+
+// TODO: Right sprite!
+/**
+ * <tt>Player.apply_speed_up</tt> allow the player to move faster for some
+ * seconds.
+ */
+Player.prototype.apply_speed_up = function() {
+	if(this.speed_up === 0) {
+		this.speed.x *= 2;
+	}
+	this.speed_up += 7;
 };
 
 
@@ -740,7 +763,6 @@ Mystery.prototype.kill = function() {
 };
 
 
-// TODO: Goody-ideas: Faster movement
 /**
  * <tt>Goody</tt> is an object for a goody that is released by a killed enemy.
  *

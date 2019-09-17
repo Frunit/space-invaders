@@ -389,7 +389,7 @@ Engine.prototype.update = function(dt) {
 		};
 	}
 
-	this.enemy_movement(dt);
+	this.update_enemies(dt);
 	this.update_entities(dt);
 
 	this.collide_bullets(this.player_bullets, this.enemy_bullets);
@@ -408,11 +408,11 @@ Engine.prototype.update = function(dt) {
 
 
 /**
- * <tt>Engine.enemy_movement</tt> udpates all enemies.
+ * <tt>Engine.update_enemies</tt> udpates all enemies.
  *
  * @param {number} dt - The time delta since last update in seconds
  */
-Engine.prototype.enemy_movement = function(dt) {
+Engine.prototype.update_enemies = function(dt) {
 	const dx = !this.enemy_moves_down ? this.enemy_direction * dt * this.enemy_speed_factor : 0;
 	const dy = this.enemy_moves_down ? dt * this.enemy_speed_factor : 0;
 
@@ -640,7 +640,7 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		case 3: {
-			this.start_break_out(player);
+			player.apply_speed_up();
 			break;
 		}
 		case 4: {
@@ -659,18 +659,6 @@ Engine.prototype.apply_goody = function(type, player) {
 		default:
 			throw 'Unknown Goody type received: ' + type;
 	}
-};
-
-
-/**
- * <tt>Engine.start_break_out</tt> puts a ball on the player's fighter that will
- * start right away upwards.
- *
- * @param {Player} player - The player to place the ball on.
- */
-Engine.prototype.start_break_out = function(player) {
-	// MAYBE: Add Break-out mode! If not, update readme!
-	console.log(player.num, 'BREAK OUT!');
 };
 
 
