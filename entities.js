@@ -85,7 +85,7 @@ function Player(x, y, num) {
 Player.prototype.reset = function() {
 	this.w = 60;
 	this.h = 32;
-	this.speed.x = 96; // pixel per second
+	this.speed.x = 128; // pixel per second
 	this.bullet_offset = {x: this.w/2, y: 0};
 	this.bullet_double_x_offset = 20;
 	this.bullet_speed = {x:0, y:-300}; // pixel per second

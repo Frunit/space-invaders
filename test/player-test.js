@@ -24,7 +24,7 @@ QUnit.test('Player initial properties', function(assert) {
 	assert.strictEqual(player.h, 32, 'h');
 	assert.strictEqual(player.x, 70, 'x');
 	assert.strictEqual(player.y, 84, 'y');
-	assert.deepEqual(player.speed, {x: 96, y: 0}, 'speed');
+	assert.deepEqual(player.speed, {x: 128, y: 0}, 'speed');
 	assert.deepEqual(player.bullet_offset, {x: 30, y: 0}, 'bullet_offset');
 	assert.strictEqual(player.bullet_double_x_offset, 20, 'bullet_double_x_offset');
 	assert.deepEqual(player.bullet_speed, {x: 0, y: -300}, 'bullet_speed');
