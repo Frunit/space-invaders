@@ -26,12 +26,12 @@ const levels = [
 		]
 	},
 	{
-		"fort": [
+		fort: [
 			"XX",
 			"XX"
 		],
-		"forts": 10,
-		"enemies": [
+		forts: 10,
+		enemies: [
 			"21111112",
 			"21_00_12",
 			"21_00_12",
@@ -39,5 +39,6 @@ const levels = [
 		]
 	}
 ];
+
 
 export {options, levels};

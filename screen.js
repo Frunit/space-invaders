@@ -39,6 +39,8 @@ function Screen(target, expected_size) {
  * be scaled down appropriatly to maximized the canvas size.
  *
  * @private
+ * @param {number} target_width - The maximum width of the canvas
+ * @param {number} target_height - The maximum height of the canvas
  */
 Screen.prototype._set_canvas_size = function(target_width, target_height) {
 	// MAYBE: Change canvas size upon browser resize

@@ -70,7 +70,7 @@ function Highscore(window_size, scores, level, date) {
 		{'date': '-', 'score': 10},
 	];
 
-	this.entities = [];
+	this.enemies = [];
 	this.texts = {};
 }
 
@@ -80,7 +80,7 @@ function Highscore(window_size, scores, level, date) {
  */
 Highscore.prototype.setup = function() {
 	this.finished = false;
-	this.entities = [];
+	this.enemies = [];
 
 	const highscore = localStorage.getItem('highscore');
 	if(highscore !== null) {
@@ -111,6 +111,13 @@ Highscore.prototype.setup = function() {
 
 	this.texts.level.push(new Text('You reached level ' + this.level, this.window_size.w / 2, 50, Infinity, 'center'));
 	this.texts.footer.push(new Text('Fire to continue', this.window_size.w / 2, this.window_size.h - 50, Infinity, 'center'));
+
+	this.enemies.push(new GUI_Element(50, 50, 'enemy1'));
+	this.enemies.push(new GUI_Element(50, 250, 'enemy2'));
+	this.enemies.push(new GUI_Element(50, 450, 'enemy3'));
+	this.enemies.push(new GUI_Element(850, 50, 'enemy1'));
+	this.enemies.push(new GUI_Element(850, 250, 'enemy2'));
+	this.enemies.push(new GUI_Element(850, 450, 'enemy3'));
 };
 
 
@@ -182,9 +189,12 @@ Highscore.prototype.update = function(dt) {
 			num_players: this.num_players,
 		};
 	}
-	else {
-		return null;
+
+	for(let enemy of this.enemies) {
+		enemy.sprite.update(dt);
 	}
+
+	return null;
 };
 
 
@@ -194,7 +204,7 @@ Highscore.prototype.update = function(dt) {
  * @returns {object[]} An array with all entities (players, enemies, ...)
  */
 Highscore.prototype.get_entities = function() {
-	return this.entities;
+	return this.enemies;
 };
 
 

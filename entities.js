@@ -595,19 +595,19 @@ Bullet.prototype.kill = function() {
 
 
 /**
- * <tt>Mystery</tt> is an object for an enemy space ship/monster.
- *
- * @constructor
- * @extends Entity
- * @param {boolean} from_left
- * 		If true, the mystery enters from left, otherwise, it enters from right
- * @param {Bounds} bounds
- * 		Screen boundaries
- */
+ * <tt>Mystery</tt> is an object for an enemy space ship/monster.
+ *
+ * @constructor
+ * @extends Entity
+ * @param {boolean} from_left
+ * 		If true, the mystery enters from left, otherwise, it enters from right
+ * @param {Bounds} bounds
+ * 		Screen boundaries
+ */
 function Mystery(from_left, bounds) {
 	Entity.call(this);
 	this.object = 'mystery';
-	 // pixel per second
+	// pixel per second
 	this.w = 64;
 	this.h = 28;
 	this.score_value = 500;
@@ -632,11 +632,11 @@ function Mystery(from_left, bounds) {
 
 
 /**
- * <tt>Mystery.update</tt> moves the mystery, respecting boundaries.
- *
- * @param {number} dt - The time delta since last update in seconds
- * @param {Bounds} bounds - Screen boundaries
- */
+ * <tt>Mystery.update</tt> moves the mystery, respecting boundaries.
+ *
+ * @param {number} dt - The time delta since last update in seconds
+ * @param {Bounds} bounds - Screen boundaries
+ */
 Mystery.prototype.update = function(dt, bounds) {
 	this.x += dt * this.speed.x;
 	this.y = this.speed.y * Math.sin(this.x * 0.05) + this.base_y;
@@ -655,9 +655,9 @@ Mystery.prototype.update = function(dt, bounds) {
 
 
 /**
- * <tt>Mystery.kill</tt> kills the mystery. It turns into an explosion for some
- * seconds.
- */
+ * <tt>Mystery.kill</tt> kills the mystery. It turns into an explosion for some
+ * seconds.
+ */
 Mystery.prototype.kill = function() {
 	this.off_time = 2;
 	this.collidable = false;
@@ -798,4 +798,4 @@ Wall.prototype.kill = function() {
 };
 
 
-export {Player, Enemy, Bullet, Goody, Wall};
+export {Player, Enemy, Bullet, Goody, Wall, Mystery};

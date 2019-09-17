@@ -42,6 +42,10 @@ import Screen from './screen.js';
  * timing, the stages and the screen.
  *
  * @constructor
+ * @param {object} options
+ * 		Various options for the game. See options.js for details.
+ * @param {Level[]} levels
+ * 		Levels to load for the player
  */
 function Game(options, levels) {
 	this.options = options;
@@ -279,6 +283,18 @@ Game.prototype.next_stage = function(payload) {
 
 	this.stage.setup();
 };
+
+
+/**
+ * @typedef {object} Level
+ * @property {string[]} fort
+ * 		The shape of a fort. <tt>X</tt> is a wall and <tt>_</tt> an empty space.
+ * @property {number} forts
+ * 		The number of forts in the level.
+ * @property {string[]} enemies
+ * 		Position of enemies. Numbers <tt>0-2</tt> define an enemy of that type.
+ * 		<tt>_</tt> is an empty space.
+ */
 
 
 export {Game};
