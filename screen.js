@@ -86,7 +86,7 @@ Screen.prototype.render = function(entities, texts) {
 	for(let text_group in texts) {
 		for(let text of texts[text_group]) {
 			this.ctx.save();
-			this.ctx.font = `${text.size}px ${text.family}`;
+			this.ctx.font = `${text.size}px monospace`;
 			this.ctx.textAlign = text.alignment;
 			this.ctx.fillStyle = text.color;
 			this.ctx.fillText(text.text, text.x, text.y);
@@ -148,10 +148,8 @@ Fake_Screen.prototype.render = function(entities, texts) {
 	for(let text_group in texts) {
 		for(let text of texts[text_group]) {
 			render_elements.push(['TEXT',
-				text.text,
-				text.x, text.y,
-				text.size, text.family,
-				text.alignment, text.color]);
+				text.text, text.x, text.y,
+				text.size, text.alignment, text.color]);
 		}
 	}
 

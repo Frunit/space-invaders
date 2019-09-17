@@ -21,16 +21,13 @@
  * 		Text color (may be any HTML color string)
  * @param {number} [size=24]
  * 		The font size
- * @param {string} [family='monospace']
- * 		The font family
  */
-function Text(text, x, y, duration, alignment='left', color='#000000', size=24, family='monospace') {
+function Text(text, x, y, duration, alignment='left', color='#000000', size=24) {
 	this.text = text;
 	this.x = x;
 	this.y = y;
 	this.duration = duration;
 	this.size = size;
-	this.family = family;
 	this.alignment = alignment;
 	this.color = color;
 
