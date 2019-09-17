@@ -51,7 +51,7 @@ function Game(options, levels) {
 	this.options = options;
 	this.levels = levels;
 
-	this.version = 'pre-alpha';
+	this.version = 'v0.1';
 
 	this.last_time = 0;
 
@@ -238,7 +238,7 @@ Game.prototype.update = function(dt) {
  * creates the screen, and starts the game loop.
  */
 Game.prototype.start = function() {
-	this.stage = new Start(this.options.total_size, 1);
+	this.stage = new Start(this.options.total_size, 1, this.version);
 	this.stage.setup();
 
 	this.screen = new Screen('game', this.options.total_size);
@@ -261,7 +261,7 @@ Game.prototype.next_stage = function(payload) {
 	switch(payload.next_stage) {
 		case 'start': {
 			const num_players = 'num_players' in payload ? payload.num_players : this.options.num_players;
-			this.stage = new Start(this.options.total_size, num_players);
+			this.stage = new Start(this.options.total_size, num_players, this.version);
 			break;
 		}
 		case 'game': {

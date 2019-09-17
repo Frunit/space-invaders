@@ -15,10 +15,12 @@ import {Text} from './text.js';
  * @param {number} window_size.w - Width in pixels
  * @param {number} window_size.h - Height in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
+ * @param {string} version - The version of the game
  */
-function Start(window_size, num_players) {
+function Start(window_size, num_players, version) {
 	this.window_size = window_size;
 	this.num_players = num_players || 1;
+	this.version = version;
 	this.finished = false;
 
 	this.selector = null;
@@ -58,6 +60,10 @@ Start.prototype.setup = function() {
 	this.enemies.push(new GUI_Element(638, 196, 'enemy2'));
 	this.enemies.push(new GUI_Element(823, 43, 'enemy1'));
 	this.enemies.push(new GUI_Element(224, 163, 'enemy3'));
+
+	// Version
+
+	this.texts.fixed.push(new Text(this.version, this.window_size.w - 5, 15, Infinity, 'right', '#000000', 10));
 };
 
 
