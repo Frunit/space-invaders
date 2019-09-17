@@ -1,10 +1,8 @@
 'use strict';
 
 import {GUI_Element} from './guielement.js';
+import {Enemy} from './entities.js';
 import {Text} from './text.js';
-
-
-// TODO: Proper design. Determine, whether player names should be entered here already
 
 
 /**
@@ -27,6 +25,8 @@ function Start(window_size, num_players, version) {
 	this.keys = [];
 	this.enemies = [];
 	this.texts = {};
+
+	this.enemy_direction = -1;
 }
 
 
@@ -35,6 +35,7 @@ function Start(window_size, num_players, version) {
  */
 Start.prototype.setup = function() {
 	this.finished = false;
+	this.enemy_direction = -1;
 
 	this.texts = {fixed: []};
 
@@ -62,12 +63,11 @@ Start.prototype.setup = function() {
 
 	// Enemies
 
-	this.enemies.push(new GUI_Element(75, 50, 'enemy2'));
-	this.enemies.push(new GUI_Element(312, 10, 'enemy1'));
-	this.enemies.push(new GUI_Element(492, 150, 'enemy3'));
-	this.enemies.push(new GUI_Element(638, 196, 'enemy2'));
-	this.enemies.push(new GUI_Element(823, 43, 'enemy1'));
-	this.enemies.push(new GUI_Element(224, 163, 'enemy3'));
+	for(let y = 0; y < 3; y++) {
+		for(let x = 0; x < 3; x++) {
+			this.enemies.push(new Enemy(370 + x * 60, 50 + y * 50, y));
+		}
+	}
 
 	// Version
 
@@ -130,8 +130,15 @@ Start.prototype.update = function(dt) {
 		};
 	}
 
+	const dx = this.enemy_direction * dt;
+	const inner_bounds = {left: 20, right: 20, bottom: 1000, top: 0};
+	let reached_boundary = false;
 	for(let enemy of this.enemies) {
-		enemy.sprite.update(dt);
+		reached_boundary = enemy.update(dt, dx, 0, inner_bounds) || reached_boundary;
+	}
+
+	if(reached_boundary) {
+		this.enemy_direction *= -1;
 	}
 
 	return null;
