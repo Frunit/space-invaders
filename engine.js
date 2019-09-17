@@ -72,7 +72,6 @@ Engine.prototype.next_level = function() {
 };
 
 
-// TODO: Engine.setup is too long. Especially level setup and GUI setup should be put into another function
 /**
  * <tt>Engine.setup</tt> initializes the game with the player and enemies.
  *
@@ -105,8 +104,26 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 
 	this.game_is_over = false;
 
-	// Players
+	if(level === null) {
+		level = this.level_list[0];
+	}
 
+	this.setup_players(fresh);
+	this.setup_gui();
+	this.setup_enemies(level.enemies);
+	this.setup_forts(level.fort, level.forts);
+};
+
+
+/**
+ * <tt>Engine.setup_players</tt> set ups the players in a new level.
+ *
+ * @param {boolean} fresh
+ * 		If <tt>true</tt>, forces new player objects (instead of using the
+ * 		existing ones). If no player objects are present, they are created in
+ * 		any case.
+ */
+Engine.prototype.setup_players = function(fresh) {
 	if(fresh) {
 		this.players = [];
 	}
@@ -124,9 +141,13 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 			this.players.push(new Player((i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left, this.inner_bounds.bottom - 20, i));
 		}
 	}
+};
 
-	// GUI
 
+/**
+ * <tt>Engine.setup_gui</tt> set ups the GUI in a new level.
+ */
+Engine.prototype.setup_gui = function() {
 	// Life icon for player 1
 	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 10, 'life'));
 	const life_width = this.gui[this.gui.length - 1].w;
@@ -157,20 +178,21 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 
 	this.texts.level.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
 	this.texts.level.push(new Text(this.level + 1, (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
+};
 
-	// Level
 
-	if(level === null) {
-		level = this.level_list[0];
-	}
-
-	// Create enemies
-	const enemy_offset = this.inner_bounds.left + (this.inner_bounds.right - this.inner_bounds.left) / 2 - level.enemies[0].length / 2 * 60;
+/**
+ * <tt>Engine.setup_enemies</tt> set ups the enemies in a new level.
+ *
+ * @param {string[]} enemies - The enemy pattern as described in {@link Level}
+ */
+Engine.prototype.setup_enemies = function(enemies) {
+	const enemy_offset = this.inner_bounds.left + (this.inner_bounds.right - this.inner_bounds.left) / 2 - enemies[0].length / 2 * 60;
 	const enemy_upper = 50;
 
-	for(let y = 0; y < level.enemies.length; y++) {
-		for(let x = 0; x < level.enemies[0].length; x++) {
-			let type = level.enemies[y][x];
+	for(let y = 0; y < enemies.length; y++) {
+		for(let x = 0; x < enemies[0].length; x++) {
+			let type = enemies[y][x];
 			if(type === '_') {
 				continue;
 			}
@@ -184,16 +206,24 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 			);
 		}
 	}
+};
 
-	// Create forts
-	const fort_x_dist = (this.inner_bounds.right - this.inner_bounds.left) / (level.forts + 1);
-	const fort_offset = this.inner_bounds.left + fort_x_dist - level.fort[0].length / 2 * 16;
-	const fort_upper = 530 - level.fort.length * 16;
 
-	for(let i = 0; i < level.forts; i++) {
-		for(let y = 0; y < level.fort.length; y++) {
-			for(let x = 0; x < level.fort[0].length; x++) {
-				if(level.fort[y][x] === 'X') {
+/**
+ * <tt>Engine.setup_forts</tt> set ups the forts in a new level.
+ *
+ * @param {string[]} fort - The structure of a fort as described in {@link Level}
+ * @param {number} forts - The number of forts
+ */
+Engine.prototype.setup_forts = function(fort, forts) {
+	const fort_x_dist = (this.inner_bounds.right - this.inner_bounds.left) / (forts + 1);
+	const fort_offset = this.inner_bounds.left + fort_x_dist - fort[0].length / 2 * 16;
+	const fort_upper = 530 - fort.length * 16;
+
+	for(let i = 0; i < forts; i++) {
+		for(let y = 0; y < fort.length; y++) {
+			for(let x = 0; x < fort[0].length; x++) {
+				if(fort[y][x] === 'X') {
 					this.walls.push(
 						new Wall(
 							fort_offset + i * fort_x_dist + x * 16, // x position
@@ -259,6 +289,7 @@ Engine.prototype.handle_input = function(key, key_down) {
 }
 
 
+// TODO: Engine.update is too long and should be split up.
 /**
  * <tt>Engine.update</tt> updates all objects in the game.
  *
