@@ -16,29 +16,15 @@
 // MAYBE: Implement music and sound
 // MAYBE: Increase shooting probability for enemies, when only few are left
 
-// Depending on whether the browser or node.js is used, offer a different debug
-// function
-if(typeof window === 'undefined') {
-	// eslint-disable-next-line
-	global.debug = function(num, message) {
-		console.log(num, message);
-	};
-}
-else {
-	// eslint-disable-next-line
-	window.debug = function(num, message) {
-		document.getElementById('debug' + num).value = message;
-	};
-}
-
 
 import {Start} from './start.js';
 import {Engine} from './engine.js';
 import {Highscore} from './highscore.js';
+import {Text} from './text.js';
+import {Resources} from './resources.js';
 
 // Attention! No curly brackets. This uses the default export that is dependent
 // on whether this runs in a browser or not (for testing in node.js).
-import Resources from './resources.js';
 import Screen from './screen.js';
 
 
@@ -56,7 +42,7 @@ function Game(options, levels) {
 	this.options = options;
 	this.levels = levels;
 
-	this.version = 'v0.1';
+	this.version = 'v0.2';
 
 	this.last_time = 0;
 
@@ -64,6 +50,11 @@ function Game(options, levels) {
 	// they might be removed after finishing the game.
 	this.last_fps = 0;
 	this.frames = 0;
+	this.fps = new Text(
+		'', 2, this.options.total_size.h - 2,
+		Infinity, 'left', '#000000', 10
+	);
+	this.show_fps = true;
 
 	this.stage = null;
 	this.screen = null;
@@ -124,7 +115,10 @@ Game.prototype.loop = function() {
 
 	// Update the game and draw the newest state.
 	const next_stage = this.update(dt);
-	this.screen.render(this.stage.get_entities(), this.stage.get_texts());
+	this.screen.render(
+		this.stage.get_entities(),
+		this.stage.get_texts().concat([this.fps]) // Inject FPS
+	);
 	this.update_fps(now);
 
 	this.last_time = now;
@@ -216,7 +210,9 @@ Game.prototype.update_fps = function(now) {
 	// FPS will be shown as 1/s (== Hz)
 	this.frames++;
 	if(now - this.last_fps > 1000) {
-		debug(4, 'FPS: ' + this.frames); // eslint-disable-line
+		if(this.show_fps) {
+			this.fps.text = this.frames;
+		}
 		this.frames = 0;
 		this.last_fps = now;
 	}

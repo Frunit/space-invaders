@@ -1,7 +1,7 @@
 'use strict';
 
 import {Game} from '../game.js';
-import { options, levels } from '../options.js';
+import {options, levels} from '../options.js';
 
 // TODO: Test if options exist.
 // TODO: Test sending "Enter" (or other keys) to input and check the response. This also triggers a stage change from start to game!

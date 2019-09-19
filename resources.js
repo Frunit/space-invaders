@@ -1,19 +1,19 @@
 'use strict';
 
-// MAYBE: Could be rewritten with a Promise instead of callback
-
 
 // Fake Image object for use in automated tests in nodejs
 if(typeof window === 'undefined') {
-	global.Image = {
-		_src: '',
-		onload: () => {},
+	global.Image = class {
+		constructor() {
+			this._src = '';
+			this.onload = () => {};
+		}
 
 		// eslint-disable-next-line
 		set src(url) {
 			this._src = url;
 			this.onload();
-		},
+		}
 
 		// eslint-disable-next-line
 		get src() {
@@ -21,7 +21,6 @@ if(typeof window === 'undefined') {
 		}
 	};
 }
-
 
 
 /**
@@ -45,6 +44,7 @@ function Resources() {
  * @param {string[]} urls - The list of urls to load.
  */
 Resources.prototype.load = function load(urls) {
+	this.expected += urls.length;
 	urls.forEach((url) => this._load(url));
 };
 
@@ -88,7 +88,6 @@ Resources.prototype.on_ready = function(func) {
 Resources.prototype._load = function(url) {
 	if(!this.resource_cache[url]) {
 		this.resource_cache[url] = false;
-		this.expected++;
 		const ext = url.split('.').pop();
 		switch(ext) {
 			case 'png': {
@@ -102,26 +101,6 @@ Resources.prototype._load = function(url) {
 					}
 				};
 				img.src = url;
-				break;
-			}
-			case 'ttf':
-			case 'woff':
-			case 'woff2': {
-				// The name is the base name,
-				// ./path/to/myfont.ttf -> myfont
-				let name = url.split('/').pop(); // remove path
-				name = name.replace(/\.[^.]+$/, ''); // remove extension
-				console.log(name, url);
-				const font = new FontFace(name, url);
-				font.load().then(
-					function(f) {
-						document.fonts.add(f);
-						this.loaded++;
-
-						if(this._is_ready()) {
-							this.ready_callback();
-						}
-				});
 				break;
 			}
 			default:
@@ -141,59 +120,4 @@ Resources.prototype._is_ready = function() {
 	return this.loaded === this.expected;
 };
 
-
-/**
- * <tt>Fake_Resources</tt> pretends to load all needed resources.
- * It will call the callback as soon as everything is "loaded".
- * It is meant for testing in a node environment, where no <tt>Image</tt>
- * object exists. As opposed to the "real" Resources, it will *never* call the
- * <tt>ready_callback</tt> set by Fake_Resources.on_ready .
- *
- * @constructor
- */
-function Fake_Resources() {
-	this.resource_cache = {};
-	this.ready_callback = () => {};
-}
-
-
-/**
- * <tt>Fake_Resources.load</tt> "loads" all resources given in the array of urls.
- *
- * @param {string[]} urls - The list of urls to load.
- */
-Fake_Resources.prototype.load = function(urls) {
-	for(let url of urls) {
-		this.resource_cache[url] = url;
-	}
-};
-
-
-/**
- * <tt>Fake_Resources.get</tt> returns the string of the given url or
- * <tt>false</tt> if the resources was never requested.
- *
- * @param {string} url - The url of the resource to get
- * @returns {string|boolean} The url or <tt>false</tt> (see description)
- */
-Fake_Resources.prototype.get = function(url) {
-	return this.resource_cache[url]
-};
-
-
-/**
- * <tt>Fake_Resources.on_ready</tt> sets the callback function that shall be
- * called when all resources were "loaded".
- *
- * @param {Function} func
- * 		The function to be called when all resources were "loaded"
- */
-Fake_Resources.prototype.on_ready = function(func) {
-	this.ready_callback = func;
-};
-
-
-// This exports a different Input depending on whether the script runs in a
-// browser or not. This is used for testing in node.js.
-const exported_class = typeof window === 'undefined' ? Fake_Resources : Resources;
-export default exported_class;
+export {Resources};
