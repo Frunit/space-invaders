@@ -451,7 +451,7 @@ function Enemy(x, y, type) {
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
 
-	this.max_cooldown = 1;
+	this.max_cooldown = 2;
 	this.cooldown = 0;
 }
 
@@ -460,13 +460,13 @@ function Enemy(x, y, type) {
  * <tt>Enemy.fire</tt> fires a bullet if the last bullet was long enough ago
  * (i.e. the cooldown is ok).
  *
- * @param {number} [chance=0.999]
- * 		The chance of *not* shooting.
+ * @param {number} [chance=0.001]
+ * 		The chance of shooting.
  * @returns {Bullet[]}
  * 		An array of Bullet objects if the ship fired. The array may be empty.
  */
-Enemy.prototype.fire = function(chance=0.999) {
-	if(this.cooldown > 0 || Math.random() < chance) {
+Enemy.prototype.fire = function(chance=0.001) {
+	if(this.cooldown > 0 || Math.random() > chance) {
 		return [];
 	}
 

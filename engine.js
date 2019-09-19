@@ -19,9 +19,9 @@ import {Text} from './text.js';
  * @param {number} border - The window border width in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
  * @param {Level[]} levels - The available levels
- * @param {number} level - The level to start at
+ * @param {number} [level_num=0] - The level to start at
  */
-function Engine(window_size, border, num_players, levels, level) {
+function Engine(window_size, border, num_players, levels, level_num=0) {
 	// These variables store all objects in the game.
 	this.enemies = [];
 	this.enemy_bullets = [];
@@ -41,7 +41,7 @@ function Engine(window_size, border, num_players, levels, level) {
 	this.game_is_over = false;
 
 	this.level_list = levels;
-	this.level = level;
+	this.level_num = level_num;
 
 	this.num_players = num_players;
 
@@ -65,26 +65,20 @@ function Engine(window_size, border, num_players, levels, level) {
  * <tt>Engine.next_level</tt> loads the next level.
  */
 Engine.prototype.next_level = function() {
-	this.level++;
-	const current = this.level_list[this.level % this.level_list.length];
-	const recurrence = Math.floor(this.level / this.level_list.length);
-	this.setup(current, recurrence, false);
+	this.level_num++;
+	this.setup();
 };
 
 
 /**
  * <tt>Engine.setup</tt> initializes the game with the player and enemies.
  *
- * @param {Level} [level=null]
- * 		The level to set up. If no level is given, the first level will be used.
- * @param {number} [recurrence=0]
- * 		How often was this level played (0 for first time, 1 for second time, ...)
  * @param {boolean} [fresh=false]
  * 		If <tt>true</tt>, forces new player objects (instead of using the
  * 		existing ones). If no player objects are present, they are created in
  * 		any case.
  */
-Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
+Engine.prototype.setup = function(fresh=false) {
 	this.enemies = [];
 	this.enemy_bullets = [];
 	this.player_bullets = [];
@@ -98,15 +92,15 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 		floating: [],
 	};
 
+	const recurrence = Math.floor(this.level_num / this.level_list.length);
+
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1 + recurrence * 0.33;
 
 	this.game_is_over = false;
 
-	if(level === null) {
-		level = this.level_list[0];
-	}
+	const level = this.level_list[this.level_num % this.level_list.length];
 
 	this.setup_players(fresh);
 	this.setup_gui();
@@ -128,23 +122,22 @@ Engine.prototype.setup_players = function(fresh) {
 		this.players = [];
 	}
 
-	const ob_left = this.outer_bounds.left;
-	const ob_right = this.outer_bounds.right;
+	const left = this.outer_bounds.left;
+	const right = this.outer_bounds.right;
 
 	if(this.players.length) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players[i].resurrect();
-			this.players[i].x = (i+1) * (ob_right - ob_left) / (this.num_players+1) + this.ob_left;
+			this.players[i].x = (i+1) * (right - left) / (this.num_players+1) + this.left;
 		}
 	}
 	else {
+		const bottom = this.inner_bounds.bottom;
 		// Create players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players.push(new Player(
-				(i+1) * (ob_right - ob_left) / (this.num_players + 1) + ob_left,
-				this.inner_bounds.bottom - 20,
-				i
+				(i+1) * (right - left) / (this.num_players + 1) + left, bottom - 20, i
 			));
 		}
 	}
@@ -235,7 +228,7 @@ Engine.prototype.setup_gui = function() {
 		'right'
 	));
 	this.texts.level.push(new Text(
-		this.level + 1,
+		this.level_num + 1,
 		(this.outer_bounds.right + this.outer_bounds.left)/2,
 		this.outer_bounds.top + 30,
 	));
@@ -249,7 +242,7 @@ Engine.prototype.setup_gui = function() {
  */
 Engine.prototype.setup_enemies = function(enemies) {
 	const ib_right = this.inner_bounds.right;
-	const ib_left = this.inner_bounds.leftt;
+	const ib_left = this.inner_bounds.left;
 	const enemy_offset = ib_left + (ib_right - ib_left) / 2 - enemies[0].length / 2 * 60;
 	const enemy_upper = 50;
 
@@ -385,7 +378,7 @@ Engine.prototype.update = function(dt) {
 		return {
 			next_stage: 'highscore',
 			scores: score,
-			level: this.level,
+			level: this.level_num,
 		};
 	}
 
@@ -525,7 +518,7 @@ Engine.prototype.collide_all = function(a, b) {
  * on the target, effects happen.
  *
  * @param {Bullet[]} bullets
- * 		The first array of entities. Bullets or Goodies
+ * 		The array of Bullets
  * @param {Entity[]} others
  * 		The second array of entities. Bullets, Enemies, Players, or Walls
  */
@@ -577,6 +570,9 @@ Engine.prototype.collide_goodies = function(goodies, players) {
 
 /**
  * <tt>Engine.collider</tt> checks if the bounding boxes of a and b overlap.
+ * There is never an overlap, if either a or b are not <tt>collidable</tt> or
+ * either a or b has not width or height. Objects *just* touching on the border
+ * are considered overlapping.
  *
  * @param {Entity} a - The first object
  * @param {number} a.x - The x coordinate (from left) in pixel
@@ -592,7 +588,8 @@ Engine.prototype.collide_goodies = function(goodies, players) {
  */
 Engine.prototype.collider = function(a, b) {
 	// MAYBE: If the bounding boxes hit, this might continue doing some kind of pixel-perfect detection.
-	return a.collidable && b. collidable && !(
+	return a.collidable && b. collidable &&
+		a.w && a.h && b.w && b.h && !(
 		a.x       > b.x + b.w ||
 		a.y       > b.y + b.h ||
 		a.x + a.w < b.x       ||
@@ -610,7 +607,7 @@ Engine.prototype.collider = function(a, b) {
  * @param {number[]} to_remove - The list of indices to remove from array
  */
 Engine.prototype.remove_multiple_elements = function(array, to_remove) {
-	for(let i = to_remove.length -1; i >= 0; i--) {
+	for(let i = to_remove.length - 1; i >= 0; i--) {
 		array.splice(to_remove[i],1);
 	}
 };
