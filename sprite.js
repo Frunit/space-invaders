@@ -34,6 +34,7 @@ function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}], 
 	this.delay_counter = 0;
 	this.idx = 0;
 	this.fresh = true;
+	this.zoom = zoom;
 }
 
 

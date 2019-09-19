@@ -115,10 +115,9 @@ Game.prototype.loop = function() {
 
 	// Update the game and draw the newest state.
 	const next_stage = this.update(dt);
-	this.screen.render(
-		this.stage.get_entities(),
-		this.stage.get_texts().concat([this.fps]) // Inject FPS
-	);
+	const texts = this.stage.get_texts();
+	texts.fps = [this.fps];
+	this.screen.render(this.stage.get_entities(), texts);
 	this.update_fps(now);
 
 	this.last_time = now;

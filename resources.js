@@ -3,20 +3,18 @@
 
 // Fake Image object for use in automated tests in nodejs
 if(typeof window === 'undefined') {
-	global.Image = class {
-		constructor() {
+	global.Image = class { // eslint-disable-line
+		constructor() { // eslint-disable-line
 			this._src = '';
 			this.onload = () => {};
 		}
 
-		// eslint-disable-next-line
-		set src(url) {
+		set src(url) { // eslint-disable-line
 			this._src = url;
 			this.onload();
 		}
 
-		// eslint-disable-next-line
-		get src() {
+		get src() { // eslint-disable-line
 			return this._src;
 		}
 	};
