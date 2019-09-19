@@ -80,7 +80,7 @@ Screen.prototype.render = function(entities, texts) {
 			params.x, params.y,
 			params.w, params.h,
 			entity.x, entity.y,
-			params.w, params.h);
+			params.w * params.zoom, params.h * params.zoom);
 	}
 
 	for(let text_group in texts) {
