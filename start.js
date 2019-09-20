@@ -131,7 +131,7 @@ Start.prototype.update = function(dt) {
 	}
 
 	const dx = this.enemy_direction * dt;
-	const inner_bounds = {left: 20, right: 20, bottom: 1000, top: 0};
+	const inner_bounds = {left: 20, right: this.window_size.w - 20, bottom: 1000, top: 0};
 	let reached_boundary = false;
 	for(let enemy of this.enemies) {
 		reached_boundary = enemy.update(dt, dx, 0, inner_bounds) || reached_boundary;

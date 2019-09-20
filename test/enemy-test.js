@@ -1,7 +1,7 @@
 'use strict';
 
 import {Resources} from '../resources.js';
-import {Enemy, Bullet} from '../entities.js';
+import {Enemy} from '../entities.js';
 
 
 // 'Load' the images.

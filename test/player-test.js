@@ -1,7 +1,7 @@
 'use strict';
 
 import {Resources} from '../resources.js';
-import {Player, Bullet} from '../entities.js';
+import {Player} from '../entities.js';
 
 
 // 'Load' the images.
@@ -195,12 +195,6 @@ QUnit.test('Player sprite changes', function(assert) {
 	const player = new Player(200, 500, 0);
 	const player2 = new Player(400, 500, 1);
 	const player3 = new Player(123, 456, 0);
-	const bounds = {
-		left: 50,
-		right: 850,
-		top: 50,
-		bottom: 550,
-	};
 
 	assert.deepEqual(player.sprite, player2.sprite, 'p1 and p2 have the same sprite');
 	assert.deepEqual(player.sprite, player3.sprite, 'p1 and p3 have the same sprite');
