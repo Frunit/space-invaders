@@ -588,8 +588,7 @@ Engine.prototype.collide_goodies = function(goodies, players) {
  */
 Engine.prototype.collider = function(a, b) {
 	// MAYBE: If the bounding boxes hit, this might continue doing some kind of pixel-perfect detection.
-	return a.collidable && b. collidable &&
-		a.w && a.h && b.w && b.h && !(
+	return a.collidable && b. collidable && !(
 		a.x       > b.x + b.w ||
 		a.y       > b.y + b.h ||
 		a.x + a.w < b.x       ||

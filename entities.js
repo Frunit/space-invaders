@@ -378,6 +378,7 @@ Player.prototype.resurrect = function() {
 	if(this.lives < 0) {
 		this.off_time = Infinity;
 		this.is_dead = true;
+		this.collidable = false;
 		this.h = 0;
 		this.w = 0;
 		this.sprite = new Sprite(

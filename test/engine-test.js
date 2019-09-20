@@ -74,9 +74,9 @@ QUnit.test('Engine collision detection', function(assert) {
 	assert.ok(engine.collider(obj_a, {x: 200, y: 100, w: 100, h: 100, collidable: true}), 'right border');
 	assert.ok(engine.collider(obj_a, {x: 0, y: 100, w: 100, h: 100, collidable: true}), 'left border');
 	assert.ok(engine.collider(obj_a, {x: 100, y: 200, w: 100, h: 100, collidable: true}), 'bottom border');
-	assert.ok(!engine.collider(obj_a, {x: 150, y: 150, w: 0, h: 100, collidable: true}), 'zero width');
-	assert.ok(!engine.collider(obj_a, {x: 150, y: 150, w: 100, h: 0, collidable: true}), 'zero height');
-	assert.ok(!engine.collider(obj_a, {x: 150, y: 150, w: 0, h: 0, collidable: true}), 'zero size');
+	assert.ok(engine.collider(obj_a, {x: 150, y: 150, w: 0, h: 100, collidable: true}), 'zero width');
+	assert.ok(engine.collider(obj_a, {x: 150, y: 150, w: 100, h: 0, collidable: true}), 'zero height');
+	assert.ok(engine.collider(obj_a, {x: 150, y: 150, w: 0, h: 0, collidable: true}), 'zero size');
 	assert.ok(engine.collider(obj_a, {x: 75, y: 75, w: 150, h: 150, collidable: true}), 'larger');
 	assert.ok(engine.collider(obj_a, {x: 125, y: 125, w: 50, h: 50, collidable: true}), 'smaller');
 });
