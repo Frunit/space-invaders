@@ -64,12 +64,12 @@ function Highscore(window_size, scores, level, date) {
 
 	// Default highscore if nothing is saved.
 	this.highscore = [
-		{'date': '-', 'score': 60},
-		{'date': '-', 'score': 50},
-		{'date': '-', 'score': 40},
-		{'date': '-', 'score': 30},
-		{'date': '-', 'score': 20},
-		{'date': '-', 'score': 10},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
 	];
 
 	this.enemies = [];
