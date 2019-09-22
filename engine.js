@@ -1,6 +1,6 @@
 'use strict';
 
-import {Player, Enemy, Wall} from './entities.js';
+import {Player, Enemy, Mystery, Wall} from './entities.js';
 import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
 
@@ -24,6 +24,7 @@ import {Text} from './text.js';
 function Engine(window_size, border, num_players, levels, level_num=0) {
 	// These variables store all objects in the game.
 	this.enemies = [];
+	this.mysteries = [];
 	this.enemy_bullets = [];
 	this.players = [];
 	this.player_bullets = [];
@@ -37,6 +38,7 @@ function Engine(window_size, border, num_players, levels, level_num=0) {
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1;
+	this.down_moves = 0;
 
 	this.game_is_over = false;
 
@@ -80,6 +82,7 @@ Engine.prototype.next_level = function() {
  */
 Engine.prototype.setup = function(fresh=false) {
 	this.enemies = [];
+	this.mysteries = [];
 	this.enemy_bullets = [];
 	this.player_bullets = [];
 	this.walls = [];
@@ -97,6 +100,7 @@ Engine.prototype.setup = function(fresh=false) {
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1 + recurrence * 0.33;
+	this.down_moves = 0;
 
 	this.game_is_over = false;
 
@@ -141,8 +145,6 @@ Engine.prototype.setup_players = function(fresh) {
 			));
 		}
 	}
-
-	console.log(this.players);
 };
 
 
@@ -384,11 +386,17 @@ Engine.prototype.update = function(dt) {
 		};
 	}
 
+	if(this.down_moves > 3 && this.mysteries.length === 0 && Math.random() < 0.001) {
+		// Start a mystery if the enemies gave enough space to the top
+		this.mysteries.push(new Mystery(Math.round(Math.random()), this.outer_bounds));
+	}
+
 	this.update_enemies(dt);
 	this.update_entities(dt);
 
 	this.collide_bullets(this.player_bullets, this.enemy_bullets);
 	this.collide_bullets(this.player_bullets, this.enemies);
+	this.collide_bullets(this.player_bullets, this.mysteries);
 	this.collide_bullets(this.enemy_bullets, this.players);
 	this.collide_bullets(this.player_bullets, this.walls);
 	this.collide_bullets(this.enemy_bullets, this.walls);
@@ -423,7 +431,8 @@ Engine.prototype.update_enemies = function(dt) {
 		else {
 			this.enemy_moves_down = 0.2;
 			this.enemy_direction *= -1;
-			this.enemy_speed_factor += 0.05
+			this.enemy_speed_factor += 0.05;
+			this.down_moves++;
 		}
 	}
 
@@ -458,6 +467,10 @@ Engine.prototype.update_entities = function(dt) {
 		bullet.update(dt, this.outer_bounds);
 	}
 
+	for(let mystery of this.mysteries) {
+		mystery.update(dt, this.outer_bounds);
+	}
+
 	for(let goody of this.goodies) {
 		goody.update(dt, this.outer_bounds);
 	}
@@ -478,6 +491,7 @@ Engine.prototype.update_entities = function(dt) {
 	// or their explosion is finished.
 	this.player_bullets = this.player_bullets.filter(bullet => bullet.active);
 	this.enemy_bullets = this.enemy_bullets.filter(bullet => bullet.active);
+	this.mysteries = this.mysteries.filter(mystery => mystery.active);
 	this.goodies = this.goodies.filter(goody => goody.active);
 	this.walls = this.walls.filter(wall => wall.active);
 	this.enemies = this.enemies.filter(enemy => enemy.active);
@@ -690,9 +704,11 @@ Engine.prototype.update_lives = function(player) {
 Engine.prototype.get_entities = function() {
 	return this.players.concat(
 		this.enemies,
+		this.mysteries,
 		this.enemy_bullets,
 		this.player_bullets,
-		this.walls, this.goodies,
+		this.walls,
+		this.goodies,
 		this.gui);
 };
 

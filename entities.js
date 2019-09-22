@@ -705,18 +705,18 @@ function Mystery(from_left, bounds) {
 
 	if(from_left) {
 		this.x = -this.w;
-		this.speed.x = 64;
+		this.speed.x = 96;
 	}
 	else {
 		this.x = bounds.right;
-		this.speed.x = -64;
+		this.speed.x = -96;
 	}
 
 	// The mystery will follow a sine curve. speed.y will be interpreted as
 	// amplitude of the curve
 	this.speed.y = 10;
 
-	this.base_y = 20;
+	this.base_y = 45;
 	this.y = this.base_y;
 }
 
@@ -737,10 +737,11 @@ Mystery.prototype.update = function(dt, bounds) {
 			this.active = false;
 		}
 	}
+	else {
+		this.active = this.x + this.w >= bounds.left && this.x <= bounds.right;
+	}
 
 	this.sprite.update(dt);
-
-	this.active = this.x < bounds.left || this.x + this.w > bounds.right;
 };
 
 
@@ -760,6 +761,8 @@ Mystery.prototype.kill = function() {
 		'sprites.png', {w: this.w, h: this.h}, 0,
 		{x: 68, y: 68}, [{x: 0, y: 0}]
 	);
+
+	return null;
 };
 
 
