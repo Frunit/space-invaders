@@ -12,7 +12,6 @@
 
 // TODO: Implement special UFO on top that traverses the screen
 // TODO: Revert to old input method!
-// TODO: Add some more levels (4-5 would be nice)
 // MAYBE: Implement music and sound
 // MAYBE: Increase shooting probability for enemies, when only few are left
 

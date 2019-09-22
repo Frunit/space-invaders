@@ -265,13 +265,13 @@ Player.prototype.choose_sprite = function() {
 	if(this.invulnerable) {
 		if(this.double_laser) {
 			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
+				'sprites.png', {w: this.w, h: this.h}, 0.2,
 				{x: 64, y: 140}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]
 			);
 		}
 		else {
 			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
+				'sprites.png', {w: this.w, h: this.h}, 0.2,
 				{x: 64, y: 104}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]
 			);
 		}

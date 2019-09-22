@@ -111,12 +111,13 @@ Highscore.prototype.setup = function() {
 		this.texts.dates.push(new Text(
 			score.date,
 			this.window_size.w * 0.25,
-			100 + i*30
+			150 + i*30
 		));
 		this.texts.scores.push(new Text(
 			score.score,
-			this.window_size.w * 0.6,
-			100 + i*30
+			this.window_size.w * 0.75,
+			150 + i*30,
+			Infinity, 'right'
 		));
 		this.texts.scores[i].set_score(score.score); // To ensure the same number of digits
 	}
@@ -138,12 +139,8 @@ Highscore.prototype.setup = function() {
 	));
 
 	// Decoration enemies
-	this.enemies.push(new GUI_Element(50, 50, 'enemy1'));
-	this.enemies.push(new GUI_Element(50, 250, 'enemy2'));
-	this.enemies.push(new GUI_Element(50, 450, 'enemy3'));
-	this.enemies.push(new GUI_Element(850, 50, 'enemy1'));
-	this.enemies.push(new GUI_Element(850, 250, 'enemy2'));
-	this.enemies.push(new GUI_Element(850, 450, 'enemy3'));
+	this.enemies.push(new GUI_Element(50, 150, 'enemy1'));
+	this.enemies.push(new GUI_Element(722, 150, 'enemy1'));
 };
 
 

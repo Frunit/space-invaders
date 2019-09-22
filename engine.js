@@ -56,7 +56,7 @@ function Engine(window_size, border, num_players, levels, level_num=0) {
 		left: border,
 		right: window_size.w - border,
 		top: border,
-		bottom: window_size.h - border,
+		bottom: window_size.h - border*2,
 	};
 }
 
@@ -129,7 +129,7 @@ Engine.prototype.setup_players = function(fresh) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players[i].resurrect();
-			this.players[i].x = (i+1) * (right - left) / (this.num_players+1) + this.left;
+			this.players[i].x = (i+1) * (right - left) / (this.num_players+1) + left;
 		}
 	}
 	else {
@@ -141,6 +141,8 @@ Engine.prototype.setup_players = function(fresh) {
 			));
 		}
 	}
+
+	console.log(this.players);
 };
 
 
