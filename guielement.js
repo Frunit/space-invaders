@@ -24,7 +24,7 @@ function GUI_Element(x, y, type) {
 			this.h = 22;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 0, y: 176}, [{x: 0, y: 0}]
+				{x: 188, y: 36}, [{x: 0, y: 0}]
 			);
 			break;
 		}
@@ -33,7 +33,7 @@ function GUI_Element(x, y, type) {
 			this.h = 22;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 28, y: 176}, [{x: 0, y: 0}]
+				{x: 216, y: 36}, [{x: 0, y: 0}]
 			);
 			break;
 		}

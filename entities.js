@@ -310,7 +310,6 @@ Player.prototype.apply_rapid_fire = function() {
 };
 
 
-// TODO: Right sprite!
 /**
  * <tt>Player.apply_speed_up</tt> allow the player to move faster for some
  * seconds.
