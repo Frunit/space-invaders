@@ -1,7 +1,7 @@
 'use strict';
 
 import {Engine} from '../engine.js';
-import {Enemy, Player, Wall} from '../entities.js';
+import {Enemy, Player, Wall, Goody} from '../entities.js';
 import {GUI_Element} from '../guielement.js';
 import {Text} from '../text.js';
 import {Resources} from '../resources.js';
@@ -15,19 +15,12 @@ resources.load([
 
 
 // TODO: ENGINE TESTS:
-// TODO: Level change
 // TODO: Input handling
 // TODO: Player shooting (shot on Wall, Enemy, Mystery, outside borders)
-// TODO: Player dying
-// TODO: Player loosing last life
-// TODO: Level setup with two players when one player is dead
-// TODO: Game over
-// TODO: Wall flying and vanishing (may be part of [Enemy, Player] shooting)
-// TODO: Applying goodies
-// TODO: Update lives
 
 
 const firetest_level = {fort: ['X'], forts: 2, enemies: ['0']};
+const goody_level = {fort: ['XXXXXXXXXXXXXXXX', 'XXXXXXXXXXXXXXXX', 'XXXXXXXXXXXXXXXX', 'XXXXXXXXXXXXXXXX'], forts: 1, enemies: ['0']};
 const minimal_level = {fort: ['X'], forts: 1, enemies: ['012']};
 const small_level = {fort: ['XXX', 'XXX'], forts: 5, enemies: ['00','11','22']};
 
@@ -35,7 +28,7 @@ const inner_bounds = {
 	'left': 20,
 	'right': 880,
 	'top': 20,
-	'bottom': 580
+	'bottom': 560
 };
 
 const outer_bounds = {
@@ -98,7 +91,7 @@ QUnit.test('Engine setup', function(assert) {
 	assert.deepEqual(engine.walls[0], new Wall(442, 514), 'Wall 1');
 
 	assert.strictEqual(engine.players.length, 1, 'number of players');
-	assert.deepEqual(engine.players[0], new Player(450, 560, 0), 'Player 1');
+	assert.deepEqual(engine.players[0], new Player(450, 580, 0), 'Player 1');
 
 	assert.deepEqual(engine.enemy_bullets, [], 'enemy bullets');
 	assert.deepEqual(engine.player_bullets, [], 'player bullets');
@@ -155,8 +148,8 @@ QUnit.test('Engine advanced setup', function(assert) {
 	assert.deepEqual(engine.walls[25], new Wall(728, 498), 'Wall 26');
 
 	assert.strictEqual(engine.players.length, 2, 'number of players');
-	assert.deepEqual(engine.players[0], new Player(300, 560, 0), 'Player 1');
-	assert.deepEqual(engine.players[1], new Player(600, 560, 1), 'Player 2');
+	assert.deepEqual(engine.players[0], new Player(300, 580, 0), 'Player 1');
+	assert.deepEqual(engine.players[1], new Player(600, 580, 1), 'Player 2');
 
 	assert.deepEqual(engine.enemy_bullets, [], 'enemy bullets');
 	assert.deepEqual(engine.player_bullets, [], 'player bullets');
@@ -268,12 +261,15 @@ QUnit.test('Engine enemy fire', function(assert) {
 
 	engine.setup();
 
+	// Shooting on the player
+
 	bullets = engine.enemies[0].fire(1);
 	engine.enemy_bullets.push(bullets[0]);
+	assert.deepEqual(engine.texts.player_lives[0], new Text(3, 36, 30), 'initial GUI player lives');
 
 	// cooldown prevents other bullets for 2 seconds
 
-	for(let i = 0; i < 15; i++) {
+	for(let i = 0; i < 16; i++) {
 		engine.update(0.1);
 		assert.strictEqual(engine.enemy_bullets.length, 1, `one shot fired ${i+1} ds`);
 		assert.strictEqual(engine.players[0].lives, 3, `Player not hit ${i+1} ds`);
@@ -287,13 +283,202 @@ QUnit.test('Engine enemy fire', function(assert) {
 	bullets = engine.enemies[0].fire(1);
 	assert.strictEqual(bullets.length, 0, 'Cooldown prevents firing 1.6 s');
 
-	for(let i = 0; i < 4; i++) {
+	for(let i = 0; i < 2; i++) {
 		engine.update(0.1);
+		bullets = engine.enemies[0].fire(1);
+		assert.strictEqual(bullets.length, 0, `Cooldown prevents firing ${i+17} ds`);
 	}
+
+	engine.update(0.1);
+
+	// Shooting on the fort/wall
 
 	bullets = engine.enemies[0].fire(1);
 	assert.strictEqual(bullets.length, 1, 'New bullet fired 2 s');
+	engine.enemy_bullets.push(bullets[0]);
 
-	// TODO: Test if bullet disappears when hitting the bottom
-	// TODO: Shoot on Wall and test consequences
+	for(let i = 0; i < 14; i++) {
+		engine.update(0.1);
+		assert.strictEqual(engine.enemy_bullets.length, 1, `one shot fired ${i+21} ds`);
+		assert.ok(engine.walls[0].collidable, `Wall not hit ${i+21} ds`);
+	}
+
+	engine.update(0.1);
+	assert.strictEqual(engine.enemy_bullets.length, 0, 'Bullet disappears 3.5 s');
+	assert.ok(!engine.walls[0].collidable, 'Wall hit 3.5 s');
+	// The flying piece of wall is guaranteed to leave the game latest after 1.8 s
+	// So it should be removed latest at 5.3 s
+
+	bullets = engine.enemies[0].fire(1);
+	assert.strictEqual(bullets.length, 0, 'Cooldown prevents firing 3.5 s');
+
+	for(let i = 0; i < 4; i++) {
+		engine.update(0.1);
+		bullets = engine.enemies[0].fire(1);
+		assert.strictEqual(bullets.length, 0, `Cooldown prevents firing ${i+36} ds`);
+	}
+	engine.update(0.1);
+
+	// Shooting to the void
+
+	bullets = engine.enemies[0].fire(1);
+	assert.strictEqual(bullets.length, 1, 'New bullet fired 4 s');
+	engine.enemy_bullets.push(bullets[0]);
+
+	for(let i = 0; i < 18; i++) {
+		engine.update(0.1);
+		assert.strictEqual(engine.enemy_bullets.length, 1, `one shot fired ${i+40} ds`);
+	}
+
+	engine.update(0.1);
+	assert.strictEqual(engine.enemy_bullets.length, 0, 'Bullet disappears 5.9 s');
+
+	assert.strictEqual(engine.walls.length, 1, 'Num of walls at the end');
+	assert.strictEqual(engine.players[0].lives, 2, 'Player not killed underways');
+	assert.strictEqual(engine.enemies.length, 1, 'Num of enemies at the end');
+});
+
+
+QUnit.test('Engine applying goodies', function(assert) {
+	const engine = new Engine({w: 900, h: 600}, 20, 1, [goody_level], 0);
+	let goody;
+
+	engine.setup();
+
+	const goody_x = 450; // center
+	const goody_y = engine.players[0].y - 20; // some pixels above player
+
+	// life (1)
+
+	assert.deepEqual(engine.texts.player_lives[0], new Text(3, 36, 30), 'initial GUI player lives');
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 1));
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 0, 'life goody 0.2 s');
+	assert.deepEqual(engine.texts.player_lives[0], new Text(4, 36, 30), 'GUI player lives after extra life');
+
+	// score (6)
+
+	assert.deepEqual(engine.texts.player_scores[0], new Text('000000', 116, 30), 'initial GUI player score');
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 6));
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 0, 'coin goody 0.2 s');
+	assert.deepEqual(engine.texts.player_scores[0], new Text('000300', 116, 30), 'GUI player score after coin');
+
+	// invulnerability (2)
+
+	assert.strictEqual(engine.players[0].invulnerable, 0, 'initial invulnerability');
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 2));
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 0, 'inv. goody 0.2 s');
+	assert.strictEqual(engine.players[0].invulnerable, 7, 'invulnerability after goody');
+
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 0)); // kill
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 0, 'inv. killer goody 0.2 s');
+	assert.deepEqual(engine.texts.player_lives[0], new Text(4, 36, 30), 'GUI player lives inv.');
+
+	// speed-up (3)
+
+	assert.strictEqual(engine.players[0].speed.x, 128, 'initial speed x');
+	assert.strictEqual(engine.players[0].speed_up, 0, 'initial speedup');
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 3));
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 0, 'speed goody 0.2 s');
+	assert.strictEqual(engine.players[0].speed.x, 256, 'speed x changes after first goody');
+	assert.strictEqual(engine.players[0].speed_up, 7, 'speedup after first goody');
+
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 3));
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 0, 'speed goody 0.2 s');
+	assert.strictEqual(engine.players[0].speed.x, 256, 'speed x no change after second goody');
+	assert.strictEqual(engine.players[0].speed_up, 13.8, 'speedup after second goody');
+
+	// double laser (4)
+
+	assert.strictEqual(engine.players[0].double_laser, 0, 'initial double laser');
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 4));
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 0, 'double laser goody 0.2 s');
+	assert.strictEqual(engine.players[0].double_laser, 7, 'double laser after goody');
+
+	// rapid fire (5)
+
+	assert.strictEqual(engine.players[0].rapid_fire, 0, 'initial rapid fire');
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 5));
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 0, 'rapid fire goody 0.2 s');
+	assert.strictEqual(engine.players[0].rapid_fire, 7, 'rapid fire after goody');
+
+	// kill (0)
+
+	engine.update(6); // To remove invulnerability
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 0));
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 0, 'killer goody 0.2 s');
+	assert.deepEqual(engine.texts.player_lives[0], new Text(3, 36, 30), 'GUI player lives after kill');
+
+	engine.goodies.push(new Goody(goody_x, goody_y, {x: 0, y: 64}, 1)); // life
+	engine.update(0.2);
+	assert.strictEqual(engine.goodies.length, 1, 'second goody should not collide');
+	assert.deepEqual(engine.texts.player_lives[0], new Text(3, 36, 30), 'GUI player lives after second goody');
+});
+
+
+QUnit.test('Engine player death', function(assert) {
+	const engine = new Engine({w: 900, h: 600}, 20, 2, [firetest_level, goody_level], 0);
+
+	engine.setup();
+
+	engine.players[0].lives = 0;
+	engine.players[1].lives = 0;
+
+	assert.strictEqual(engine.walls.length, 2, 'walls as indicator of loaded level');
+
+	assert.strictEqual(engine.players[0].w, 60, 'player 1 visible');
+	assert.ok(engine.players[0].collidable, 'player 1 interactable');
+
+	assert.strictEqual(engine.level_num, 0, 'starting in level 0');
+
+	engine.apply_goody(0, engine.players[0]); // kill player 1
+
+	assert.strictEqual(engine.players[0].lives, -1, 'killed player 1');
+	assert.deepEqual(engine.texts.player_lives[0], new Text(0, 36, 30), 'GUI should show 0, not -1');
+
+	engine.update(0.1);
+
+	assert.strictEqual(engine.enemies.length, 1, 'one enemy present');
+
+	engine.enemies[0].kill();
+	engine.update(1.91);
+
+	assert.strictEqual(engine.players[0].off_time, Infinity, 'player 1 off_time after 2.01 s');
+	assert.strictEqual(engine.players[0].lives, -1, 'player 1 dead after 2.01 s');
+	assert.strictEqual(engine.enemies.length, 1, 'one enemy present after 2.01 s');
+	assert.strictEqual(engine.players[0].w, 0, 'player 1 invisible after 2.01 ');
+	assert.ok(!engine.players[0].collidable, 'player 1 not interactable after 2.01 ');
+
+	engine.update(0.1); // only enemy is killed; next_level() ist called
+
+	assert.strictEqual(engine.level_num, 1, 'now level 1');
+
+	assert.strictEqual(engine.players[0].off_time, Infinity, 'player 1 off_time in next level');
+	assert.strictEqual(engine.players[0].lives, -1, 'player 1 still dead');
+	assert.strictEqual(engine.players[0].w, 0, 'player 1 still invisible');
+	assert.ok(!engine.players[0].collidable, 'player 1 still not interactable');
+
+	assert.strictEqual(engine.walls.length, 64, 'walls as indicator of newly loaded level');
+
+	engine.apply_goody(0, engine.players[1]); // kill player 2
+	let res = engine.update(1.91);
+
+	assert.strictEqual(res, null, 'engine still running 1');
+
+	res = engine.update(0.1);
+	assert.strictEqual(res, null, 'engine still running 2');
+
+	res = engine.update(0.1);
+
+	const expected_return = {next_stage: 'highscore', scores: [0, 0], level: 1}
+
+	assert.deepEqual(res, expected_return, 'engine not running anymore');
 });
