@@ -1,17 +1,11 @@
 'use strict';
 
-import Resources from '../resources.js';
+import {Resources} from '../resources.js';
 import {Sprite} from '../sprite.js';
 
 
-// This allows the resources to 'load' the graphics and just then start the
-// tests. Otherwise, the tests would start automatically and a potential race
-// condition might occur.
-QUnit.config.autostart = false;
-
-// 'Load' the images. Start the tests when finished.
+// 'Load' the images.
 global.resources = new Resources();
-resources.on_ready(() => {QUnit.start()});
 resources.load([
 	'gfx/sprites.png',
 ]);
@@ -20,7 +14,7 @@ resources.load([
 QUnit.test('Sprite default values', function(assert) {
 	let sprite = new Sprite('sprites.png', {w: 64, h: 64});
 
-	assert.strictEqual(sprite.pic, 'gfx/sprites.png', 'url existing');
+	assert.strictEqual(sprite.pic.src, 'gfx/sprites.png', 'url existing');
 	assert.deepEqual(sprite.offset, {x: 0, y: 0}, 'default value offset');
 	assert.deepEqual(sprite.frames, [{x: 0, y: 0}], 'default value frames');
 	assert.strictEqual(sprite.delay, 1, 'default value delay');

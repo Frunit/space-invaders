@@ -6,29 +6,13 @@
 <link rel="stylesheet" href="game.css">
 </head>
 <body>
-<input id="debug1">
-<input id="debug2">
-<input id="debug3">
-<input id="debug4">
-<br>
-
 <div id="game"></div>
-
-<div id="highscore-div">
-<input type="text" id="highscore" size="8">
-</div>
-
-<script>
-document.getElementById('highscore').addEventListener('input', function(e) {
-	const value = document.getElementById('highscore').value.toUpperCase();
-	document.getElementById('highscore').value = value.replace(/[^A-Z0-9 ]/g, '').substr(0, 8);
-});
-</script>
 
 <script type="module">
 import { Game } from './game.js';
+import { options, levels } from './options.js';
 
-const game = new Game();
+const game = new Game(options, levels);
 </script>
 </body>
 </html>

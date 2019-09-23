@@ -1,17 +1,11 @@
 'use strict';
 
-import Resources from '../resources.js';
-import {Player, Bullet} from '../entities.js';
+import {Resources} from '../resources.js';
+import {Player} from '../entities.js';
 
 
-// This allows the resources to 'load' the graphics and just then start the
-// tests. Otherwise, the tests would start automatically and a potential race
-// condition might occur.
-QUnit.config.autostart = false;
-
-// 'Load' the images. Start the tests when finished.
+// 'Load' the images.
 global.resources = new Resources();
-resources.on_ready(() => {QUnit.start()});
 resources.load([
 	'gfx/sprites.png',
 ]);
@@ -24,7 +18,7 @@ QUnit.test('Player initial properties', function(assert) {
 	assert.strictEqual(player.h, 32, 'h');
 	assert.strictEqual(player.x, 70, 'x');
 	assert.strictEqual(player.y, 84, 'y');
-	assert.deepEqual(player.speed, {x: 96, y: 0}, 'speed');
+	assert.deepEqual(player.speed, {x: 128, y: 0}, 'speed');
 	assert.deepEqual(player.bullet_offset, {x: 30, y: 0}, 'bullet_offset');
 	assert.strictEqual(player.bullet_double_x_offset, 20, 'bullet_double_x_offset');
 	assert.deepEqual(player.bullet_speed, {x: 0, y: -300}, 'bullet_speed');
@@ -201,12 +195,6 @@ QUnit.test('Player sprite changes', function(assert) {
 	const player = new Player(200, 500, 0);
 	const player2 = new Player(400, 500, 1);
 	const player3 = new Player(123, 456, 0);
-	const bounds = {
-		left: 50,
-		right: 850,
-		top: 50,
-		bottom: 550,
-	};
 
 	assert.deepEqual(player.sprite, player2.sprite, 'p1 and p2 have the same sprite');
 	assert.deepEqual(player.sprite, player3.sprite, 'p1 and p3 have the same sprite');

@@ -1,17 +1,11 @@
 'use strict';
 
-import Resources from '../resources.js';
-import {Enemy, Bullet} from '../entities.js';
+import {Resources} from '../resources.js';
+import {Enemy} from '../entities.js';
 
 
-// This allows the resources to 'load' the graphics and just then start the
-// tests. Otherwise, the tests would start automatically and a potential race
-// condition might occur.
-QUnit.config.autostart = false;
-
-// 'Load' the images. Start the tests when finished.
+// 'Load' the images.
 global.resources = new Resources();
-resources.on_ready(() => {QUnit.start()});
 resources.load([
 	'gfx/sprites.png',
 ]);
@@ -72,8 +66,8 @@ QUnit.test('Enemy properties after some time', function(assert) {
 });
 
 
-/* TODO QUnit.test('Enemy movement and bounds', function(assert) {
-	const enemy = new Enemy(100, 100, 0);
+QUnit.test('Enemy movement and bounds', function(assert) {
+	const enemy = new Enemy(130, 100, 0);
 	const enemy2 = new Enemy(100, 100, 0);
 	const bounds = {
 		left: 50,
@@ -84,27 +78,33 @@ QUnit.test('Enemy properties after some time', function(assert) {
 
 	let reached_border = false;
 
-	reached_border = enemy.update(1, -10, 0, bounds);
+	reached_border = enemy.update(1, -1, 0, bounds);
+	assert.ok(!reached_border, 'Left bound not reached');
+	reached_border = enemy.update(1, -0.0001, 0, bounds);
+	assert.ok(reached_border, 'Left bound reached');
 
-	assert.ok(reached_border, 'Left bound');
+	reached_border = enemy.update(1, 10, 0, bounds);
+	assert.ok(!reached_border, 'Right bound not reached');
 
-	enemy.move(100000, bounds);
-	enemy2.move(7.82, bounds);
+	reached_border = enemy.update(1, 2.0001, 0, bounds);
+	assert.ok(!reached_border, 'Right bound not reached');
 
-	assert.strictEqual(enemy.x + enemy.w, bounds.right, 'Right bound enemy 1');
-	assert.strictEqual(enemy2.x + enemy2.w, bounds.right, 'Right bound enemy 2');
+	reached_border = enemy.update(1, 0.0001, 0, bounds);
+	assert.ok(reached_border, 'Right bound reached');
 
-	enemy.move(-0.2, bounds);
-	enemy.move(-0.3, bounds);
-	enemy.move(-0.33, bounds);
-	enemy.move(-0.16, bounds);
-	enemy.move(-0.26, bounds);
-	enemy.move(1, bounds);
+	enemy.x = 100;
+	enemy2.x = 100;
 
-	enemy2.move(-0.25, bounds);
+	enemy.update(1, 0.10001, 0, bounds);
+	enemy.update(1, 0.2002, 0, bounds);
+	enemy.update(1, 0.303, 0, bounds);
+	enemy.update(1, 0.44, 0, bounds);
+	enemy.update(1, 0.500005, 0, bounds);
 
-	assert.ok(Math.abs(enemy2.x - enemy.x) < 0.00001, 'step-wise vs. absolute movement');
-});*/
+	enemy2.update(1, 1.543215, 0, bounds);
+
+	assert.ok(Math.abs(enemy2.x - enemy.x) < 0.0000001, 'step-wise vs. absolute movement');
+});
 
 
 QUnit.test('Enemy shooting', function(assert) {
@@ -117,25 +117,25 @@ QUnit.test('Enemy shooting', function(assert) {
 	};
 	let bullets;
 
-	bullets = enemy.fire(0);
+	bullets = enemy.fire(1);
 	assert.strictEqual(bullets.length, 1, 'First shot');
-	assert.strictEqual(bullets[0].x, 500-bullets[0].w/2, 'Bullet x');
-	//TODO:assert.strictEqual(bullets[0].y, 300-8+bullets[0].h/2, 'Bullet y');
-	assert.strictEqual(bullets[0].owner, -1, 'Bullet owner');
+	assert.strictEqual(bullets[0].x, 500-bullets[0].w/2, 'Bullet x 1');
+	assert.strictEqual(316, bullets[0].y + bullets[0].h/2, 'Bullet y 1');
+	assert.strictEqual(bullets[0].owner, -1, 'Bullet owner 1');
 
 	enemy.update(0.5, 0.5, 0.5, bounds);
 
-	bullets = enemy.fire(0);
-	assert.ok(Math.abs(enemy.cooldown - 0.5) < 0.00001, 'Current cooldown');
+	bullets = enemy.fire(1);
+	assert.ok(Math.abs(enemy.cooldown - 1.5) < 0.00001, 'Current cooldown');
 	assert.strictEqual(bullets.length, 0, 'Blocked by cooldown');
 
-	enemy.update(0.5, 0.5, 0.5, bounds);
+	enemy.update(1.5, 0.5, 0.5, bounds);
 
-	bullets = enemy.fire(0);
-	assert.strictEqual(bullets.length, 1, 'First shot');
-	assert.strictEqual(bullets[0].x, 564-bullets[0].w/2, 'Bullet x');
-	//TODO:assert.strictEqual(bullets[0].y, 364-8+bullets[0].h/2, 'Bullet y');
-	assert.strictEqual(bullets[0].owner, -1, 'Bullet owner');
+	bullets = enemy.fire(1);
+	assert.strictEqual(bullets.length, 1, 'Second shot');
+	assert.strictEqual(bullets[0].x, 564-bullets[0].w/2, 'Bullet x 2');
+	assert.strictEqual(380, bullets[0].y + bullets[0].h/2, 'Bullet y 2');
+	assert.strictEqual(bullets[0].owner, -1, 'Bullet owner 2');
 });
 
 
@@ -194,5 +194,4 @@ QUnit.test('Enemy kill', function(assert) {
 	assert.ok(enemy.off_time < 0, 'off_time after 2.0001 s');
 	assert.strictEqual(enemy.x + 4, enemy2.x, 'position must not change when dead x after 2.0001 s');
 	assert.strictEqual(enemy.y, enemy2.y, 'position must not change when dead y after 2.0001 s');
-
 });

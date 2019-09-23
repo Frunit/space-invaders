@@ -1,6 +1,7 @@
 'use strict';
 
 import {GUI_Element} from './guielement.js';
+import {Enemy} from './entities.js';
 import {Text} from './text.js';
 
 
@@ -12,16 +13,20 @@ import {Text} from './text.js';
  * @param {number} window_size.w - Width in pixels
  * @param {number} window_size.h - Height in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
+ * @param {string} version - The version of the game
  */
-function Start(window_size, num_players) {
+function Start(window_size, num_players, version) {
 	this.window_size = window_size;
 	this.num_players = num_players || 1;
+	this.version = version;
 	this.finished = false;
 
 	this.selector = null;
 	this.keys = [];
 	this.enemies = [];
 	this.texts = {};
+
+	this.enemy_direction = -1;
 }
 
 
@@ -30,6 +35,7 @@ function Start(window_size, num_players) {
  */
 Start.prototype.setup = function() {
 	this.finished = false;
+	this.enemy_direction = -1;
 
 	this.texts = {fixed: []};
 
@@ -39,8 +45,16 @@ Start.prototype.setup = function() {
 	this.selector.x = this.window_size.w / 2 - this.selector.w - 10;
 	this.selector.y = this.window_size.h / 2 + this.selector.h * (this.num_players - 2);
 
-	this.texts.fixed.push(new Text('One player', this.window_size.w / 2 + 5, this.window_size.h / 2, Infinity));
-	this.texts.fixed.push(new Text('Two players', this.window_size.w / 2 + 5, this.window_size.h / 2 + this.selector.h, Infinity));
+	this.texts.fixed.push(new Text(
+		'One player',
+		this.window_size.w / 2 + 5,
+		this.window_size.h / 2
+	));
+	this.texts.fixed.push(new Text(
+		'Two players',
+		this.window_size.w / 2 + 5,
+		this.window_size.h / 2 + this.selector.h
+	));
 
 	// Keys
 
@@ -49,12 +63,23 @@ Start.prototype.setup = function() {
 
 	// Enemies
 
-	this.enemies.push(new GUI_Element(75, 50, 'enemy2'));
-	this.enemies.push(new GUI_Element(312, 10, 'enemy1'));
-	this.enemies.push(new GUI_Element(492, 150, 'enemy3'));
-	this.enemies.push(new GUI_Element(638, 196, 'enemy2'));
-	this.enemies.push(new GUI_Element(823, 43, 'enemy1'));
-	this.enemies.push(new GUI_Element(224, 163, 'enemy3'));
+	for(let y = 0; y < 3; y++) {
+		for(let x = 0; x < 3; x++) {
+			this.enemies.push(new Enemy(370 + x * 60, 50 + y * 50, y));
+		}
+	}
+
+	// Version
+
+	this.texts.fixed.push(new Text(
+		this.version,
+		this.window_size.w - 5, // x
+		15,                     // y
+		Infinity,               // duration
+		'right',                // alignment
+		'#000000',              // color
+		10                      // size
+	));
 };
 
 
@@ -105,8 +130,15 @@ Start.prototype.update = function(dt) {
 		};
 	}
 
+	const dx = this.enemy_direction * dt;
+	const inner_bounds = {left: 20, right: this.window_size.w - 20, bottom: 1000, top: 0};
+	let reached_boundary = false;
 	for(let enemy of this.enemies) {
-		enemy.sprite.update(dt);
+		reached_boundary = enemy.update(dt, dx, 0, inner_bounds) || reached_boundary;
+	}
+
+	if(reached_boundary) {
+		this.enemy_direction *= -1;
 	}
 
 	return null;

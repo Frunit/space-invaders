@@ -17,8 +17,9 @@
  * @param {object[]} [frames] - The coordinates of the animation frame relativ to the offset
  * @param {number} [frames[].x=0] - The x coordinate (from left) in pixel
  * @param {number} [frames[].y=0] - The y coordinate (from top) in pixel
+ * @param {number} [zoom=1] - Zoom factor for displaying the sprite
  */
-function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}]) {
+function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}], zoom=1) {
 	// add standard path to graphics file name
 	this.pic = resources.get('gfx/' + url);
 
@@ -33,6 +34,7 @@ function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}]) 
 	this.delay_counter = 0;
 	this.idx = 0;
 	this.fresh = true;
+	this.zoom = zoom;
 }
 
 
@@ -102,6 +104,7 @@ Sprite.prototype.render = function() {
 		y: this.offset.y + frame.y,
 		w: this.size.w,
 		h: this.size.h,
+		zoom: this.zoom
 	};
 };
 

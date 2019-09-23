@@ -1,24 +1,18 @@
 'use strict';
 
-import Resources from '../resources.js';
+import {Resources} from '../resources.js';
 import {Wall} from '../entities.js';
 
 
-// This allows the resources to 'load' the graphics and just then start the
-// tests. Otherwise, the tests would start automatically and a potential race
-// condition might occur.
-QUnit.config.autostart = false;
-
-// 'Load' the images. Start the tests when finished.
+// 'Load' the required images.
 global.resources = new Resources();
-resources.on_ready(() => {QUnit.start()});
 resources.load([
 	'gfx/sprites.png',
 ]);
 
 
 QUnit.test('Wall inital properties', function(assert) {
-	let wall = new Wall(15236, 6842);
+	const wall = new Wall(15236, 6842);
 	assert.strictEqual(wall.object, 'wall', 'object name');
 	assert.strictEqual(wall.w, 16, 'w');
 	assert.strictEqual(wall.h, 16, 'h');

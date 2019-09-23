@@ -1,11 +1,12 @@
 'use strict';
 
-import {Player, Enemy, Wall} from './entities.js';
+import {Player, Enemy, Mystery, Wall} from './entities.js';
 import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
 
 
-// TODO: Sometimes, bullet stay hanging around
+// MAYBE: Show achieved score when killing an enemy or getting the coin goody
+
 
 /**
  * <tt>Engine</tt> is the actual game engine. It *should* work without any
@@ -18,11 +19,12 @@ import {Text} from './text.js';
  * @param {number} border - The window border width in pixels
  * @param {number} num_players - The number of players. Should be 1 or 2.
  * @param {Level[]} levels - The available levels
- * @param {number} level - The level to start at
+ * @param {number} [level_num=0] - The level to start at
  */
-function Engine(window_size, border, num_players, levels, level) {
+function Engine(window_size, border, num_players, levels, level_num=0) {
 	// These variables store all objects in the game.
 	this.enemies = [];
+	this.mysteries = [];
 	this.enemy_bullets = [];
 	this.players = [];
 	this.player_bullets = [];
@@ -36,11 +38,12 @@ function Engine(window_size, border, num_players, levels, level) {
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1;
+	this.down_moves = 0;
 
 	this.game_is_over = false;
 
 	this.level_list = levels;
-	this.level = level;
+	this.level_num = level_num;
 
 	this.num_players = num_players;
 
@@ -55,7 +58,7 @@ function Engine(window_size, border, num_players, levels, level) {
 		left: border,
 		right: window_size.w - border,
 		top: border,
-		bottom: window_size.h - border,
+		bottom: window_size.h - border*2,
 	};
 }
 
@@ -64,28 +67,22 @@ function Engine(window_size, border, num_players, levels, level) {
  * <tt>Engine.next_level</tt> loads the next level.
  */
 Engine.prototype.next_level = function() {
-	this.level++;
-	const current = this.level_list[this.level % this.level_list.length];
-	const recurrence = Math.floor(this.level / this.level_list.length);
-	this.setup(current, recurrence, false);
+	this.level_num++;
+	this.setup();
 };
 
 
-// TODO: Engine.setup is too long. Especially level setup and GUI setup should be put into another function
 /**
  * <tt>Engine.setup</tt> initializes the game with the player and enemies.
  *
- * @param {Level} [level=null]
- * 		The level to set up. If no level is given, the first level will be used.
- * @param {number} [recurrence=0]
- * 		How often was this level played (0 for first time, 1 for second time, ...)
  * @param {boolean} [fresh=false]
  * 		If <tt>true</tt>, forces new player objects (instead of using the
  * 		existing ones). If no player objects are present, they are created in
  * 		any case.
  */
-Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
+Engine.prototype.setup = function(fresh=false) {
 	this.enemies = [];
+	this.mysteries = [];
 	this.enemy_bullets = [];
 	this.player_bullets = [];
 	this.walls = [];
@@ -98,71 +95,164 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 		floating: [],
 	};
 
+	const recurrence = Math.floor(this.level_num / this.level_list.length);
+
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
 	this.enemy_speed_factor = 1 + recurrence * 0.33;
+	this.down_moves = 0;
 
 	this.game_is_over = false;
 
-	// Players
+	const level = this.level_list[this.level_num % this.level_list.length];
 
+	this.setup_players(fresh);
+	this.setup_gui();
+	this.setup_enemies(level.enemies);
+	this.setup_forts(level.fort, level.forts);
+};
+
+
+/**
+ * <tt>Engine.setup_players</tt> set ups the players in a new level.
+ *
+ * @param {boolean} fresh
+ * 		If <tt>true</tt>, forces new player objects (instead of using the
+ * 		existing ones). If no player objects are present, they are created in
+ * 		any case.
+ */
+Engine.prototype.setup_players = function(fresh) {
 	if(fresh) {
 		this.players = [];
 	}
 
+	const left = this.outer_bounds.left;
+	const right = this.outer_bounds.right;
+
 	if(this.players.length) {
 		// Reset players
 		for(let i = 0; i < this.num_players; i++) {
-			this.players[i].reset();
-			this.players[i].x = (i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left;
+			this.players[i].resurrect();
+			this.players[i].x = (i+1) * (right - left) / (this.num_players+1) + left;
 		}
 	}
 	else {
+		const bottom = this.outer_bounds.bottom;
 		// Create players
 		for(let i = 0; i < this.num_players; i++) {
-			this.players.push(new Player((i+1) * (this.outer_bounds.right - this.outer_bounds.left) / (this.num_players + 1) + this.outer_bounds.left, this.inner_bounds.bottom - 20, i));
+			this.players.push(new Player(
+				(i+1) * (right - left) / (this.num_players + 1) + left, bottom - 20, i
+			));
 		}
 	}
+};
 
-	// GUI
 
-	this.gui.push(new GUI_Element(this.outer_bounds.left + 5, this.outer_bounds.top + 10, 'life'));
+/**
+ * <tt>Engine.setup_gui</tt> set ups the GUI in a new level.
+ */
+Engine.prototype.setup_gui = function() {
+	// Life icon for player 1
+	this.gui.push(new GUI_Element(
+		this.outer_bounds.left + 5,
+		this.outer_bounds.top + 10,
+		'life'
+	));
+
 	const life_width = this.gui[this.gui.length - 1].w;
-	this.texts.player_lives.push(new Text(this.players[0].lives, this.outer_bounds.left + 10 + life_width, this.outer_bounds.top + 30, Infinity));
 
-	this.gui.push(new GUI_Element(this.outer_bounds.left + 95, this.outer_bounds.top + 10, 'score'));
+	// Life counter text player 1
+	this.texts.player_lives.push(new Text(
+		this.players[0].lives,
+		this.outer_bounds.left + 10 + life_width,
+		this.outer_bounds.top + 30
+	));
+
+	this.update_lives(this.players[0]);
+
+	// Score icon for player 1
+	this.gui.push(new GUI_Element(
+		this.outer_bounds.left + 95,
+		this.outer_bounds.top + 10,
+		'score'
+	));
+
 	const score_width = this.gui[this.gui.length - 1].w;
 
-	this.texts.player_scores.push(new Text('', this.outer_bounds.left + 100 + score_width, this.outer_bounds.top + 30, Infinity));
+	// Score counter text player 1
+	this.texts.player_scores.push(new Text(
+		'',
+		this.outer_bounds.left + 100 + score_width,
+		this.outer_bounds.top + 30,
+	));
 	this.texts.player_scores[0].set_score(this.players[0].score);
 
 	if(this.num_players === 2) {
-		this.gui.push(new GUI_Element(this.outer_bounds.right - 5 - life_width, this.outer_bounds.top + 10, 'life'));
+		// Life icon for player 2
+		this.gui.push(new GUI_Element(
+			this.outer_bounds.right - 5 - life_width,
+			this.outer_bounds.top + 10,
+			'life'
+		));
 
-		this.texts.player_lives.push(new Text(this.players[1].lives, this.outer_bounds.right - 10 - life_width, this.outer_bounds.top + 30, Infinity, 'right'));
+		// Life counter text player 2
+		this.texts.player_lives.push(new Text(
+			this.players[1].lives,
+			this.outer_bounds.right - 10 - life_width,
+			this.outer_bounds.top + 30,
+			Infinity,
+			'right'
+		));
 
-		this.gui.push(new GUI_Element(this.outer_bounds.right - 95, this.outer_bounds.top + 10, 'score'));
+		this.update_lives(this.players[1]);
 
-		this.texts.player_scores.push(new Text('', this.outer_bounds.right - 100, this.outer_bounds.top + 30, Infinity, 'right'));
+		// Score icon for player 2
+		this.gui.push(new GUI_Element(
+			this.outer_bounds.right - 95,
+			this.outer_bounds.top + 10,
+			'score')
+		);
+
+		// Score counter text player 2
+		this.texts.player_scores.push(new Text(
+			'',
+			this.outer_bounds.right - 100,
+			this.outer_bounds.top + 30,
+			Infinity,
+			'right'
+		));
 		this.texts.player_scores[1].set_score(this.players[1].score);
 	}
 
-	this.texts.level.push(new Text('Level ', (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity, 'right'));
-	this.texts.level.push(new Text(this.level + 1, (this.outer_bounds.right + this.outer_bounds.left)/2, this.outer_bounds.top + 30, Infinity));
+	this.texts.level.push(new Text(
+		'Level ',
+		(this.outer_bounds.right + this.outer_bounds.left)/2,
+		this.outer_bounds.top + 30,
+		Infinity,
+		'right'
+	));
+	this.texts.level.push(new Text(
+		this.level_num + 1,
+		(this.outer_bounds.right + this.outer_bounds.left)/2,
+		this.outer_bounds.top + 30,
+	));
+};
 
-	// Level
 
-	if(level === null) {
-		level = this.level_list[0];
-	}
+/**
+ * <tt>Engine.setup_enemies</tt> set ups the enemies in a new level.
+ *
+ * @param {string[]} enemies - The enemy pattern as described in {@link Level}
+ */
+Engine.prototype.setup_enemies = function(enemies) {
+	const ib_right = this.inner_bounds.right;
+	const ib_left = this.inner_bounds.left;
+	const enemy_offset = ib_left + (ib_right - ib_left) / 2 - enemies[0].length / 2 * 60;
+	const enemy_upper = 50;
 
-	// Create enemies
-	const enemy_offset = this.inner_bounds.left + (this.inner_bounds.right - this.inner_bounds.left) / 2 - level.enemies[0].length / 2 * 60;
-	const enemy_upper = 30;
-
-	for(let y = 0; y < level.enemies.length; y++) {
-		for(let x = 0; x < level.enemies[0].length; x++) {
-			let type = level.enemies[y][x];
+	for(let y = 0; y < enemies.length; y++) {
+		for(let x = 0; x < enemies[0].length; x++) {
+			let type = enemies[y][x];
 			if(type === '_') {
 				continue;
 			}
@@ -176,16 +266,24 @@ Engine.prototype.setup = function(level=null, recurrence=0, fresh=false) {
 			);
 		}
 	}
+};
 
-	// Create forts
-	const fort_x_dist = (this.inner_bounds.right - this.inner_bounds.left) / (level.forts + 1);
-	const fort_offset = this.inner_bounds.left + fort_x_dist - level.fort[0].length / 2 * 16;
-	const fort_upper = 530 - level.fort.length * 16;
 
-	for(let i = 0; i < level.forts; i++) {
-		for(let y = 0; y < level.fort.length; y++) {
-			for(let x = 0; x < level.fort[0].length; x++) {
-				if(level.fort[y][x] === 'X') {
+/**
+ * <tt>Engine.setup_forts</tt> set ups the forts in a new level.
+ *
+ * @param {string[]} fort - The structure of a fort as described in {@link Level}
+ * @param {number} forts - The number of forts
+ */
+Engine.prototype.setup_forts = function(fort, forts) {
+	const fort_x_dist = (this.inner_bounds.right - this.inner_bounds.left) / (forts + 1);
+	const fort_offset = this.inner_bounds.left + fort_x_dist - fort[0].length / 2 * 16;
+	const fort_upper = 530 - fort.length * 16;
+
+	for(let i = 0; i < forts; i++) {
+		for(let y = 0; y < fort.length; y++) {
+			for(let x = 0; x < fort[0].length; x++) {
+				if(fort[y][x] === 'X') {
 					this.walls.push(
 						new Wall(
 							fort_offset + i * fort_x_dist + x * 16, // x position
@@ -284,10 +382,40 @@ Engine.prototype.update = function(dt) {
 		return {
 			next_stage: 'highscore',
 			scores: score,
-			level: this.level,
+			level: this.level_num,
 		};
 	}
 
+	if(this.down_moves > 3 && this.mysteries.length === 0 && Math.random() < 0.001) {
+		// Start a mystery if the enemies gave enough space to the top
+		this.mysteries.push(new Mystery(Math.round(Math.random()), this.outer_bounds));
+	}
+
+	this.update_enemies(dt);
+	this.update_entities(dt);
+
+	this.collide_bullets(this.player_bullets, this.enemy_bullets);
+	this.collide_bullets(this.player_bullets, this.enemies);
+	this.collide_bullets(this.player_bullets, this.mysteries);
+	this.collide_bullets(this.enemy_bullets, this.players);
+	this.collide_bullets(this.player_bullets, this.walls);
+	this.collide_bullets(this.enemy_bullets, this.walls);
+	this.collide_goodies(this.goodies, this.players);
+
+	if(this.enemies.length === 0) {
+		this.next_level();
+	}
+
+	return null;
+};
+
+
+/**
+ * <tt>Engine.update_enemies</tt> udpates all enemies.
+ *
+ * @param {number} dt - The time delta since last update in seconds
+ */
+Engine.prototype.update_enemies = function(dt) {
 	const dx = !this.enemy_moves_down ? this.enemy_direction * dt * this.enemy_speed_factor : 0;
 	const dy = this.enemy_moves_down ? dt * this.enemy_speed_factor : 0;
 
@@ -301,9 +429,10 @@ Engine.prototype.update = function(dt) {
 			this.game_is_over = true;
 		}
 		else {
-			this.enemy_moves_down = 1;
+			this.enemy_moves_down = 0.2;
 			this.enemy_direction *= -1;
-			this.enemy_speed_factor += 0.05
+			this.enemy_speed_factor += 0.05;
+			this.down_moves++;
 		}
 	}
 
@@ -320,13 +449,26 @@ Engine.prototype.update = function(dt) {
 			this.enemy_bullets.push(bullet[0]);
 		}
 	}
+};
 
+
+/**
+ * <tt>Engine.update_entities</tt> udpates all bullets, goodies, walls and
+ * texts. It also removes entities that are not active anymore.
+ *
+ * @param {number} dt - The time delta since last update in seconds
+ */
+Engine.prototype.update_entities = function(dt) {
 	for(let bullet of this.enemy_bullets) {
 		bullet.update(dt, this.outer_bounds);
 	}
 
 	for(let bullet of this.player_bullets) {
 		bullet.update(dt, this.outer_bounds);
+	}
+
+	for(let mystery of this.mysteries) {
+		mystery.update(dt, this.outer_bounds);
 	}
 
 	for(let goody of this.goodies) {
@@ -349,25 +491,27 @@ Engine.prototype.update = function(dt) {
 	// or their explosion is finished.
 	this.player_bullets = this.player_bullets.filter(bullet => bullet.active);
 	this.enemy_bullets = this.enemy_bullets.filter(bullet => bullet.active);
+	this.mysteries = this.mysteries.filter(mystery => mystery.active);
 	this.goodies = this.goodies.filter(goody => goody.active);
 	this.walls = this.walls.filter(wall => wall.active);
 	this.enemies = this.enemies.filter(enemy => enemy.active);
-
-	this.collide_bullets(this.player_bullets, this.enemy_bullets);
-	this.collide_bullets(this.player_bullets, this.enemies);
-	this.collide_bullets(this.enemy_bullets, this.players);
-	this.collide_bullets(this.player_bullets, this.walls);
-	this.collide_bullets(this.enemy_bullets, this.walls);
-	this.collide_goodies(this.goodies, this.players);
-
-	if(this.enemies.length === 0) {
-		this.next_level();
-	}
-
-	return null;
 };
 
 
+/**
+ * <tt>Engine.collide_all</tt> test if any element of <tt>a</tt> overlaps with
+ * any element of <tt>b</tt>. If an element of <tt>a</tt> collides with multiple
+ * elements of <tt>b</tt>, only the first element <tt>b</tt> will be returned.
+ *
+ * @param {object[]} a
+ * 		First array of objects to test
+ * @param {object[]} b
+ * 		Second array of objects to test
+ * @returns {Array[]}
+ * 		An array of tuples containing the indices of colliding objects. It is in
+ * 		the form: <tt>[[idx_a, idx_b], ...]</tt>.
+ *
+ */
 Engine.prototype.collide_all = function(a, b) {
 	const colliding = [];
 
@@ -390,7 +534,7 @@ Engine.prototype.collide_all = function(a, b) {
  * on the target, effects happen.
  *
  * @param {Bullet[]} bullets
- * 		The first array of entities. Bullets or Goodies
+ * 		The array of Bullets
  * @param {Entity[]} others
  * 		The second array of entities. Bullets, Enemies, Players, or Walls
  */
@@ -442,13 +586,24 @@ Engine.prototype.collide_goodies = function(goodies, players) {
 
 /**
  * <tt>Engine.collider</tt> checks if the bounding boxes of a and b overlap.
+ * There is never an overlap, if either a or b are not <tt>collidable</tt> or
+ * either a or b has not width or height. Objects *just* touching on the border
+ * are considered overlapping.
  *
  * @param {Entity} a - The first object
+ * @param {number} a.x - The x coordinate (from left) in pixel
+ * @param {number} a.y - The y coordinate (from top) in pixel
+ * @param {number} a.w - The width in pixel
+ * @param {number} a.h - The height in pixel
  * @param {Entity} b - The second object
+ * @param {number} b.x - The x coordinate (from left) in pixel
+ * @param {number} b.y - The y coordinate (from top) in pixel
+ * @param {number} b.w - The width in pixel
+ * @param {number} b.h - The height in pixel
  * @returns {boolean} Whether or not the bounding boxes overlap.
  */
 Engine.prototype.collider = function(a, b) {
-	// TODO: If the bounding boxes hit, this might continue doing some kind of pixel-perfect detection.
+	// MAYBE: If the bounding boxes hit, this might continue doing some kind of pixel-perfect detection.
 	return a.collidable && b. collidable && !(
 		a.x       > b.x + b.w ||
 		a.y       > b.y + b.h ||
@@ -467,8 +622,9 @@ Engine.prototype.collider = function(a, b) {
  * @param {number[]} to_remove - The list of indices to remove from array
  */
 Engine.prototype.remove_multiple_elements = function(array, to_remove) {
-	for(let i = to_remove.length -1; i >= 0; i--)
+	for(let i = to_remove.length - 1; i >= 0; i--) {
 		array.splice(to_remove[i],1);
+	}
 };
 
 
@@ -496,7 +652,7 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		case 3: {
-			this.start_break_out(player);
+			player.apply_speed_up();
 			break;
 		}
 		case 4: {
@@ -508,25 +664,13 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		case 6: {
-			player.score += 500;
+			player.score += 300;
 			this.texts.player_scores[player.num].set_score(player.score);
 			break;
 		}
 		default:
 			throw 'Unknown Goody type received: ' + type;
 	}
-};
-
-
-/**
- * <tt>Engine.start_break_out</tt> puts a ball on the player's fighter that will
- * start right away upwards.
- *
- * @param {Player} player - The player to place the ball on.
- */
-Engine.prototype.start_break_out = function(player) {
-	// TODO: Add Break-out mode!
-	console.log(player.num, 'BREAK OUT!');
 };
 
 
@@ -560,9 +704,11 @@ Engine.prototype.update_lives = function(player) {
 Engine.prototype.get_entities = function() {
 	return this.players.concat(
 		this.enemies,
+		this.mysteries,
 		this.enemy_bullets,
 		this.player_bullets,
-		this.walls, this.goodies,
+		this.walls,
+		this.goodies,
 		this.gui);
 };
 

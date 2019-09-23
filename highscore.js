@@ -1,9 +1,10 @@
 'use strict';
 
-/* eslint-disable */ // TODO!
-
 import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
+
+
+// MAYBE: Allow name instead of date
 
 
 // The highscore is saved in the `localStorage`. This storage is only available
@@ -12,6 +13,7 @@ if(typeof window === 'undefined') {
 	global.localStorage = {
 		store: {},
 
+		// eslint-disable-next-line
 		getItem: function(name) {
 			if(!(name in this.store)) {
 				return null;
@@ -20,6 +22,7 @@ if(typeof window === 'undefined') {
 			return this.store[name];
 		},
 
+		// eslint-disable-next-line
 		setItem: function(name, content) {
 			this.store[name] = content;
 		}
@@ -38,29 +41,38 @@ if(typeof window === 'undefined') {
  * 		Width in pixels
  * @param {number} window_size.h
  * 		Height in pixels
- * @param {Score[]} scores
+ * @param {number[]} scores
  * 		The final scores of the player(s). Should contain one or two elements.
  * @param {number} level
  * 		The level that was reached
+ * @param {Date} date
+ * 		The date that shall be used for a new highscore entry
  */
-function Highscore(window_size, scores, level) {
+function Highscore(window_size, scores, level, date) {
 	this.window_size = window_size;
 	this.scores = scores;
 	this.level = level + 1;
+	this.date = date.toLocaleString('de-DE', {
+		day: '2-digit',
+		month: 'short',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit'
+	});
 
 	this.finished = false;
 
 	// Default highscore if nothing is saved.
 	this.highscore = [
-		{'name': 'A', 'score': 60},
-		{'name': 'B', 'score': 50},
-		{'name': 'C', 'score': 40},
-		{'name': 'D', 'score': 30},
-		{'name': 'E', 'score': 20},
-		{'name': 'F', 'score': 10},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
+		{'date': '-', 'score': 0},
 	];
 
-	this.entities = [];
+	this.enemies = [];
 	this.texts = {};
 }
 
@@ -70,7 +82,7 @@ function Highscore(window_size, scores, level) {
  */
 Highscore.prototype.setup = function() {
 	this.finished = false;
-	this.entities = [];
+	this.enemies = [];
 
 	const highscore = localStorage.getItem('highscore');
 	if(highscore !== null) {
@@ -86,21 +98,49 @@ Highscore.prototype.setup = function() {
 	// GUI
 
 	this.texts = {
-		names: [],
+		dates: [],
 		scores: [],
 		level: [],
 		footer: []
 	};
 
+	// The high score table
+
 	for(let i = 0; i < this.highscore.length; i++) {
 		const score = this.highscore[i];
-		this.texts.names.push(new Text(score.name, this.window_size.w * 0.25, 100 + i*30, Infinity));
-		this.texts.scores.push(new Text(score.score, this.window_size.w * 0.6, 100 + i*30, Infinity));
+		this.texts.dates.push(new Text(
+			score.date,
+			this.window_size.w * 0.25,
+			150 + i*30
+		));
+		this.texts.scores.push(new Text(
+			score.score,
+			this.window_size.w * 0.75,
+			150 + i*30,
+			Infinity, 'right'
+		));
 		this.texts.scores[i].set_score(score.score); // To ensure the same number of digits
 	}
 
-	this.texts.level.push(new Text('You reached level ' + this.level, this.window_size.w / 2, 50, Infinity, 'center'));
-	this.texts.footer.push(new Text('Fire to continue', this.window_size.w / 2, this.window_size.h - 50, Infinity, 'center'));
+	// Info texts
+	this.texts.level.push(new Text(
+		'You reached level ' + this.level,
+		this.window_size.w / 2,
+		50,
+		Infinity,
+		'center'
+	));
+	this.texts.footer.push(new Text(
+		'Fire to continue',
+		this.window_size.w / 2,
+		this.window_size.h - 50,
+		Infinity,
+		'center'
+	));
+
+	// Decoration enemies
+	this.enemies.push(new GUI_Element(50, 150, 'enemy1'));
+	this.enemies.push(new GUI_Element(722, 150, 'enemy1'));
 };
 
 
@@ -108,15 +148,15 @@ Highscore.prototype.setup = function() {
  * <tt>Highscore.add_score</tt> adds a score to the existing highscore table in
  * memory. Nothing is changed in the localStorage.
  *
- * @param {Score} score - The score to add
+ * @param {number} score - The score to add
  */
 Highscore.prototype.add_score = function(score) {
-	this.highscore.sort((a, b) => parseInt(b[1]) - parseInt(a[1]));
+	this.highscore.sort((a, b) => b.score - a.score);
 	const l = this.highscore.length;
 
 	for(let i = 0; i < l; i++) {
-		if(this.highscore[i][1] < score[1]) {
-			this.highscore.splice(i, 0, score);
+		if(this.highscore[i].score < score) {
+			this.highscore.splice(i, 0, {'date': this.date, 'score': score});
 			break;
 		}
 	}
@@ -172,9 +212,12 @@ Highscore.prototype.update = function(dt) {
 			num_players: this.num_players,
 		};
 	}
-	else {
-		return null;
+
+	for(let enemy of this.enemies) {
+		enemy.sprite.update(dt);
 	}
+
+	return null;
 };
 
 
@@ -184,7 +227,7 @@ Highscore.prototype.update = function(dt) {
  * @returns {object[]} An array with all entities (players, enemies, ...)
  */
 Highscore.prototype.get_entities = function() {
-	return this.entities;
+	return this.enemies;
 };
 
 
@@ -196,13 +239,6 @@ Highscore.prototype.get_entities = function() {
 Highscore.prototype.get_texts = function() {
 	return this.texts;
 };
-
-
-/**
- * @typedef {object} Score
- * @property {string} name  - The name of the player
- * @property {number} score - The score of the player
- */
 
 
 export {Highscore};

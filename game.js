@@ -10,30 +10,19 @@
  * More information is given in the <tt>readme.md</tt>.
  */
 
-// TODO: Implement special UFO on top that traverses the screen
-// TODO: Maybe implement music and sound
-
-// Depending on whether the browser or node.js is used, offer a different debug
-// function
-if(typeof window === 'undefined') {
-	global.debug = function(num, message) {
-		console.log(num, message);
-	};
-}
-else {
-	window.debug = function(num, message) {
-		document.getElementById('debug' + num).value = message;
-	};
-}
+// TODO: Revert to old input method!
+// MAYBE: Implement music and sound
+// MAYBE: Increase shooting probability for enemies, when only few are left
 
 
 import {Start} from './start.js';
 import {Engine} from './engine.js';
 import {Highscore} from './highscore.js';
+import {Text} from './text.js';
+import {Resources} from './resources.js';
 
 // Attention! No curly brackets. This uses the default export that is dependent
 // on whether this runs in a browser or not (for testing in node.js).
-import Resources from './resources.js';
 import Screen from './screen.js';
 
 
@@ -42,39 +31,16 @@ import Screen from './screen.js';
  * timing, the stages and the screen.
  *
  * @constructor
+ * @param {object} options
+ * 		Various options for the game. See options.js for details.
+ * @param {Level[]} levels
+ * 		Levels to load for the player
  */
-function Game() {
+function Game(options, levels) {
+	this.options = options;
+	this.levels = levels;
 
-	// TODO: The options and the version may be externalized using json or the like.
-	this.options = {
-		total_size: {w: 900, h: 600},
-		border: 20,
-		num_players: 1,
-		start_level: 0,
-	};
-
-	// TODO: Load levels from levels.json!
-	this.levels = [
-		{
-			fort: [
-				"__XXXX__",
-				"XXXXXXXX",
-				"XXXXXXXX",
-				"XXXXXXXX",
-				"XX____XX"
-			],
-			forts: 4,
-			enemies: [
-				"0000000000",
-				"1111111111",
-				"1111111111",
-				"2222222222",
-				"2222222222"
-			]
-		}
-	];
-
-	this.version = 'pre-alpha';
+	this.version = 'v0.3';
 
 	this.last_time = 0;
 
@@ -82,6 +48,11 @@ function Game() {
 	// they might be removed after finishing the game.
 	this.last_fps = 0;
 	this.frames = 0;
+	this.fps = new Text(
+		'', 2, this.options.total_size.h - 2,
+		Infinity, 'left', '#000000', 10
+	);
+	this.show_fps = true;
 
 	this.stage = null;
 	this.screen = null;
@@ -142,7 +113,9 @@ Game.prototype.loop = function() {
 
 	// Update the game and draw the newest state.
 	const next_stage = this.update(dt);
-	this.screen.render(this.stage.get_entities(), this.stage.get_texts());
+	const texts = this.stage.get_texts();
+	texts.fps = [this.fps];
+	this.screen.render(this.stage.get_entities(), texts);
 	this.update_fps(now);
 
 	this.last_time = now;
@@ -234,7 +207,9 @@ Game.prototype.update_fps = function(now) {
 	// FPS will be shown as 1/s (== Hz)
 	this.frames++;
 	if(now - this.last_fps > 1000) {
-		debug(4, 'FPS: ' + this.frames); // eslint-disable-line
+		if(this.show_fps) {
+			this.fps.text = this.frames;
+		}
 		this.frames = 0;
 		this.last_fps = now;
 	}
@@ -261,7 +236,7 @@ Game.prototype.update = function(dt) {
  * creates the screen, and starts the game loop.
  */
 Game.prototype.start = function() {
-	this.stage = new Start(this.options.total_size, 1);
+	this.stage = new Start(this.options.total_size, 1, this.version);
 	this.stage.setup();
 
 	this.screen = new Screen('game', this.options.total_size);
@@ -283,20 +258,29 @@ Game.prototype.start = function() {
 Game.prototype.next_stage = function(payload) {
 	switch(payload.next_stage) {
 		case 'start': {
-			const num_players = 'num_players' in payload ? payload.num_players : this.options.num_players;
-			this.stage = new Start(this.options.total_size, num_players);
+			const num_players = 'num_players' in payload ?
+				payload.num_players :
+				this.options.num_players;
+			this.stage = new Start(this.options.total_size, num_players, this.version);
 			break;
 		}
 		case 'game': {
-			const num_players = 'num_players' in payload ? payload.num_players : this.options.num_players;
-			const start_level = 'start_level' in payload ? payload.start_level : this.options.start_level;
-			this.stage = new Engine(this.options.total_size, this.options.border, num_players, this.levels, start_level);
+			const num_players = 'num_players' in payload ?
+				payload.num_players :
+				this.options.num_players;
+			const start_level = 'start_level' in payload ?
+				payload.start_level :
+				this.options.start_level;
+			this.stage = new Engine(
+				this.options.total_size, this.options.border, num_players, this.levels, start_level
+			);
 			break;
 		}
 		case 'highscore': {
+			const current_date = new Date();
 			const scores = 'scores' in payload ? payload.scores : [];
 			const level = 'level' in payload ? payload.level : 0;
-			this.stage = new Highscore(this.options.total_size, scores, level);
+			this.stage = new Highscore(this.options.total_size, scores, level, current_date);
 			break;
 		}
 		default:
@@ -305,6 +289,18 @@ Game.prototype.next_stage = function(payload) {
 
 	this.stage.setup();
 };
+
+
+/**
+ * @typedef {object} Level
+ * @property {string[]} fort
+ * 		The shape of a fort. <tt>X</tt> is a wall and <tt>_</tt> an empty space.
+ * @property {number} forts
+ * 		The number of forts in the level.
+ * @property {string[]} enemies
+ * 		Position of enemies. Numbers <tt>0-2</tt> define an enemy of that type.
+ * 		<tt>_</tt> is an empty space.
+ */
 
 
 export {Game};

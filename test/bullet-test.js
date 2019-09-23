@@ -1,17 +1,11 @@
 'use strict';
 
-import Resources from '../resources.js';
+import {Resources} from '../resources.js';
 import {Bullet} from '../entities.js';
 
 
-// This allows the resources to 'load' the graphics and just then start the
-// tests. Otherwise, the tests would start automatically and a potential race
-// condition might occur.
-QUnit.config.autostart = false;
-
-// 'Load' the images. Start the tests when finished.
+// 'Load' the images.
 global.resources = new Resources();
-resources.on_ready(() => {QUnit.start()});
 resources.load([
 	'gfx/sprites.png',
 ]);

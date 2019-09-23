@@ -51,13 +51,16 @@ function Player(x, y, num) {
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
 
-	this.speed.x = 96; // pixel per second
+	this.speed.x = 128; // pixel per second
 
 	this.bullet_offset = {x: this.w/2, y: 0};
 	this.bullet_double_x_offset = 20;
 	this.bullet_speed = {x: 0, y: -300}; // pixel per second
 
-	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
+	this.sprite = new Sprite(
+		'sprites.png', {w: this.w, h: this.h}, 0,
+		{x: 0, y: 100}, [{x: 0, y: 0}]
+	);
 
 	this.score = 0;
 	this.lives = 3;
@@ -75,6 +78,7 @@ function Player(x, y, num) {
 	this.invulnerable = 0;
 	this.double_laser = 0;
 	this.rapid_fire = 0;
+	this.speed_up = 0;
 }
 
 
@@ -85,12 +89,15 @@ function Player(x, y, num) {
 Player.prototype.reset = function() {
 	this.w = 60;
 	this.h = 32;
-	this.speed.x = 96; // pixel per second
+	this.speed.x = 128; // pixel per second
 	this.bullet_offset = {x: this.w/2, y: 0};
 	this.bullet_double_x_offset = 20;
 	this.bullet_speed = {x:0, y:-300}; // pixel per second
 
-	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
+	this.sprite = new Sprite(
+		'sprites.png', {w: this.w, h: this.h}, 0,
+		{x: 0, y: 100}, [{x: 0, y: 0}]
+	);
 
 	this.max_cooldown = 1;
 	this.rapid_cooldown = 0.3;
@@ -104,6 +111,7 @@ Player.prototype.reset = function() {
 	this.invulnerable = 0;
 	this.double_laser = 0;
 	this.rapid_fire = 0;
+	this.speed_up = 0;
 };
 
 
@@ -116,7 +124,7 @@ Player.prototype.reset = function() {
  * 		cooldown prevented firing.
  */
 Player.prototype.fire = function() {
-	// TODO: The cooldown should be ignored, if no bullet of the player is present anywhere.
+	// MAYBE: The cooldown should be ignored, if no bullet of the player is present anywhere.
 	// Still, an inactive player (hidden or dead) should not shoot!
 	if(!this.firing || this.cooldown) {
 		return [];
@@ -236,6 +244,14 @@ Player.prototype.update = function(dt, bounds) {
 		}
 	}
 
+	if(this.speed_up) {
+		this.speed_up -= dt;
+		if(this.speed_up < 0) {
+			this.speed_up = 0;
+			this.speed.x /= 2;
+		}
+	}
+
 	this.move(this.moving * dt, bounds);
 	return this.fire();
 };
@@ -248,18 +264,30 @@ Player.prototype.update = function(dt, bounds) {
 Player.prototype.choose_sprite = function() {
 	if(this.invulnerable) {
 		if(this.double_laser) {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 64, y: 140}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0.2,
+				{x: 64, y: 140}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]
+			);
 		}
 		else {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 64, y: 104}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0.2,
+				{x: 64, y: 104}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]
+			);
 		}
 	}
 	else {
 		if(this.double_laser) {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 140}, [{x: 0, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0,
+				{x: 0, y: 140}, [{x: 0, y: 0}]
+			);
 		}
 		else {
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 0, y: 100}, [{x: 0, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0,
+				{x: 0, y: 100}, [{x: 0, y: 0}]
+			);
 		}
 	}
 };
@@ -279,6 +307,18 @@ Player.prototype.apply_rapid_fire = function() {
 		}
 	}
 	this.rapid_fire += 7;
+};
+
+
+/**
+ * <tt>Player.apply_speed_up</tt> allow the player to move faster for some
+ * seconds.
+ */
+Player.prototype.apply_speed_up = function() {
+	if(this.speed_up === 0) {
+		this.speed.x *= 2;
+	}
+	this.speed_up += 7;
 };
 
 
@@ -317,7 +357,10 @@ Player.prototype.kill = function(force=false) {
 		this.off_time = 2;
 		this.cooldown = 2;
 		this.collidable = false;
-		this.sprite = new Sprite('sprites.png', {w: 64, h: 32}, 0.5, {x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]);
+		this.sprite = new Sprite(
+			'sprites.png', {w: 64, h: 32}, 0.5,
+			{x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]
+		);
 	}
 
 	return null;
@@ -334,9 +377,13 @@ Player.prototype.resurrect = function() {
 	if(this.lives < 0) {
 		this.off_time = Infinity;
 		this.is_dead = true;
+		this.collidable = false;
 		this.h = 0;
 		this.w = 0;
-		this.sprite = new Sprite('sprites.png', {w: 1, h: 1}, 0, {x: 0, y: 0}, [{x: 0, y: 0}]);
+		this.sprite = new Sprite(
+			'sprites.png', {w: 1, h: 1}, 0,
+			{x: 0, y: 0}, [{x: 0, y: 0}]
+		);
 	}
 	else {
 		this.reset()
@@ -368,21 +415,30 @@ function Enemy(x, y, type) {
 			this.w = 32;
 			this.h = 32;
 			this.score_value = 30;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 2, {x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 2,
+				{x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]
+			);
 			break;
 		}
 		case 1: {
 			this.w = 44;
 			this.h = 32;
 			this.score_value = 20;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 2, {x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 2,
+				{x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]
+			);
 			break;
 		}
 		case 2: {
 			this.w = 48;
 			this.h = 32;
 			this.score_value = 10;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 2, {x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 2,
+				{x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]
+			);
 			break;
 		}
 		default:
@@ -395,7 +451,7 @@ function Enemy(x, y, type) {
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
 
-	this.max_cooldown = 1;
+	this.max_cooldown = 2;
 	this.cooldown = 0;
 }
 
@@ -404,13 +460,13 @@ function Enemy(x, y, type) {
  * <tt>Enemy.fire</tt> fires a bullet if the last bullet was long enough ago
  * (i.e. the cooldown is ok).
  *
- * @param {number} [chance=0.999]
- * 		The chance of *not* shooting.
+ * @param {number} [chance=0.001]
+ * 		The chance of shooting.
  * @returns {Bullet[]}
  * 		An array of Bullet objects if the ship fired. The array may be empty.
  */
-Enemy.prototype.fire = function(chance=0.999) {
-	if(this.cooldown > 0 || Math.random() < chance) {
+Enemy.prototype.fire = function(chance=0.001) {
+	if(this.cooldown > 0 || Math.random() > chance) {
 		return [];
 	}
 
@@ -418,7 +474,13 @@ Enemy.prototype.fire = function(chance=0.999) {
 
 	const type = Math.floor(Math.random() * 3) + 1; // Random number: one of [1, 2, 3]
 
-	return [new Bullet(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.bullet_speed, type, -1)];
+	return [new Bullet(
+		this.x + this.bullet_offset.x,
+		this.y + this.bullet_offset.y,
+		this.bullet_speed,
+		type,
+		-1
+	)];
 };
 
 
@@ -484,11 +546,19 @@ Enemy.prototype.kill = function() {
 	this.collidable = false;
 	this.speed.x = 0;
 	this.speed.y = 0;
-	this.sprite = new Sprite('sprites.png', {w: 52, h: 32}, 0, {x: 68, y: 68}, [{x: 0, y: 0}]);
+	this.sprite = new Sprite(
+		'sprites.png', {w: 52, h: 32}, 0,
+		{x: 68, y: 68}, [{x: 0, y: 0}]
+	);
 
 	if(Math.random() < 0.333) {
 		const type = Math.floor(Math.random() * 7); // Random number: one of [0 .. 6]
-		return new Goody(this.x + this.bullet_offset.x, this.y + this.bullet_offset.y, this.goody_speed, type);
+		return new Goody(
+			this.x + this.bullet_offset.x,
+			this.y + this.bullet_offset.y,
+			this.goody_speed,
+			type
+		);
 	}
 
 	return null;
@@ -524,25 +594,39 @@ function Bullet(x, y, speed, type, owner=-1) {
 		case 0: {
 			this.w = 4;
 			this.h = 16;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 144, y: 36}, [{x: 0, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0,
+				{x: 144, y: 36}, [{x: 0, y: 0}]
+			);
 			break;
 		}
 		case 1: {
 			this.w = 12;
 			this.h = 28;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0.1, {x: 0, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0.1,
+				{x: 0, y: 36},
+				[{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]
+			);
 			break;
 		}
 		case 2: {
 			this.w = 12;
 			this.h = 28;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0.1, {x: 52, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0.1,
+				{x: 52, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]
+			);
 			break;
 		}
 		case 3: {
 			this.w = 12;
 			this.h = 24;
-			this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0.1, {x: 92, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]);
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0.1,
+				{x: 92, y: 36},
+				[{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]
+			);
 			break;
 		}
 		default:
@@ -588,13 +672,101 @@ Bullet.prototype.kill = function() {
 	this.off_time = 2;
 	this.speed = {x: 0, y: 0};
 	this.collidable = false;
-	this.sprite = new Sprite('sprites.png', {w: 12, h: 24}, 0, {x: 172, y: 36}, [{x: 0, y: 0}]);
+	this.sprite = new Sprite(
+		'sprites.png', {w: 12, h: 24}, 0,
+		{x: 172, y: 36}, [{x: 0, y: 0}]
+	);
 
 	return null;
 };
 
 
-// TODO: Goody-ideas: Faster movement
+/**
+ * <tt>Mystery</tt> is an object for an enemy space ship/monster.
+ *
+ * @constructor
+ * @extends Entity
+ * @param {boolean} from_left
+ * 		If true, the mystery enters from left, otherwise, it enters from right
+ * @param {Bounds} bounds
+ * 		Screen boundaries
+ */
+function Mystery(from_left, bounds) {
+	Entity.call(this);
+	this.object = 'mystery';
+	// pixel per second
+	this.w = 64;
+	this.h = 28;
+	this.score_value = 500;
+	this.sprite = new Sprite(
+		'sprites.png', {w: this.w, h: this.h}, 0,
+		{x: 0, y: 68}, [{x: 0, y: 0}]
+	);
+
+	if(from_left) {
+		this.x = -this.w;
+		this.speed.x = 96;
+	}
+	else {
+		this.x = bounds.right;
+		this.speed.x = -96;
+	}
+
+	// The mystery will follow a sine curve. speed.y will be interpreted as
+	// amplitude of the curve
+	this.speed.y = 10;
+
+	this.base_y = 45;
+	this.y = this.base_y;
+}
+
+
+/**
+ * <tt>Mystery.update</tt> moves the mystery, respecting boundaries.
+ *
+ * @param {number} dt - The time delta since last update in seconds
+ * @param {Bounds} bounds - Screen boundaries
+ */
+Mystery.prototype.update = function(dt, bounds) {
+	if(this.off_time >= 0) {
+		this.off_time -= dt;
+		if(this.off_time < 0) {
+			this.active = false;
+		}
+	}
+	else {
+		this.x += dt * this.speed.x;
+		this.y = this.speed.y * Math.sin(this.x * 0.05) + this.base_y;
+		this.active = this.x + this.w >= bounds.left && this.x <= bounds.right;
+	}
+
+	this.sprite.update(dt);
+};
+
+
+/**
+ * <tt>Mystery.kill</tt> kills the mystery. It turns into an explosion for some
+ * seconds.
+ *
+ * @returns {null} To be compliant with other kill functions.
+ */
+Mystery.prototype.kill = function() {
+	this.off_time = 2;
+	this.collidable = false;
+	this.speed.x = 0;
+	this.w = 52;
+	this.h = 32;
+	this.x += 6;
+	this.y += 2;
+	this.sprite = new Sprite(
+		'sprites.png', {w: this.w, h: this.h}, 0,
+		{x: 68, y: 68}, [{x: 0, y: 0}]
+	);
+
+	return null;
+};
+
+
 /**
  * <tt>Goody</tt> is an object for a goody that is released by a killed enemy.
  *
@@ -625,7 +797,10 @@ function Goody(x, y, speed, type) {
 	this.type = type;
 
 	if(type >= 0 && type <= 6) {
-		this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 260, y: 0}, [{x: 0, y: this.h*type}]);
+		this.sprite = new Sprite(
+			'sprites.png', {w: this.w, h: this.h}, 0,
+			{x: 260, y: 0}, [{x: 0, y: this.h*type}]
+		);
 	}
 	else {
 		throw 'Unknown Goody type received: ' + type;
@@ -672,7 +847,10 @@ function Wall(x, y) {
 	this.h = 16;
 	this.gravity = 300;
 
-	this.sprite = new Sprite('sprites.png', {w: this.w, h: this.h}, 0, {x: 152, y: 36}, [{x: 0, y: 0}]);
+	this.sprite = new Sprite(
+		'sprites.png', {w: this.w, h: this.h}, 0,
+		{x: 152, y: 36}, [{x: 0, y: 0}]
+	);
 
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
@@ -686,7 +864,7 @@ function Wall(x, y) {
  * @param {Bounds} bounds - Hard boundaries for the wall piece
  */
 Wall.prototype.update = function(dt, bounds) {
-	// TODO: Might be cool, if the block could rotate :)
+	// MAYBE: Might be cool, if the block could rotate :)
 
 	// As long as the block is collidable, it does not move, so no update is needed
 	if(this.collidable) {
@@ -722,4 +900,4 @@ Wall.prototype.kill = function() {
 };
 
 
-export {Player, Enemy, Bullet, Goody, Wall};
+export {Player, Enemy, Bullet, Goody, Wall, Mystery};
