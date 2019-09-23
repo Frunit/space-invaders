@@ -728,9 +728,6 @@ function Mystery(from_left, bounds) {
  * @param {Bounds} bounds - Screen boundaries
  */
 Mystery.prototype.update = function(dt, bounds) {
-	this.x += dt * this.speed.x;
-	this.y = this.speed.y * Math.sin(this.x * 0.05) + this.base_y;
-
 	if(this.off_time >= 0) {
 		this.off_time -= dt;
 		if(this.off_time < 0) {
@@ -738,6 +735,8 @@ Mystery.prototype.update = function(dt, bounds) {
 		}
 	}
 	else {
+		this.x += dt * this.speed.x;
+		this.y = this.speed.y * Math.sin(this.x * 0.05) + this.base_y;
 		this.active = this.x + this.w >= bounds.left && this.x <= bounds.right;
 	}
 
@@ -748,6 +747,8 @@ Mystery.prototype.update = function(dt, bounds) {
 /**
  * <tt>Mystery.kill</tt> kills the mystery. It turns into an explosion for some
  * seconds.
+ *
+ * @returns {null} To be compliant with other kill functions.
  */
 Mystery.prototype.kill = function() {
 	this.off_time = 2;

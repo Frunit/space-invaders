@@ -10,7 +10,6 @@
  * More information is given in the <tt>readme.md</tt>.
  */
 
-// TODO: Implement special UFO on top that traverses the screen
 // TODO: Revert to old input method!
 // MAYBE: Implement music and sound
 // MAYBE: Increase shooting probability for enemies, when only few are left

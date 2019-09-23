@@ -47,11 +47,11 @@ QUnit.test('Highscore setup', function(assert) {
 	assert.deepEqual(JSON.parse(localStorage.getItem('highscore'))[1], {'date': formatted_date, 'score': 20}, 'saved in localStorage');
 
 	assert.strictEqual(hs.texts.dates.length, 6, 'table dates length');
-	assert.deepEqual(hs.texts.dates[0], new Text(formatted_date, 225, 100), 'table dates element 1');
-	assert.deepEqual(hs.texts.dates[5], new Text('-', 225, 250), 'table dates element 6');
+	assert.deepEqual(hs.texts.dates[0], new Text(formatted_date, 225, 150), 'table dates element 1');
+	assert.deepEqual(hs.texts.dates[5], new Text('-', 225, 300), 'table dates element 6');
 	assert.strictEqual(hs.texts.scores.length, 6, 'table scores length');
-	assert.deepEqual(hs.texts.scores[0], new Text('000040', 540, 100), 'table scores element 1');
-	assert.deepEqual(hs.texts.scores[5], new Text('000000', 540, 250), 'table scores element 6');
+	assert.deepEqual(hs.texts.scores[0], new Text('000040', 675, 150, Infinity, 'right'), 'table scores element 1');
+	assert.deepEqual(hs.texts.scores[5], new Text('000000', 675, 300, Infinity, 'right'), 'table scores element 6');
 
 	assert.strictEqual(hs.texts.level.length, 1, 'table level length');
 	assert.deepEqual(hs.texts.level[0], new Text('You reached level 4', 450, 50, Infinity, 'center'), 'table level element');
@@ -59,9 +59,9 @@ QUnit.test('Highscore setup', function(assert) {
 	assert.strictEqual(hs.texts.footer.length, 1, 'table footer length');
 	assert.deepEqual(hs.texts.footer[0], new Text('Fire to continue', 450, 550, Infinity, 'center'), 'table footer element');
 
-	assert.strictEqual(hs.enemies.length, 6, 'enemies length');
-	assert.deepEqual(hs.enemies[0], new GUI_Element(50, 50, 'enemy1'), 'enemy 1');
-	assert.deepEqual(hs.enemies[5], new GUI_Element(850, 450, 'enemy3'), 'enemy 2');
+	assert.strictEqual(hs.enemies.length, 2, 'enemies length');
+	assert.deepEqual(hs.enemies[0], new GUI_Element(50, 150, 'enemy1'), 'enemy 1');
+	assert.deepEqual(hs.enemies[1], new GUI_Element(722, 150, 'enemy1'), 'enemy 2');
 });
 
 
@@ -72,24 +72,24 @@ QUnit.test('Highscore update', function(assert) {
 	const hs = new Highscore({w: 900, h: 600}, [1230954718, 0], 123, date);
 	hs.setup();
 
-	const enemy1 = new GUI_Element(50, 50, 'enemy1');
-	const enemy6 = new GUI_Element(850, 450, 'enemy3');
+	const enemy1 = new GUI_Element(50, 150, 'enemy1');
+	const enemy2 = new GUI_Element(722, 150, 'enemy1');
 
-	assert.strictEqual(hs.enemies.length, 6, 'enemies length');
+	assert.strictEqual(hs.enemies.length, 2, 'enemies length');
 	assert.deepEqual(hs.enemies[0], enemy1, 'enemy 1');
-	assert.deepEqual(hs.enemies[5], enemy6, 'enemy 2');
+	assert.deepEqual(hs.enemies[1], enemy2, 'enemy 2');
 
 	let ret;
 
 	for(let i = 0; i < 5; i++) {
 		ret = hs.update(1);
 		enemy1.sprite.update(1);
-		enemy6.sprite.update(1);
+		enemy2.sprite.update(1);
 
 		assert.strictEqual(ret, null, 'return is null');
-		assert.strictEqual(hs.enemies.length, 6, 'enemies length');
+		assert.strictEqual(hs.enemies.length, 2, 'enemies length');
 		assert.deepEqual(hs.enemies[0], enemy1, 'enemy 1');
-		assert.deepEqual(hs.enemies[5], enemy6, 'enemy 2');
+		assert.deepEqual(hs.enemies[1], enemy2, 'enemy 2');
 	}
 });
 

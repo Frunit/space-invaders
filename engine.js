@@ -137,7 +137,7 @@ Engine.prototype.setup_players = function(fresh) {
 		}
 	}
 	else {
-		const bottom = this.inner_bounds.bottom;
+		const bottom = this.outer_bounds.bottom;
 		// Create players
 		for(let i = 0; i < this.num_players; i++) {
 			this.players.push(new Player(
@@ -664,7 +664,7 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		case 6: {
-			player.score += 500;
+			player.score += 300;
 			this.texts.player_scores[player.num].set_score(player.score);
 			break;
 		}

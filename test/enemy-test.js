@@ -194,5 +194,4 @@ QUnit.test('Enemy kill', function(assert) {
 	assert.ok(enemy.off_time < 0, 'off_time after 2.0001 s');
 	assert.strictEqual(enemy.x + 4, enemy2.x, 'position must not change when dead x after 2.0001 s');
 	assert.strictEqual(enemy.y, enemy2.y, 'position must not change when dead y after 2.0001 s');
-
 });
