@@ -386,7 +386,7 @@ Player.prototype.resurrect = function() {
 		);
 	}
 	else {
-		this.reset()
+		this.reset();
 	}
 };
 

@@ -85,7 +85,7 @@ function Game(options, levels) {
 
 	// And finally, the necessary graphics are loaded and the game is started as
 	// soon as the graphics were loaded.
-	resources.on_ready(() => {this.start()});
+	resources.on_ready(() => {this.start();});
 	resources.load([
 		'gfx/sprites.png',
 		'gfx/keys.png',
@@ -156,10 +156,10 @@ Game.prototype.handle_input = function(event, key_down) {
 	switch(code) {
 		case 'ControlRight':
 		case 'Control':
-			key = 'CTRL'; break
+			key = 'CTRL'; break;
 		case 'ShiftLeft':
 		case 'Shift':
-			key = 'SHIFT'; break
+			key = 'SHIFT'; break;
 		case 'Space':
 		case 'Spacebar':
 		case ' ':

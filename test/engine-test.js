@@ -36,7 +36,7 @@ const outer_bounds = {
 	'right': 900,
 	'top': 0,
 	'bottom': 600
-}
+};
 
 
 QUnit.test('Engine initial values', function(assert) {
@@ -341,7 +341,6 @@ QUnit.test('Engine enemy fire', function(assert) {
 
 QUnit.test('Engine applying goodies', function(assert) {
 	const engine = new Engine({w: 900, h: 600}, 20, 1, [goody_level], 0);
-	let goody;
 
 	engine.setup();
 
@@ -478,7 +477,15 @@ QUnit.test('Engine player death', function(assert) {
 
 	res = engine.update(0.1);
 
-	const expected_return = {next_stage: 'highscore', scores: [0, 0], level: 1}
+	const expected_return = {next_stage: 'highscore', scores: [0, 0], level: 1};
 
 	assert.deepEqual(res, expected_return, 'engine not running anymore');
 });
+
+
+//~ QUnit.test('Engine player shooting', function(assert) {
+	//~ const engine = new Engine({w: 900, h: 600}, 20, 1, [firetest_level], 0);
+	//~ engine.setup();
+
+
+//~ });

@@ -40,6 +40,7 @@ module.exports = {
                 }
             }
         ],
+        "semi": ["error", "always"],
         "eqeqeq": "error",
         "block-scoped-var": "error",
         "consistent-return": "error",

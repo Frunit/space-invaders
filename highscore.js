@@ -195,7 +195,7 @@ Highscore.prototype.handle_input = function(key, key_down) {
 			this.finished = true; // This will trigger a stage change upon next update
 			break;
 	}
-}
+};
 
 
 /**

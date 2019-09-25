@@ -346,7 +346,7 @@ Engine.prototype.handle_input = function(key, key_down) {
 				break;
 		}
 	}
-}
+};
 
 
 /**
@@ -374,7 +374,7 @@ Engine.prototype.update = function(dt) {
 	}
 
 	if(this.game_is_over) {
-		const score = []
+		const score = [];
 		for(let player of this.players) {
 			score.push(player.score);
 		}

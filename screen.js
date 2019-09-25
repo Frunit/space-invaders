@@ -17,7 +17,7 @@ function Screen(target, expected_size) {
 	this.canvas = document.createElement('canvas');
 	this.ctx = this.canvas.getContext('2d');
 	this.ctx.imageSmoothingEnabled = false;
-	const target_element = document.getElementById(target)
+	const target_element = document.getElementById(target);
 	target_element.appendChild(this.canvas);
 
 	this.expected_size = expected_size;

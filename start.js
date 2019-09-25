@@ -112,7 +112,7 @@ Start.prototype.handle_input = function(key, key_down) {
 	}
 
 	// Other keys are ignored
-}
+};
 
 
 /**
