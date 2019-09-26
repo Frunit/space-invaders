@@ -31,6 +31,13 @@ function Screen(target, expected_size) {
 		e.preventDefault();
 		return false;
 	});
+
+	const self = this;
+
+	// React on screen size changes (i.e. resizing the browser window)
+	window.addEventListener('resize', () => {
+		self._set_canvas_size(self.target_element.clientWidth, self.target_element.clientHeight);
+	});
 }
 
 
@@ -44,7 +51,6 @@ function Screen(target, expected_size) {
  * @param {number} target_height - The maximum height of the canvas
  */
 Screen.prototype._set_canvas_size = function(target_width, target_height) {
-	// MAYBE: Change canvas size upon browser resize
 	const expected_aspect_ratio = this.expected_size.w / this.expected_size.h;
 	const target_aspect_ratio = target_width / target_height;
 
