@@ -1,6 +1,5 @@
 'use strict';
 
-
 // Fake Image object for use in automated tests in nodejs
 if(typeof window === 'undefined') {
 	global.Image = class { // eslint-disable-line

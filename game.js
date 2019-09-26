@@ -10,8 +10,7 @@
  * More information is given in the <tt>readme.md</tt>.
  */
 
-// TODO: Revert to old input method!
-// MAYBE: Implement music and sound
+// TODO: Improve input method!
 // MAYBE: Increase shooting probability for enemies, when only few are left
 
 
@@ -128,7 +127,7 @@ Game.prototype.loop = function() {
 	// Ask Javascript to call this function again when suitable.
 	// Advantage over a timeout is that it automatically pauses the game when
 	// the window is, for example, minimized.
-	// This will not work in nodejs!
+	// This will not loop in nodejs for testing purposes!
 	if(typeof window !== 'undefined') {
 		requestAnimationFrame(() => this.loop());
 	}
