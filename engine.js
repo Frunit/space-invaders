@@ -22,6 +22,7 @@ import {Text} from './text.js';
  * @param {number} [level_num=0] - The level to start at
  */
 function Engine(window_size, border, num_players, levels, level_num=0) {
+	this.name = 'engine';
 	// These variables store all objects in the game.
 	this.enemies = [];
 	this.mysteries = [];
@@ -603,7 +604,8 @@ Engine.prototype.collide_goodies = function(goodies, players) {
  * @returns {boolean} Whether or not the bounding boxes overlap.
  */
 Engine.prototype.collider = function(a, b) {
-	// MAYBE: If the bounding boxes hit, this might continue doing some kind of pixel-perfect detection.
+	// This might test for pixel-perfect detection if the bounding-boxes overlap,
+	// but in practise, this is sufficient
 	return a.collidable && b. collidable && !(
 		a.x       > b.x + b.w ||
 		a.y       > b.y + b.h ||

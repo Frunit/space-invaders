@@ -20,6 +20,8 @@ resources.load([
 
 QUnit.test('Start setup', function(assert) {
 	const start = new Start({w: 900, h: 600}, 0, 'VERSION');
+	assert.strictEqual(start.name, 'start', 'start name');
+
 	start.setup();
 
 	assert.ok(!start.finished, 'finished');

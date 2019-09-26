@@ -40,6 +40,8 @@ const outer_bounds = {
 QUnit.test('Engine initial values', function(assert) {
 	const engine = new Engine({w: 900, h: 600}, 20, 1, [minimal_level], 0);
 
+	assert.strictEqual(engine.name, 'engine', 'engine name');
+
 	assert.ok(!engine.game_is_over, 'game over');
 
 	assert.strictEqual(engine.enemy_direction, -1, 'enemy direction');

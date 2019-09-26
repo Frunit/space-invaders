@@ -29,6 +29,7 @@ QUnit.test('Highscore setup', function(assert) {
 	assert.strictEqual(localStorage.getItem('highscore'), null, 'localStorage is resetted');
 
 	const hs = new Highscore({w: 900, h: 600}, [20, 40], 3, date);
+	assert.strictEqual(hs.name, 'highscore', 'highscore name');
 	hs.setup();
 
 	// Date.toLocaleString is implementation dependent, so I cannot assume that

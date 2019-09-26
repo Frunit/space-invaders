@@ -16,6 +16,7 @@ import {Text} from './text.js';
  * @param {string} version - The version of the game
  */
 function Start(window_size, num_players, version) {
+	this.name = 'start';
 	this.window_size = window_size;
 	this.num_players = num_players || 1;
 	this.version = version;

@@ -49,6 +49,7 @@ if(typeof window === 'undefined') {
  * 		The date that shall be used for a new highscore entry
  */
 function Highscore(window_size, scores, level, date) {
+	this.name = 'highscore';
 	this.window_size = window_size;
 	this.scores = scores;
 	this.level = level + 1;
