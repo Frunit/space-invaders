@@ -17,14 +17,14 @@ function Screen(target, expected_size) {
 	this.canvas = document.createElement('canvas');
 	this.ctx = this.canvas.getContext('2d');
 	this.ctx.imageSmoothingEnabled = false;
-	const target_element = document.getElementById(target);
-	target_element.appendChild(this.canvas);
+	this.target_element = document.getElementById(target);
+	this.target_element.appendChild(this.canvas);
 
 	this.expected_size = expected_size;
 	this.scale = 1;
 	this.canvas.width = expected_size.w;
 	this.canvas.height = expected_size.h;
-	this._set_canvas_size(target_element.clientWidth, target_element.clientHeight);
+	this._set_canvas_size(this.target_element.clientWidth, this.target_element.clientHeight);
 
 	// Disable the right-click context menu in the game
 	this.canvas.addEventListener('contextmenu', function(e) {
