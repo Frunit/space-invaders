@@ -1,3 +1,7 @@
+html {
+	height: 100%;
+}
+
 body {
 	background-color: grey;
 	height: 100%;
@@ -5,40 +9,14 @@ body {
 	margin: 0px;
 }
 
-html {
-	height: 100%;
-}
-
 canvas {
-	margin: 10px;
-	border: 1px solid blue;
+	padding: 0px;
 	margin: 0px;
 }
 
 #game {
 	width: 95%;
 	height: 95%;
-	border: 1px solid red;
 	padding: 0px;
-}
-
-input {
-	border: 1px solid grey;
-}
-
-#highscore-div {
-	position: absolute;
-	top: 300px;
-	left: 300px;
-	display: none;
-}
-
-#highscore {
-	font-family: monospace;
-	font-weight: bold;
-	font-size: 12pt;
-	border: 0px;
-	background-color: black;
-	color: white;
-	padding: 12px;
+	margin: 2.5%;
 }
