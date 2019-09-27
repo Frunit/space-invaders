@@ -18,22 +18,22 @@ QUnit.test('Input', function(assert) {
 	input.set_key('Enter', true);
 	assert.ok(input.is_down('ENTER'), 'Enter');
 
-	input.set_key('keyA', true);
+	input.set_key('KeyA', true);
 	assert.ok(input.is_down('LEFT0'), 'keyA');
 	input.set_key('a', false);
 	assert.ok(!input.is_down('LEFT0'), 'a');
 
-	input.set_key('keyD', true);
+	input.set_key('KeyD', true);
 	assert.ok(input.is_down('RIGHT0'), 'keyD');
 	input.set_key('d', false);
 	assert.ok(!input.is_down('RIGHT0'), 'd');
 
-	input.set_key('keyW', true);
+	input.set_key('KeyW', true);
 	assert.ok(input.is_down('UP0'), 'keyW');
 	input.set_key('w', false);
 	assert.ok(!input.is_down('UP0'), 'w');
 
-	input.set_key('keyS', true);
+	input.set_key('KeyS', true);
 	assert.ok(input.is_down('DOWN0'), 'keyS');
 	input.set_key('s', false);
 	assert.ok(!input.is_down('DOWN0'), 's');
