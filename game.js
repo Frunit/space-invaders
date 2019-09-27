@@ -10,7 +10,6 @@
  * More information is given in the <tt>readme.md</tt>.
  */
 
-// TODO: Improve input method!
 // MAYBE: Increase shooting probability for enemies, when only few are left
 
 
@@ -19,6 +18,7 @@ import {Engine} from './engine.js';
 import {Highscore} from './highscore.js';
 import {Text} from './text.js';
 import {Resources} from './resources.js';
+import {Input} from './input.js';
 
 // Attention! No curly brackets. This uses the default export that is dependent
 // on whether this runs in a browser or not (for testing in node.js).
@@ -61,24 +61,18 @@ function Game(options, levels) {
 	// context (browser vs. node.js)
 	if(typeof window === 'undefined') {
 		global.resources = new Resources();
+		global.input = new Input();
 	}
 	else {
 		window.resources = new Resources();
-
-		// The meaning of `this` is dependent on the context. To keep the scope
-		// of the `game` object, the current `this` is saved in `self`. If I
-		// would use `this` in the event listeners, `this` would refer to the
-		// event and not the `game` object.
-		const self = this;
+		window.input = new Input();
 
 		document.addEventListener('keydown', function(e) {
-			if(!e.repeat) {
-				self.handle_input(e, true);
-			}
+			input.set_key(e.code || e.key, true);
 		});
 
 		document.addEventListener('keyup', function(e) {
-			self.handle_input(e, false);
+			input.set_key(e.code || e.key, false);
 		});
 	}
 
@@ -135,68 +129,6 @@ Game.prototype.loop = function() {
 
 
 /**
- * <tt>Game.handle_input</tt> determines the key pressed or lifted and sends the
- * right abstract key description to the current stage.
- *
- * @param {event} event
- * 		The keydown or keyup event
- * @param {boolean} key_down
- * 		<tt>true</tt>, if it is a keydown event, <tt>false</tt> if it is a
- * 		keyup event
- */
-Game.prototype.handle_input = function(event, key_down) {
-	if(this.stage === null) {
-		return;
-	}
-
-	const code = event.code || event.key;
-	let key = '';
-
-	switch(code) {
-		case 'ControlRight':
-		case 'Control':
-			key = 'CTRL'; break;
-		case 'ShiftLeft':
-		case 'Shift':
-			key = 'SHIFT'; break;
-		case 'Space':
-		case 'Spacebar':
-		case ' ':
-			key = 'SPACE'; break;
-		case 'Enter':
-			key = 'ENTER'; break;
-		case 'Escape':
-		case 'Esc':
-			key = 'ESCAPE'; break;
-		case 'KeyA':
-		case 'a':
-			key = 'LEFT0'; break;
-		case 'ArrowLeft':
-			key = 'LEFT1'; break;
-		case 'KeyD':
-		case 'd':
-			key = 'RIGHT0'; break;
-		case 'ArrowRight':
-			key = 'RIGHT1'; break;
-		case 'KeyW':
-		case 'w':
-			key = 'UP0'; break;
-		case 'ArrowUp':
-			key = 'UP1'; break;
-		case 'KeyS':
-			key = 'DOWN0'; break;
-		case 's':
-		case 'ArrowDown':
-			key = 'DOWN1'; break;
-	}
-
-	if(key !== '') {
-		this.stage.handle_input(key, key_down);
-	}
-};
-
-
-/**
  * <tt>Game.update_fps</tt> is a debugging function to show the current frames
  * per second.
  *
@@ -226,6 +158,7 @@ Game.prototype.update_fps = function(now) {
  * 		is returned. Otherwise, <tt>null</tt> is returned.
  */
 Game.prototype.update = function(dt) {
+	this.stage.handle_input();
 	return this.stage.update(dt);
 };
 

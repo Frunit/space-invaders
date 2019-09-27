@@ -300,52 +300,44 @@ Engine.prototype.setup_forts = function(fort, forts) {
 
 /**
  * <tt>Engine.handle_input</tt> handles player input.
- *
- * @param {string} key - The key that was pressed
- * @param {boolean} key_down - Whether the key is down or up
  */
-Engine.prototype.handle_input = function(key, key_down) {
+Engine.prototype.handle_input = function() {
 	if(this.num_players === 1) {
-		switch(key) {
-			case 'LEFT0':
-			case 'LEFT1':
-				this.players[0].moving = -1 * key_down;
-				break;
-			case 'RIGHT0':
-			case 'RIGHT1':
-				this.players[0].moving = 1 * key_down;
-				break;
-			case 'SPACE':
-			case 'ENTER':
-			case 'UP0':
-			case 'UP1':
-				this.players[0].firing = key_down;
-				break;
+		if(input.is_down_arr(['LEFT0', 'LEFT1'])) {
+			this.players[0].moving = -1;
 		}
+		else if(input.is_down_arr(['RIGHT0', 'RIGHT1'])) {
+			this.players[0].moving = 1;
+		}
+		else {
+			this.players[0].moving = 0;
+		}
+
+		this.players[0].firing = input.is_down_arr(['SPACE', 'ENTER', 'UP0', 'UP1']);
 	}
 	else {
-		switch(key) {
-			case 'LEFT0':
-				this.players[0].moving = -1 * key_down;
-				break;
-			case 'LEFT1':
-				this.players[1].moving = -1 * key_down;
-				break;
-			case 'RIGHT0':
-				this.players[0].moving = 1 * key_down;
-				break;
-			case 'RIGHT1':
-				this.players[1].moving = 1 * key_down;
-				break;
-			case 'SPACE':
-			case 'UP0':
-				this.players[0].firing = key_down;
-				break;
-			case 'ENTER':
-			case 'UP1':
-				this.players[1].firing = key_down;
-				break;
+		if(input.is_down('LEFT0')) {
+			this.players[0].moving = -1;
 		}
+		else if(input.is_down('RIGHT0')) {
+			this.players[0].moving = 1;
+		}
+		else {
+			this.players[0].moving = 0;
+		}
+
+		if(input.is_down('LEFT1')) {
+			this.players[1].moving = -1;
+		}
+		else if(input.is_down('RIGHT1')) {
+			this.players[1].moving = 1;
+		}
+		else {
+			this.players[1].moving = 0;
+		}
+
+		this.players[0].firing = input.is_down_arr(['SPACE', 'UP0']);
+		this.players[1].firing = input.is_down_arr(['ENTER', 'UP1']);
 	}
 };
 

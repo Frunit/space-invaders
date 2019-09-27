@@ -178,23 +178,12 @@ Highscore.prototype.save_highscore = function() {
 
 
 /**
- * <tt>Highscore.handle_input</tt> handles input.
- *
- * @param {string} key - The key that was pressed
- * @param {boolean} key_down - Whether the key is down or up
+ * <tt>Highscore.handle_input</tt> reacts on keyboard input.
  */
-Highscore.prototype.handle_input = function(key, key_down) {
-	if(!key_down) {
-		return;
-	}
-
-	switch(key) {
-		case 'SPACE':
-		case 'ENTER':
-		case 'UP0':
-		case 'UP1':
-			this.finished = true; // This will trigger a stage change upon next update
-			break;
+Highscore.prototype.handle_input = function() {
+	if(input.is_down_arr(['SPACE', 'ENTER', 'UP0', 'UP1'])) {
+		this.finished = true; // This will trigger a stage change upon next update
+		input.reset();
 	}
 };
 
