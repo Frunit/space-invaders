@@ -11,4 +11,4 @@ install:
 script:
   - node --require esm $(which qunit)
   - eslint --global resources *.js
-  - eslint --global QUnit --global resources --rule 'max-len: 0' --rule 'max-lines-per-function: 0' test/*.js
+  - "eslint --global QUnit --global resources --rule 'max-len: 0' --rule 'max-lines-per-function: 0' test/*.js"
