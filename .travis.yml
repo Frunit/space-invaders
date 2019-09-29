@@ -3,12 +3,9 @@ node_js:
   - 12.4.0
 # commands to install dependencies
 install:
-  - npm install --save qunit
-  - npm install --save esm
-  - npm install --save eslint
-  - npm install --save eslint-plugin-jsdoc
+  - npm install
 # commands to run tests
 script:
-  - node --require esm $(which qunit)
-  - eslint --global resources --global input *.js
-  - "eslint --global QUnit --global resources --rule 'max-len: 0' --rule 'max-lines-per-function: 0' test/*.js"
+  - node --require esm node_modules/qunit/bin/qunit.js
+  - node node_modules/eslint/bin/eslint.js --global resources --global input *.js
+  - "node node_modules/eslint/bin/eslint.js --global QUnit --global resources --rule 'max-len: 0' --rule 'max-lines-per-function: 0' test/*.js"
