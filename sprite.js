@@ -64,7 +64,7 @@ Sprite.prototype.update = function(dt) {
 Sprite.prototype.reset = function() {
 	this.idx = 0;
 	this.delay_counter = 0;
-	this.fresh = true
+	this.fresh = true;
 };
 
 

@@ -16,6 +16,7 @@ import {Text} from './text.js';
  * @param {string} version - The version of the game
  */
 function Start(window_size, num_players, version) {
+	this.name = 'start';
 	this.window_size = window_size;
 	this.num_players = num_players || 1;
 	this.version = version;
@@ -86,33 +87,18 @@ Start.prototype.setup = function() {
 /**
  * <tt>Start.handle_input</tt> handles input.
  * (<i>- sincerely, Captain Obvious</i>)
- *
- * @param {string} key - The key that was pressed
- * @param {boolean} key_down - Whether the key is down or up
  */
-Start.prototype.handle_input = function(key, key_down) {
-	// On the start screen, nothing happens, if any key is unpressed.
-	if(!key_down) {
-		return;
+Start.prototype.handle_input = function() {
+	if(input.is_down_arr(['SPACE', 'ENTER'])) {
+		this.finished = true; // This will trigger a stage change upon next update
 	}
 
-	switch(key) {
-		case 'UP0':
-		case 'UP1':
-			this.select_next(-1);
-			break;
-		case 'DOWN0':
-		case 'DOWN1':
-			this.select_next(1);
-			break;
-		case 'SPACE':
-		case 'ENTER':
-			this.finished = true; // This will trigger a stage change upon next update
-			break;
+	else if(input.is_down_arr(['UP0', 'UP1', 'DOWN0', 'DOWN1'])) {
+		this.select_next();
 	}
 
-	// Other keys are ignored
-}
+	input.reset();
+};
 
 
 /**

@@ -1,6 +1,5 @@
 'use strict';
 
-
 import {Sprite} from './sprite.js';
 
 
@@ -124,8 +123,6 @@ Player.prototype.reset = function() {
  * 		cooldown prevented firing.
  */
 Player.prototype.fire = function() {
-	// MAYBE: The cooldown should be ignored, if no bullet of the player is present anywhere.
-	// Still, an inactive player (hidden or dead) should not shoot!
 	if(!this.firing || this.cooldown) {
 		return [];
 	}
@@ -386,7 +383,7 @@ Player.prototype.resurrect = function() {
 		);
 	}
 	else {
-		this.reset()
+		this.reset();
 	}
 };
 

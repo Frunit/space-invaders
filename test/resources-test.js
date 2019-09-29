@@ -39,7 +39,7 @@ QUnit.test('Resources', function(assert) {
 
 	assert.ok(res._is_ready, 'Internal _is_ready');
 
-	assert.throws(() => {res.load(['ok.png', 'not_ok.jpg'])}, 'Should throw upon unknown file type');
+	assert.throws(() => {res.load(['ok.png', 'not_ok.jpg']);}, 'Should throw upon unknown file type');
 });
 
 

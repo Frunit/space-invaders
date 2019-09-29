@@ -1,7 +1,7 @@
 'use strict';
 
 import {Engine} from '../engine.js';
-import {Enemy, Player, Wall, Goody} from '../entities.js';
+import {Enemy, Player, Wall, Goody, Mystery} from '../entities.js';
 import {GUI_Element} from '../guielement.js';
 import {Text} from '../text.js';
 import {Resources} from '../resources.js';
@@ -12,11 +12,6 @@ global.resources = new Resources();
 resources.load([
 	'gfx/sprites.png',
 ]);
-
-
-// TODO: ENGINE TESTS:
-// TODO: Input handling
-// TODO: Player shooting (shot on Wall, Enemy, Mystery, outside borders)
 
 
 const firetest_level = {fort: ['X'], forts: 2, enemies: ['0']};
@@ -36,11 +31,13 @@ const outer_bounds = {
 	'right': 900,
 	'top': 0,
 	'bottom': 600
-}
+};
 
 
 QUnit.test('Engine initial values', function(assert) {
 	const engine = new Engine({w: 900, h: 600}, 20, 1, [minimal_level], 0);
+
+	assert.strictEqual(engine.name, 'engine', 'engine name');
 
 	assert.ok(!engine.game_is_over, 'game over');
 
@@ -341,7 +338,6 @@ QUnit.test('Engine enemy fire', function(assert) {
 
 QUnit.test('Engine applying goodies', function(assert) {
 	const engine = new Engine({w: 900, h: 600}, 20, 1, [goody_level], 0);
-	let goody;
 
 	engine.setup();
 
@@ -478,7 +474,72 @@ QUnit.test('Engine player death', function(assert) {
 
 	res = engine.update(0.1);
 
-	const expected_return = {next_stage: 'highscore', scores: [0, 0], level: 1}
+	const expected_return = {next_stage: 'highscore', scores: [0, 0], level: 1};
 
 	assert.deepEqual(res, expected_return, 'engine not running anymore');
+});
+
+
+QUnit.test('Engine player shooting', function(assert) {
+	const engine = new Engine({w: 900, h: 600}, 20, 1, [firetest_level], 0);
+	engine.setup();
+
+	let bullets;
+
+	// Let two bullets hit each other
+
+	bullets = engine.enemies[0].fire(1);
+	assert.strictEqual(bullets.length, 1, 'Enemy had one shot');
+	engine.enemy_bullets.push(bullets[0]);
+	// Prevent the enemy from shooting accidently throughout this test
+	engine.enemies[0].cooldown = 100;
+
+	engine.players[0].firing = true;
+	bullets = engine.players[0].fire();
+	engine.players[0].firing = false;
+	assert.strictEqual(bullets.length, 1, 'Player had one shot');
+	engine.player_bullets.push(bullets[0]);
+	engine.player_bullets[0].x = engine.enemy_bullets[0].x; // align bullets so they hit each other
+
+	for(let i = 0; i < 7; i++) {
+		engine.update(0.1);
+		assert.strictEqual(engine.enemy_bullets.length, 1, `one enemy shot fired ${i+1} ds`);
+		assert.ok(engine.enemy_bullets[0].collidable, `enemy bullet collidable ${i+1} ds`);
+		assert.strictEqual(engine.player_bullets.length, 1, `one player shot fired ${i+1} ds`);
+	}
+
+	engine.update(0.1);
+	assert.strictEqual(engine.enemy_bullets.length, 1, 'Enemy bullet still there 0.8 s');
+	assert.ok(!engine.enemy_bullets[0].collidable, 'Enemy bullet is explosion 0.8s');
+	assert.strictEqual(engine.player_bullets.length, 0, 'Player bullet gone 0.8 s');
+
+	engine.update(0.6);
+
+	// Create Mystery
+	engine.mysteries.push(new Mystery(true, outer_bounds));
+
+	engine.update(3.5);
+
+	// Hit a mystery
+	engine.players[0].firing = true;
+	bullets = engine.players[0].fire();
+	engine.players[0].firing = false;
+	assert.strictEqual(bullets.length, 1, 'Player had a second shot');
+	engine.player_bullets.push(bullets[0]);
+
+	for(let i = 0; i < 15; i++) {
+		engine.update(0.1);
+		assert.strictEqual(engine.enemy_bullets.length, 0, `no enemy shots fired ${i+50} ds`);
+		assert.strictEqual(engine.player_bullets.length, 1, `one player shot fired ${i+50} ds`);
+		assert.strictEqual(engine.mysteries.length, 1, `one mystery ${i+50} ds`);
+		assert.strictEqual(engine.mysteries[0].off_time, -1, `mystery not hit ${i+50} ds`);
+	}
+
+	engine.update(0.1);
+	assert.strictEqual(engine.player_bullets.length, 0, 'player hit mystery');
+	assert.strictEqual(engine.mysteries.length, 1, 'still one mystery');
+	assert.strictEqual(engine.mysteries[0].off_time, 2, 'mystery hit');
+
+	engine.update(2.1);
+	assert.strictEqual(engine.mysteries.length, 0, 'no mystery anymore');
 });

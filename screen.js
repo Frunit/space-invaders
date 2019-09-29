@@ -17,19 +17,26 @@ function Screen(target, expected_size) {
 	this.canvas = document.createElement('canvas');
 	this.ctx = this.canvas.getContext('2d');
 	this.ctx.imageSmoothingEnabled = false;
-	const target_element = document.getElementById(target)
-	target_element.appendChild(this.canvas);
+	this.target_element = document.getElementById(target);
+	this.target_element.appendChild(this.canvas);
 
 	this.expected_size = expected_size;
 	this.scale = 1;
 	this.canvas.width = expected_size.w;
 	this.canvas.height = expected_size.h;
-	this._set_canvas_size(target_element.clientWidth, target_element.clientHeight);
+	this._set_canvas_size(this.target_element.clientWidth, this.target_element.clientHeight);
 
 	// Disable the right-click context menu in the game
 	this.canvas.addEventListener('contextmenu', function(e) {
 		e.preventDefault();
 		return false;
+	});
+
+	const self = this;
+
+	// React on screen size changes (i.e. resizing the browser window)
+	window.addEventListener('resize', () => {
+		self._set_canvas_size(self.target_element.clientWidth, self.target_element.clientHeight);
 	});
 }
 
@@ -44,7 +51,6 @@ function Screen(target, expected_size) {
  * @param {number} target_height - The maximum height of the canvas
  */
 Screen.prototype._set_canvas_size = function(target_width, target_height) {
-	// MAYBE: Change canvas size upon browser resize
 	const expected_aspect_ratio = this.expected_size.w / this.expected_size.h;
 	const target_aspect_ratio = target_width / target_height;
 

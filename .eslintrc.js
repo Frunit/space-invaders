@@ -9,8 +9,7 @@ module.exports = {
         "plugin:jsdoc/recommended",
     ],
     "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly",
+        "resources": "readonly"
     },
     "parserOptions": {
         "ecmaVersion": 2018,
@@ -40,6 +39,7 @@ module.exports = {
                 }
             }
         ],
+        "semi": ["error", "always"],
         "eqeqeq": "error",
         "block-scoped-var": "error",
         "consistent-return": "error",

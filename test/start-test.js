@@ -15,11 +15,10 @@ resources.load([
 ]);
 
 
-// TODO: Start input (up, down, fire)
-
-
 QUnit.test('Start setup', function(assert) {
 	const start = new Start({w: 900, h: 600}, 0, 'VERSION');
+	assert.strictEqual(start.name, 'start', 'start name');
+
 	start.setup();
 
 	assert.ok(!start.finished, 'finished');
@@ -35,6 +34,18 @@ QUnit.test('Start setup', function(assert) {
 	assert.deepEqual(start.enemies[0], new Enemy(370, 50, 0), 'enemy 1');
 	assert.deepEqual(start.enemies[4], new Enemy(430, 100, 1), 'enemy 5');
 	assert.deepEqual(start.enemies[8], new Enemy(490, 150, 2), 'enemy 9');
+});
+
+
+QUnit.test('Start selector', function(assert) {
+	const start = new Start({w: 900, h: 600}, 0, 'VERSION');
+	start.setup();
+
+	assert.strictEqual(start.num_players, 1, 'num_players');
+	start.select_next();
+	assert.strictEqual(start.num_players, 2, 'num_players');
+	start.select_next();
+	assert.strictEqual(start.num_players, 1, 'num_players');
 });
 
 
