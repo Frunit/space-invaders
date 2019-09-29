@@ -372,6 +372,8 @@ Engine.prototype.update = function(dt) {
 			score.push(player.score);
 		}
 
+		input.reset();
+
 		return {
 			next_stage: 'highscore',
 			scores: score,

@@ -12,8 +12,6 @@ resources.load([
 ]);
 
 
-// TODO: Highscore input handling (fire)
-
 const date = new Date('2019-05-04T13:37:59');
 const formatted_date = date.toLocaleString('de-DE', {
 	day: '2-digit',

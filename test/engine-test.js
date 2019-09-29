@@ -14,9 +14,6 @@ resources.load([
 ]);
 
 
-// TODO: Engine Input handling
-
-
 const firetest_level = {fort: ['X'], forts: 2, enemies: ['0']};
 const goody_level = {fort: ['XXXXXXXXXXXXXXXX', 'XXXXXXXXXXXXXXXX', 'XXXXXXXXXXXXXXXX', 'XXXXXXXXXXXXXXXX'], forts: 1, enemies: ['0']};
 const minimal_level = {fort: ['X'], forts: 1, enemies: ['012']};

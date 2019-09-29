@@ -9,8 +9,7 @@ module.exports = {
         "plugin:jsdoc/recommended",
     ],
     "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly",
+        "resources": "readonly"
     },
     "parserOptions": {
         "ecmaVersion": 2018,

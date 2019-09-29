@@ -91,14 +91,13 @@ Start.prototype.setup = function() {
 Start.prototype.handle_input = function() {
 	if(input.is_down_arr(['SPACE', 'ENTER'])) {
 		this.finished = true; // This will trigger a stage change upon next update
-		input.reset();
-		return;
 	}
 
-	if(input.is_down_arr(['UP0', 'UP1', 'DOWN0', 'DOWN1'])) {
+	else if(input.is_down_arr(['UP0', 'UP1', 'DOWN0', 'DOWN1'])) {
 		this.select_next();
-		input.reset();
 	}
+
+	input.reset();
 };
 
 
