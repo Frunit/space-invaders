@@ -1,0 +1,15 @@
+{
+  "name": "space-invaders",
+  "version": "1.0.0",
+  "description": "Space Invaders in Javascript for an it-talents.de competition",
+  "author": "Mathias Bockwoldt",
+  "scripts": {
+    "test": "node --require esm node_modules/qunit/bin/qunit.js && node node_modules/eslint/bin/eslint.js --global input *.js && node node_modules/eslint/bin/eslint.js --global QUnit --rule 'max-len: 0' --rule 'max-lines-per-function: 0' test/*.js"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.0",
+    "eslint-plugin-jsdoc": "^15.9.5",
+    "esm": "^3.2.25",
+    "qunit": "^2.9.2"
+  }
+}
