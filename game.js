@@ -39,7 +39,7 @@ function Game(options, levels) {
 	this.options = options;
 	this.levels = levels;
 
-	this.version = 'v0.5';
+	this.version = 'v1.0.0';
 
 	this.last_time = 0;
 
