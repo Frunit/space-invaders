@@ -263,13 +263,13 @@ Player.prototype.choose_sprite = function() {
 		if(this.double_laser) {
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 0.2,
-				{x: 64, y: 140}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]
+				{x: 64, y: 140}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}, {x: this.w*2 + 4, y: 0}]
 			);
 		}
 		else {
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 0.2,
-				{x: 64, y: 104}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]
+				{x: 64, y: 104}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}, {x: this.w*2 + 4, y: 0}]
 			);
 		}
 	}
@@ -414,7 +414,7 @@ function Enemy(x, y, type) {
 			this.score_value = 30;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]
+				{x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}]
 			);
 			break;
 		}
@@ -424,7 +424,7 @@ function Enemy(x, y, type) {
 			this.score_value = 20;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]
+				{x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}]
 			);
 			break;
 		}
@@ -434,7 +434,7 @@ function Enemy(x, y, type) {
 			this.score_value = 10;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}]
+				{x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}]
 			);
 			break;
 		}
@@ -593,7 +593,7 @@ function Bullet(x, y, speed, type, owner=-1) {
 			this.h = 16;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 144, y: 36}, [{x: 0, y: 0}]
+				{x: 145, y: 36}, [{x: 0, y: 0}]
 			);
 			break;
 		}
@@ -603,7 +603,8 @@ function Bullet(x, y, speed, type, owner=-1) {
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 0.1,
 				{x: 0, y: 36},
-				[{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]
+				[{x: 0, y: 0}, {x: this.w + 1, y: 0},
+				{x: this.w*2 + 2, y: 0}, {x: this.w*3 + 3, y: 0}]
 			);
 			break;
 		}
@@ -612,7 +613,7 @@ function Bullet(x, y, speed, type, owner=-1) {
 			this.h = 28;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 0.1,
-				{x: 52, y: 36}, [{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}]
+				{x: 52, y: 36}, [{x: 0, y: 0}, {x: this.w + 1, y: 0}, {x: this.w*2 + 2, y: 0}]
 			);
 			break;
 		}
@@ -622,7 +623,8 @@ function Bullet(x, y, speed, type, owner=-1) {
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 0.1,
 				{x: 92, y: 36},
-				[{x: 0, y: 0}, {x: this.w, y: 0}, {x: this.w*2, y: 0}, {x: this.w*3, y: 0}]
+				[{x: 0, y: 0}, {x: this.w + 1, y: 0},
+				{x: this.w*2 + 2, y: 0}, {x: this.w*3 + 3, y: 0}]
 			);
 			break;
 		}
@@ -796,7 +798,7 @@ function Goody(x, y, speed, type) {
 	if(type >= 0 && type <= 6) {
 		this.sprite = new Sprite(
 			'sprites.png', {w: this.w, h: this.h}, 0,
-			{x: 260, y: 0}, [{x: 0, y: this.h*type}]
+			{x: 260, y: 0}, [{x: 0, y: (this.h + 2)*type}]
 		);
 	}
 	else {

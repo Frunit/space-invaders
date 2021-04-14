@@ -68,7 +68,7 @@ function GUI_Element(x, y, type) {
 			this.h = 32;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}], 4
+				{x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}], 4
 			);
 			break;
 		}
@@ -77,7 +77,7 @@ function GUI_Element(x, y, type) {
 			this.h = 32;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}], 4
+				{x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}], 4
 			);
 			break;
 		}
@@ -86,7 +86,7 @@ function GUI_Element(x, y, type) {
 			this.h = 32;
 			this.sprite = new Sprite(
 				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w, y: 0}], 4
+				{x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}], 4
 			);
 			break;
 		}

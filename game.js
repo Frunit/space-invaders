@@ -39,7 +39,7 @@ function Game(options, levels) {
 	this.options = options;
 	this.levels = levels;
 
-	this.version = 'v1.0.0';
+	this.version = 'v1.0.1';
 
 	this.last_time = 0;
 
@@ -139,7 +139,7 @@ Game.prototype.update_fps = function(now) {
 	this.frames++;
 	if(now - this.last_fps > 1000) {
 		if(this.show_fps) {
-			this.fps.text = this.frames;
+			this.fps.text = `FPS: ${this.frames}`;
 		}
 		this.frames = 0;
 		this.last_fps = now;
