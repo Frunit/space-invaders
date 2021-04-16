@@ -35,7 +35,7 @@ const all_strings = {
 		one_player: 'Én spiller',
 		two_players: 'To spillere',
 		level: 'Level ',
-		fire_to_continue: 'Skyt fo å fortsette',
+		fire_to_continue: 'Skyt for å fortsette',
 		you_reached_a: 'Du klarte det til level ',
 		you_reached_b: '!',
 		locale: 'nb-NO'

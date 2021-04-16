@@ -1,9 +1,10 @@
 html {
-	height: 95%;
+	height: 100%;
+	overflow: hidden;
 }
 
 body {
-	background-color: grey;
+	background: black bottom url("gfx/bg.png");
 	height: 100%;
 	padding: 0px;
 	margin: 0px;

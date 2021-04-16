@@ -12,7 +12,6 @@
 
 // MAYBE: Increase shooting probability for enemies, when only few are left
 
-
 import {Start} from './start.js';
 import {Engine} from './engine.js';
 import {Highscore} from './highscore.js';
@@ -39,7 +38,7 @@ function Game(options, levels) {
 	this.options = options;
 	this.levels = levels;
 
-	this.version = 'v1.0.1';
+	this.version = 'v1.1.0';
 
 	this.last_time = 0;
 
@@ -49,7 +48,7 @@ function Game(options, levels) {
 	this.frames = 0;
 	this.fps = new Text(
 		'', 2, this.options.total_size.h - 2,
-		Infinity, 'left', '#000000', 10
+		Infinity, 'left', '#ffffff', 10
 	);
 	this.show_fps = true;
 

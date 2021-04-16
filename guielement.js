@@ -45,6 +45,24 @@ function GUI_Element(x, y, type) {
 			);
 			break;
 		}
+		case 'arrow_left': {
+			this.w = 14;
+			this.h = 22;
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0,
+				{x: 0, y: 176}, [{x: 0, y: 0}]
+			);
+			break;
+		}
+		case 'arrow_right': {
+			this.w = 14;
+			this.h = 22;
+			this.sprite = new Sprite(
+				'sprites.png', {w: this.w, h: this.h}, 0,
+				{x: 16, y: 176}, [{x: 0, y: 0}]
+			);
+			break;
+		}
 		case 'keys1': {
 			this.w = 399;
 			this.h = 140;
