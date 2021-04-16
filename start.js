@@ -1,6 +1,6 @@
 'use strict';
 
-import {Intstr, change_language} from './i18n.js';
+import {lang, lang_change, langs, lang_idx} from './i18n.js';
 import {GUI_Element} from './guielement.js';
 import {Enemy} from './entities.js';
 import {Text} from './text.js';
@@ -39,38 +39,16 @@ Start.prototype.setup = function() {
 	this.finished = false;
 	this.enemy_direction = -1;
 
-	this.texts = {fixed: []};
-
 	// Selector
 
 	this.selector = new GUI_Element(300, 200, 'selector');
 	this.selector.x = this.window_size.w / 2 - this.selector.w - 10;
 	this.selector.y = this.window_size.h / 2 + this.selector.h * (this.num_players - 2);
 
-	this.texts.fixed.push(new Text(
-		Intstr.one_player,
-		this.window_size.w / 2 + 5,
-		this.window_size.h / 2
-	));
-	this.texts.fixed.push(new Text(
-		Intstr.two_players,
-		this.window_size.w / 2 + 5,
-		this.window_size.h / 2 + this.selector.h
-	));
-
 	// Keys
 
 	this.keys.push(new GUI_Element(70, 445, 'keys1'));
-	this.texts.fixed.push(new Text(Intstr.left, 125, 520, Infinity, 'right'));
-	this.texts.fixed.push(new Text(Intstr.fire, 154, 460, Infinity, 'center'));
-	this.texts.fixed.push(new Text(Intstr.right, 190, 520));
-	this.texts.fixed.push(new Text(Intstr.fire, 369, 520, Infinity, 'center'));
-
 	this.keys.push(new GUI_Element(590, 445, 'keys2'));
-	this.texts.fixed.push(new Text(Intstr.fire, 624, 485, Infinity, 'center'));
-	this.texts.fixed.push(new Text(Intstr.left, 738, 520, Infinity, 'right'));
-	this.texts.fixed.push(new Text(Intstr.fire, 774, 460, Infinity, 'center'));
-	this.texts.fixed.push(new Text(Intstr.fire, 810, 520));
 
 	// Enemies
 
@@ -79,6 +57,8 @@ Start.prototype.setup = function() {
 			this.enemies.push(new Enemy(370 + x * 60, 50 + y * 50, y));
 		}
 	}
+
+	this.update_texts();
 
 	// Version
 
@@ -105,6 +85,18 @@ Start.prototype.handle_input = function() {
 
 	else if(input.is_down_arr(['UP0', 'UP1', 'DOWN0', 'DOWN1'])) {
 		this.select_next();
+	}
+
+	else if(input.is_down_arr(['RIGHT0', 'RIGHT1'])) {
+		lang_change(1);
+		console.log(lang.fire);
+		this.update_texts();
+	}
+
+	else if(input.is_down_arr(['LEFT0', 'LEFT1'])) {
+		lang_change(-1);
+		console.log(lang.fire);
+		this.update_texts();
 	}
 
 	input.reset();
@@ -142,7 +134,7 @@ Start.prototype.update = function(dt) {
 
 
 /**
- * <tt>Start.select_next</tt> Selects the other menu point.
+ * <tt>Start.select_next</tt> selects the other menu point.
  */
 Start.prototype.select_next = function() {
 	this.num_players = this.num_players === 1 ? 2: 1;
@@ -170,6 +162,37 @@ Start.prototype.get_entities = function() {
  */
 Start.prototype.get_texts = function() {
 	return this.texts;
+};
+
+
+/**
+ * <tt>Start.update_texts</tt> updates all texts to the current language.
+ */
+Start.prototype.update_texts = function() {
+	this.texts = {fixed: []};
+
+	// Player one/two
+	this.texts.fixed.push(new Text(
+		lang.one_player,
+		this.window_size.w / 2 + 5,
+		this.window_size.h / 2
+	));
+	this.texts.fixed.push(new Text(
+		lang.two_players,
+		this.window_size.w / 2 + 5,
+		this.window_size.h / 2 + this.selector.h
+	));
+
+	// Keys
+	this.texts.fixed.push(new Text(lang.left, 125, 520, Infinity, 'right'));
+	this.texts.fixed.push(new Text(lang.fire, 154, 460, Infinity, 'center'));
+	this.texts.fixed.push(new Text(lang.right, 190, 520));
+	this.texts.fixed.push(new Text(lang.fire, 369, 520, Infinity, 'center'));
+
+	this.texts.fixed.push(new Text(lang.fire, 624, 485, Infinity, 'center'));
+	this.texts.fixed.push(new Text(lang.left, 738, 520, Infinity, 'right'));
+	this.texts.fixed.push(new Text(lang.fire, 774, 460, Infinity, 'center'));
+	this.texts.fixed.push(new Text(lang.right, 810, 520));
 };
 
 

@@ -40,21 +40,41 @@ const all_strings = {
 };
 
 
-let lang = 'EN';
-let Intstr = all_strings[lang];
+let current = 'EN';
+const langs = Object.getOwnPropertyNames(all_strings).sort();
+let lang_idx = langs.indexOf(current);
+let lang = all_strings[current];
 
 
-function change_language(language) {
-	lang = language || navigator.language || navigator.userLanguage;
-	lang = lang.substring(0, 2).toUpperCase();
+function lang_change(dir) {
+	if(dir > 0) {
+		lang_idx++;
+		if(lang_idx >= langs.length) {
+			lang_idx = 0;
+		}
 
-	if(!all_strings.hasOwnProperty(lang)) {
-		lang = 'EN';
+		current = langs[lang_idx];
+	}
+	else if(dir < 0) {
+		lang_idx--;
+		if(lang_idx < 0) {
+			lang_idx = langs.length - 1;
+		}
+
+		current = langs[lang_idx];
+	}
+	else {
+		current = navigator.language || navigator.userLanguage;
+		current = current.substring(0, 2).toUpperCase();
+
+		if(!all_strings.hasOwnProperty(current)) {
+			current = 'EN';
+		}
 	}
 
-	Intstr = all_strings[lang];
+	lang = all_strings[current];
 }
 
-change_language();
+lang_change();
 
-export {Intstr, change_language};
+export {lang, lang_change, langs, lang_idx};

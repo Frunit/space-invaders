@@ -1,6 +1,6 @@
 'use strict';
 
-import {Intstr} from './i18n.js';
+import {lang} from './i18n.js';
 import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
 
@@ -54,7 +54,7 @@ function Highscore(window_size, scores, level, date) {
 	this.window_size = window_size;
 	this.scores = scores;
 	this.level = level + 1;
-	this.date = date.toLocaleString(Intstr.locale, {
+	this.date = date.toLocaleString(lang.locale, {
 		day: '2-digit',
 		month: 'short',
 		year: 'numeric',
@@ -126,14 +126,14 @@ Highscore.prototype.setup = function() {
 
 	// Info texts
 	this.texts.level.push(new Text(
-		Intstr.you_reached_a + this.level + Intstr.you_reached_b,
+		lang.you_reached_a + this.level + lang.you_reached_b,
 		this.window_size.w / 2,
 		50,
 		Infinity,
 		'center'
 	));
 	this.texts.footer.push(new Text(
-		Intstr.fire_to_continue,
+		lang.fire_to_continue,
 		this.window_size.w / 2,
 		this.window_size.h - 50,
 		Infinity,

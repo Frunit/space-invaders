@@ -1,6 +1,6 @@
 'use strict';
 
-import {Intstr} from './i18n.js';
+import {lang} from './i18n.js';
 import {Player, Enemy, Mystery, Wall} from './entities.js';
 import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
@@ -227,7 +227,7 @@ Engine.prototype.setup_gui = function() {
 	}
 
 	this.texts.level.push(new Text(
-		Intstr.level,
+		lang.level,
 		(this.outer_bounds.right + this.outer_bounds.left)/2,
 		this.outer_bounds.top + 30,
 		Infinity,
