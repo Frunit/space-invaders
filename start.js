@@ -1,5 +1,6 @@
 'use strict';
 
+import {Intstr, change_language} from './i18n.js';
 import {GUI_Element} from './guielement.js';
 import {Enemy} from './entities.js';
 import {Text} from './text.js';
@@ -47,12 +48,12 @@ Start.prototype.setup = function() {
 	this.selector.y = this.window_size.h / 2 + this.selector.h * (this.num_players - 2);
 
 	this.texts.fixed.push(new Text(
-		'One player',
+		Intstr.one_player,
 		this.window_size.w / 2 + 5,
 		this.window_size.h / 2
 	));
 	this.texts.fixed.push(new Text(
-		'Two players',
+		Intstr.two_players,
 		this.window_size.w / 2 + 5,
 		this.window_size.h / 2 + this.selector.h
 	));
@@ -60,7 +61,16 @@ Start.prototype.setup = function() {
 	// Keys
 
 	this.keys.push(new GUI_Element(70, 445, 'keys1'));
+	this.texts.fixed.push(new Text(Intstr.left, 125, 520, Infinity, 'right'));
+	this.texts.fixed.push(new Text(Intstr.fire, 154, 460, Infinity, 'center'));
+	this.texts.fixed.push(new Text(Intstr.right, 190, 520));
+	this.texts.fixed.push(new Text(Intstr.fire, 369, 520, Infinity, 'center'));
+
 	this.keys.push(new GUI_Element(590, 445, 'keys2'));
+	this.texts.fixed.push(new Text(Intstr.fire, 624, 485, Infinity, 'center'));
+	this.texts.fixed.push(new Text(Intstr.left, 738, 520, Infinity, 'right'));
+	this.texts.fixed.push(new Text(Intstr.fire, 774, 460, Infinity, 'center'));
+	this.texts.fixed.push(new Text(Intstr.fire, 810, 520));
 
 	// Enemies
 
@@ -78,7 +88,7 @@ Start.prototype.setup = function() {
 		15,                     // y
 		Infinity,               // duration
 		'right',                // alignment
-		'#000000',              // color
+		'#ffffff',              // color
 		10                      // size
 	));
 };
