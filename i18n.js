@@ -2,6 +2,7 @@
 
 const all_strings = {
 	EN: {
+		lang: 'EN',
 		left: 'left',
 		right: 'right',
 		fire: 'fire',
@@ -14,6 +15,7 @@ const all_strings = {
 		locale: 'en-GB'
 	},
 	DE: {
+		lang: 'DE',
 		left: 'links',
 		right: 'rechts',
 		fire: 'Feuer',
@@ -26,6 +28,7 @@ const all_strings = {
 		locale: 'de-DE'
 	},
 	NO: {
+		lang: 'NO',
 		left: 'venstre',
 		right: 'høyre',
 		fire: 'skyt',
@@ -77,4 +80,4 @@ function lang_change(dir) {
 
 lang_change();
 
-export {lang, lang_change, langs, lang_idx};
+export {lang, lang_change};

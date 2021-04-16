@@ -1,6 +1,6 @@
 'use strict';
 
-import {lang, lang_change, langs, lang_idx} from './i18n.js';
+import {lang, lang_change} from './i18n.js';
 import {GUI_Element} from './guielement.js';
 import {Enemy} from './entities.js';
 import {Text} from './text.js';
@@ -58,11 +58,23 @@ Start.prototype.setup = function() {
 		}
 	}
 
+	// Text
+
+	this.keys.push(new GUI_Element(
+		this.window_size.w / 2 - this.selector.w - 20,
+		this.window_size.h / 2 - this.selector.h * 2,
+		'arrow_left'
+	));
+	this.keys.push(new GUI_Element(
+		this.window_size.w / 2 - this.selector.w + 40,
+		this.window_size.h / 2 - this.selector.h * 2,
+		'arrow_right'
+	));
 	this.update_texts();
 
 	// Version
 
-	this.texts.fixed.push(new Text(
+	this.texts.version = [new Text(
 		this.version,
 		this.window_size.w - 5, // x
 		15,                     // y
@@ -70,7 +82,7 @@ Start.prototype.setup = function() {
 		'right',                // alignment
 		'#ffffff',              // color
 		10                      // size
-	));
+	)];
 };
 
 
@@ -89,13 +101,11 @@ Start.prototype.handle_input = function() {
 
 	else if(input.is_down_arr(['RIGHT0', 'RIGHT1'])) {
 		lang_change(1);
-		console.log(lang.fire);
 		this.update_texts();
 	}
 
 	else if(input.is_down_arr(['LEFT0', 'LEFT1'])) {
 		lang_change(-1);
-		console.log(lang.fire);
 		this.update_texts();
 	}
 
@@ -169,7 +179,7 @@ Start.prototype.get_texts = function() {
  * <tt>Start.update_texts</tt> updates all texts to the current language.
  */
 Start.prototype.update_texts = function() {
-	this.texts = {fixed: []};
+	this.texts.fixed = [];
 
 	// Player one/two
 	this.texts.fixed.push(new Text(
@@ -181,6 +191,14 @@ Start.prototype.update_texts = function() {
 		lang.two_players,
 		this.window_size.w / 2 + 5,
 		this.window_size.h / 2 + this.selector.h
+	));
+
+	// Language
+	this.texts.fixed.push(new Text(
+		lang.lang,
+		this.window_size.w / 2 - this.selector.w / 2 - 13,
+		this.window_size.h / 2 - this.selector.h - 15,
+		Infinity, 'center'
 	));
 
 	// Keys
