@@ -6,20 +6,25 @@
  * hence, animation.
  *
  * @constructor
- * @param {string} url - The filename of the sprite sheet without path
- * @param {object} size - The size of the sprite
- * @param {number} size.w - The width of the sprite in pixel
- * @param {number} size.h - The height of the sprite in pixel
- * @param {number} [delay=1] - The delay between two frames in milliseconds
- * @param {object} [offset] - The offset of the sprite on the sprite sheet
- * @param {number} [offset.x=0] - The x coordinate (from left) in pixel
- * @param {number} [offset.y=0] - The y coordinate (from top) in pixel
- * @param {object[]} [frames] - The coordinates of the animation frame relativ to the offset
- * @param {number} [frames[].x=0] - The x coordinate (from left) in pixel
- * @param {number} [frames[].y=0] - The y coordinate (from top) in pixel
+ * @param {info} object - Information about the sprite
+ * @param {string} [info.url='sprites.png'] - The filename of the sprite sheet without path
+ * @param {object} info.size - The size of the sprite
+ * @param {number} info.size.w - The width of the sprite in pixel
+ * @param {number} info.size.h - The height of the sprite in pixel
+ * @param {number} [info.delay=1] - The delay between two frames in milliseconds
+ * @param {object} info.offset - The offset of the sprite on the sprite sheet
+ * @param {number} info.offset.x - The x coordinate (from left) in pixel
+ * @param {number} info.offset.y - The y coordinate (from top) in pixel
+ * @param {object[]} [info.frames] - The coordinates of the animation frame relativ to the offset
+ * @param {number} [info.frames[].x=0] - The x coordinate (from left) in pixel
+ * @param {number} [info.frames[].y=0] - The y coordinate (from top) in pixel
  * @param {number} [zoom=1] - Zoom factor for displaying the sprite
  */
-function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}], zoom=1) {
+function Sprite(info, zoom=1) {
+	const url = info.hasOwnProperty('url') ? info.url : 'sprites.png';
+	const delay = info.hasOwnProperty('delay') ? info.delay : 1;
+	const frames = info.hasOwnProperty('frames') ? info.frames : [{x: 0, y: 0}];
+
 	// add standard path to graphics file name
 	this.pic = resources.get('gfx/' + url);
 
@@ -27,8 +32,8 @@ function Sprite(url, size, delay=1, offset={x: 0, y: 0}, frames=[{x: 0, y: 0}], 
 		throw 'URL not found: gfx/' + url;
 	}
 
-	this.offset = offset;
-	this.size = size;
+	this.offset = info.offset;
+	this.size = info.size;
 	this.delay = delay;
 	this.frames = frames;
 	this.delay_counter = 0;

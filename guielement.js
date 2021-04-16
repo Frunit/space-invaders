@@ -1,5 +1,6 @@
 'use strict';
 
+import {sprite_info} from './sprite_info.js';
 import {Sprite} from './sprite.js';
 
 
@@ -19,93 +20,63 @@ import {Sprite} from './sprite.js';
 function GUI_Element(x, y, type) {
 	switch(type) {
 		case 'life': {
-			this.w = 26;
-			this.h = 22;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 188, y: 36}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.life);
+			this.w = sprite_info.life.size.w;
+			this.h = sprite_info.life.size.h;
 			break;
 		}
 		case 'score': {
-			this.w = 16;
-			this.h = 22;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 216, y: 36}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.score);
+			this.w = sprite_info.score.size.w;
+			this.h = sprite_info.score.size.h;
 			break;
 		}
 		case 'selector': {
-			this.w = 60;
-			this.h = 32;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 0, y: 100}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.player);
+			this.w = sprite_info.player.size.w;
+			this.h = sprite_info.player.size.h;
 			break;
 		}
 		case 'arrow_left': {
-			this.w = 14;
-			this.h = 22;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 0, y: 176}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.arrow_left);
+			this.w = sprite_info.arrow_left.size.w;
+			this.h = sprite_info.arrow_left.size.h;
 			break;
 		}
 		case 'arrow_right': {
-			this.w = 14;
-			this.h = 22;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 16, y: 176}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.arrow_right);
+			this.w = sprite_info.arrow_right.size.w;
+			this.h = sprite_info.arrow_right.size.h;
 			break;
 		}
 		case 'keys1': {
-			this.w = 399;
-			this.h = 140;
-			this.sprite = new Sprite(
-				'keys.png', {w: this.w, h: this.h}, 0,
-				{x: 0, y: 0}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.keys1);
+			this.w = sprite_info.keys1.size.w;
+			this.h = sprite_info.keys1.size.h;
 			break;
 		}
 		case 'keys2': {
-			this.w = 282;
-			this.h = 140;
-			this.sprite = new Sprite(
-				'keys.png', {w: this.w, h: this.h}, 0,
-				{x: 0, y: 149}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.keys2);
+			this.w = sprite_info.keys2.size.w;
+			this.h = sprite_info.keys2.size.h;
 			break;
 		}
 		case 'enemy1': {
-			this.w = 32;
-			this.h = 32;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}], 4
-			);
+			this.sprite = new Sprite(sprite_info.enemy1, 4);
+			this.w = sprite_info.enemy1.size.w;
+			this.h = sprite_info.enemy1.size.h;
 			break;
 		}
 		case 'enemy2': {
-			this.w = 44;
-			this.h = 32;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}], 4
-			);
+			this.sprite = new Sprite(sprite_info.enemy2, 4);
+			this.w = sprite_info.enemy2.size.w;
+			this.h = sprite_info.enemy2.size.h;
 			break;
 		}
 		case 'enemy3': {
-			this.w = 48;
-			this.h = 32;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}], 4
-			);
+			this.sprite = new Sprite(sprite_info.enemy3, 4);
+			this.w = sprite_info.enemy3.size.w;
+			this.h = sprite_info.enemy3.size.h;
 			break;
 		}
 		default:

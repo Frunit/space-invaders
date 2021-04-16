@@ -1,5 +1,6 @@
 'use strict';
 
+import {sprite_info} from './sprite_info.js';
 import {Sprite} from './sprite.js';
 
 
@@ -44,8 +45,8 @@ function Entity() {
 function Player(x, y, num) {
 	Entity.call(this);
 	this.object = 'player';
-	this.w = 60;
-	this.h = 32;
+	this.w = sprite_info.player.size.w;
+	this.h = sprite_info.player.size.h;
 
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
@@ -56,10 +57,7 @@ function Player(x, y, num) {
 	this.bullet_double_x_offset = 20;
 	this.bullet_speed = {x: 0, y: -300}; // pixel per second
 
-	this.sprite = new Sprite(
-		'sprites.png', {w: this.w, h: this.h}, 0,
-		{x: 0, y: 100}, [{x: 0, y: 0}]
-	);
+	this.sprite = new Sprite(sprite_info.player);
 
 	this.score = 0;
 	this.lives = 3;
@@ -86,17 +84,14 @@ function Player(x, y, num) {
  * lives, and death status.
  */
 Player.prototype.reset = function() {
-	this.w = 60;
-	this.h = 32;
+	this.w = sprite_info.player.size.w;
+	this.h = sprite_info.player.size.h;
 	this.speed.x = 128; // pixel per second
 	this.bullet_offset = {x: this.w/2, y: 0};
 	this.bullet_double_x_offset = 20;
 	this.bullet_speed = {x:0, y:-300}; // pixel per second
 
-	this.sprite = new Sprite(
-		'sprites.png', {w: this.w, h: this.h}, 0,
-		{x: 0, y: 100}, [{x: 0, y: 0}]
-	);
+	this.sprite = new Sprite(sprite_info.player);
 
 	this.max_cooldown = 1;
 	this.rapid_cooldown = 0.3;
@@ -261,30 +256,18 @@ Player.prototype.update = function(dt, bounds) {
 Player.prototype.choose_sprite = function() {
 	if(this.invulnerable) {
 		if(this.double_laser) {
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0.2,
-				{x: 64, y: 140}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}, {x: this.w*2 + 4, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.invul_double);
 		}
 		else {
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0.2,
-				{x: 64, y: 104}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}, {x: this.w*2 + 4, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.invul_single);
 		}
 	}
 	else {
 		if(this.double_laser) {
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 0, y: 140}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.double);
 		}
 		else {
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 0, y: 100}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.player);
 		}
 	}
 };
@@ -354,10 +337,7 @@ Player.prototype.kill = function(force=false) {
 		this.off_time = 2;
 		this.cooldown = 2;
 		this.collidable = false;
-		this.sprite = new Sprite(
-			'sprites.png', {w: 64, h: 32}, 0.5,
-			{x: 124, y: 68}, [{x: 0, y: 0}, {x: 64, y: 0}]
-		);
+		this.sprite = new Sprite(sprite_info.player_explode);
 	}
 
 	return null;
@@ -377,10 +357,7 @@ Player.prototype.resurrect = function() {
 		this.collidable = false;
 		this.h = 0;
 		this.w = 0;
-		this.sprite = new Sprite(
-			'sprites.png', {w: 1, h: 1}, 0,
-			{x: 0, y: 0}, [{x: 0, y: 0}]
-		);
+		this.sprite = new Sprite(sprite_info.empty);
 	}
 	else {
 		this.reset();
@@ -409,33 +386,24 @@ function Enemy(x, y, type) {
 
 	switch(type) {
 		case 0: {
-			this.w = 32;
-			this.h = 32;
 			this.score_value = 30;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 0, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.enemy1);
+			this.w = sprite_info.enemy1.size.w;
+			this.h = sprite_info.enemy1.size.h;
 			break;
 		}
 		case 1: {
-			this.w = 44;
-			this.h = 32;
 			this.score_value = 20;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 68, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.enemy2);
+			this.w = sprite_info.enemy2.size.w;
+			this.h = sprite_info.enemy2.size.h;
 			break;
 		}
 		case 2: {
-			this.w = 48;
-			this.h = 32;
 			this.score_value = 10;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 2,
-				{x: 160, y: 0}, [{x: 0, y: 0}, {x: this.w + 2, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.enemy3);
+			this.w = sprite_info.enemy3.size.w;
+			this.h = sprite_info.enemy3.size.h;
 			break;
 		}
 		default:
@@ -536,17 +504,15 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
  */
 Enemy.prototype.kill = function() {
 	// All enemies have the same explosion, so they have to be moved to center the explosion
-	this.x += Math.floor(this.w/2 - 26);
-	this.w = 52;
+	const new_w = sprite_info.enemy_explode.size.w;
+	this.x += Math.floor(this.w - new_w);
+	this.w = new_w;
 	this.off_time = 2;
 	this.cooldown = 2;
 	this.collidable = false;
 	this.speed.x = 0;
 	this.speed.y = 0;
-	this.sprite = new Sprite(
-		'sprites.png', {w: 52, h: 32}, 0,
-		{x: 68, y: 68}, [{x: 0, y: 0}]
-	);
+	this.sprite = new Sprite(sprite_info.enemy_explode);
 
 	if(Math.random() < 0.333) {
 		const type = Math.floor(Math.random() * 7); // Random number: one of [0 .. 6]
@@ -589,43 +555,27 @@ function Bullet(x, y, speed, type, owner=-1) {
 
 	switch(type) {
 		case 0: {
-			this.w = 4;
-			this.h = 16;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0,
-				{x: 145, y: 36}, [{x: 0, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.player_bullet);
+			this.w = sprite_info.player_bullet.size.w;
+			this.h = sprite_info.player_bullet.size.h;
 			break;
 		}
 		case 1: {
-			this.w = 12;
-			this.h = 28;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0.1,
-				{x: 0, y: 36},
-				[{x: 0, y: 0}, {x: this.w + 1, y: 0},
-				{x: this.w*2 + 2, y: 0}, {x: this.w*3 + 3, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.bullet1);
+			this.w = sprite_info.bullet1.size.w;
+			this.h = sprite_info.bullet1.size.h;
 			break;
 		}
 		case 2: {
-			this.w = 12;
-			this.h = 28;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0.1,
-				{x: 52, y: 36}, [{x: 0, y: 0}, {x: this.w + 1, y: 0}, {x: this.w*2 + 2, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.bullet2);
+			this.w = sprite_info.bullet2.size.w;
+			this.h = sprite_info.bullet2.size.h;
 			break;
 		}
 		case 3: {
-			this.w = 12;
-			this.h = 24;
-			this.sprite = new Sprite(
-				'sprites.png', {w: this.w, h: this.h}, 0.1,
-				{x: 92, y: 36},
-				[{x: 0, y: 0}, {x: this.w + 1, y: 0},
-				{x: this.w*2 + 2, y: 0}, {x: this.w*3 + 3, y: 0}]
-			);
+			this.sprite = new Sprite(sprite_info.bullet3);
+			this.w = sprite_info.bullet3.size.w;
+			this.h = sprite_info.bullet3.size.h;
 			break;
 		}
 		default:
@@ -671,10 +621,7 @@ Bullet.prototype.kill = function() {
 	this.off_time = 2;
 	this.speed = {x: 0, y: 0};
 	this.collidable = false;
-	this.sprite = new Sprite(
-		'sprites.png', {w: 12, h: 24}, 0,
-		{x: 172, y: 36}, [{x: 0, y: 0}]
-	);
+	this.sprite = new Sprite(sprite_info.bullet_explode);
 
 	return null;
 };
@@ -693,14 +640,11 @@ Bullet.prototype.kill = function() {
 function Mystery(from_left, bounds) {
 	Entity.call(this);
 	this.object = 'mystery';
-	// pixel per second
-	this.w = 64;
-	this.h = 28;
+	// speed in pixel per second
 	this.score_value = 500;
-	this.sprite = new Sprite(
-		'sprites.png', {w: this.w, h: this.h}, 0,
-		{x: 0, y: 68}, [{x: 0, y: 0}]
-	);
+	this.sprite = new Sprite(sprite_info.mystery);
+	this.w = sprite_info.mystery.size.w;
+	this.h = sprite_info.mystery.size.h;
 
 	if(from_left) {
 		this.x = -this.w;
@@ -753,14 +697,14 @@ Mystery.prototype.kill = function() {
 	this.off_time = 2;
 	this.collidable = false;
 	this.speed.x = 0;
-	this.w = 52;
-	this.h = 32;
-	this.x += 6;
-	this.y += 2;
-	this.sprite = new Sprite(
-		'sprites.png', {w: this.w, h: this.h}, 0,
-		{x: 68, y: 68}, [{x: 0, y: 0}]
-	);
+	this.sprite = new Sprite(sprite_info.enemy_explode);
+
+	const new_w = sprite_info.enemy_explode.size.w;
+	const new_h = sprite_info.enemy_explode.size.h;
+	this.x += this.w - new_w
+	this.y += this.h - new_h
+	this.w = new_w;
+	this.h = new_h;
 
 	return null;
 };
@@ -791,15 +735,12 @@ Mystery.prototype.kill = function() {
 function Goody(x, y, speed, type) {
 	Entity.call(this);
 	this.object = 'goody';
-	this.w = 46;
-	this.h = 22;
 	this.type = type;
 
 	if(type >= 0 && type <= 6) {
-		this.sprite = new Sprite(
-			'sprites.png', {w: this.w, h: this.h}, 0,
-			{x: 260, y: 0}, [{x: 0, y: (this.h + 2)*type}]
-		);
+		this.sprite = new Sprite(sprite_info.goodies[type]);
+		this.w = sprite_info.goodies[type].size.w;
+		this.h = sprite_info.goodies[type].size.h;
 	}
 	else {
 		throw 'Unknown Goody type received: ' + type;
@@ -842,14 +783,11 @@ Goody.prototype.update = function(dt, bounds) {
 function Wall(x, y) {
 	Entity.call(this);
 	this.object = 'wall';
-	this.w = 16;
-	this.h = 16;
 	this.gravity = 300;
 
-	this.sprite = new Sprite(
-		'sprites.png', {w: this.w, h: this.h}, 0,
-		{x: 152, y: 36}, [{x: 0, y: 0}]
-	);
+	this.sprite = new Sprite(sprite_info.wall);
+	this.w = sprite_info.wall.size.w;
+	this.h = sprite_info.wall.size.h;
 
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
