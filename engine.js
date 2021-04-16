@@ -1,6 +1,7 @@
 'use strict';
 
 import {lang} from './i18n.js';
+import {options} from './options.js';
 import {Player, Enemy, Mystery, Wall} from './entities.js';
 import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
@@ -10,8 +11,8 @@ import {Text} from './text.js';
 
 
 /**
- * <tt>Engine</tt> is the actual game engine. It *should* work without any
- * screen, making, it more easily testable.
+ * <tt>Engine</tt> is the actual game engine. It works without any
+ * screen, making it more easily testable.
  *
  * @constructor
  * @param {object} window_size - The window size
@@ -101,7 +102,7 @@ Engine.prototype.setup = function(fresh=false) {
 
 	this.enemy_direction = -1;
 	this.enemy_moves_down = 0;
-	this.enemy_speed_factor = 1 + recurrence * 0.33;
+	this.enemy_speed_factor = 1 + recurrence * options.enemy_level_speedup;
 	this.down_moves = 0;
 
 	this.game_is_over = false;
@@ -249,8 +250,8 @@ Engine.prototype.setup_gui = function() {
 Engine.prototype.setup_enemies = function(enemies) {
 	const ib_right = this.inner_bounds.right;
 	const ib_left = this.inner_bounds.left;
-	const enemy_offset = ib_left + (ib_right - ib_left) / 2 - enemies[0].length / 2 * 60;
-	const enemy_upper = 50;
+	const enemy_offset = ib_left + (ib_right - ib_left) / 2 - enemies[0].length / 2 * options.enemy_dx;
+	const enemy_upper = options.enemy_dy;
 
 	for(let y = 0; y < enemies.length; y++) {
 		for(let x = 0; x < enemies[0].length; x++) {
@@ -261,8 +262,8 @@ Engine.prototype.setup_enemies = function(enemies) {
 
 			this.enemies.push(
 				new Enemy(
-					enemy_offset + x * 60,
-					enemy_upper + y * 50,
+					enemy_offset + x * options.enemy_dx,
+					enemy_upper + y * options.enemy_dy,
 					+type
 				)
 			);
@@ -278,9 +279,10 @@ Engine.prototype.setup_enemies = function(enemies) {
  * @param {number} forts - The number of forts
  */
 Engine.prototype.setup_forts = function(fort, forts) {
+	const block_size = 16;
 	const fort_x_dist = (this.inner_bounds.right - this.inner_bounds.left) / (forts + 1);
-	const fort_offset = this.inner_bounds.left + fort_x_dist - fort[0].length / 2 * 16;
-	const fort_upper = 530 - fort.length * 16;
+	const fort_offset = this.inner_bounds.left + fort_x_dist - fort[0].length / 2 * block_size;
+	const fort_upper = 530 - fort.length * block_size;
 
 	for(let i = 0; i < forts; i++) {
 		for(let y = 0; y < fort.length; y++) {
@@ -288,8 +290,8 @@ Engine.prototype.setup_forts = function(fort, forts) {
 				if(fort[y][x] === 'X') {
 					this.walls.push(
 						new Wall(
-							fort_offset + i * fort_x_dist + x * 16, // x position
-							fort_upper + y * 16                     // y position
+							fort_offset + i * fort_x_dist + x * block_size, // x position
+							fort_upper + y * block_size                     // y position
 						)
 					);
 				}
@@ -382,7 +384,7 @@ Engine.prototype.update = function(dt) {
 		};
 	}
 
-	if(this.down_moves > 3 && this.mysteries.length === 0 && Math.random() < 0.001) {
+	if(this.down_moves > 3 && this.mysteries.length === 0 && Math.random() < options.mystery_prob) {
 		// Start a mystery if the enemies gave enough space to the top
 		this.mysteries.push(new Mystery(Math.round(Math.random()), this.outer_bounds));
 	}
@@ -425,9 +427,9 @@ Engine.prototype.update_enemies = function(dt) {
 			this.game_is_over = true;
 		}
 		else {
-			this.enemy_moves_down = 0.2;
+			this.enemy_moves_down = options.enemy_downwards_speed;
 			this.enemy_direction *= -1;
-			this.enemy_speed_factor += 0.05;
+			this.enemy_speed_factor += options.enemy_line_speedup;
 			this.down_moves++;
 		}
 	}
@@ -661,7 +663,7 @@ Engine.prototype.apply_goody = function(type, player) {
 			break;
 		}
 		case 6: {
-			player.score += 300;
+			player.score += options.scores.goldgoody;
 			this.texts.player_scores[player.num].set_score(player.score);
 			break;
 		}

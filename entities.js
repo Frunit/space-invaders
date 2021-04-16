@@ -1,5 +1,6 @@
 'use strict';
 
+import {options} from './options.js';
 import {sprite_info} from './sprite_info.js';
 import {Sprite} from './sprite.js';
 
@@ -51,20 +52,20 @@ function Player(x, y, num) {
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
 
-	this.speed.x = 128; // pixel per second
+	this.speed.x = options.player_speed;
 
 	this.bullet_offset = {x: this.w/2, y: 0};
 	this.bullet_double_x_offset = 20;
-	this.bullet_speed = {x: 0, y: -300}; // pixel per second
+	this.bullet_speed = {x: 0, y: -options.bullet_speed};
 
 	this.sprite = new Sprite(sprite_info.player);
 
 	this.score = 0;
-	this.lives = 3;
+	this.lives = options.start_lives;
 	this.num = num;
 
-	this.max_cooldown = 1;
-	this.rapid_cooldown = 0.3;
+	this.max_cooldown = options.player_cooldown;
+	this.rapid_cooldown = options.player_rapid_cooldown;
 	this.cooldown = 0;
 
 	this.moving = 0;
@@ -86,15 +87,15 @@ function Player(x, y, num) {
 Player.prototype.reset = function() {
 	this.w = sprite_info.player.size.w;
 	this.h = sprite_info.player.size.h;
-	this.speed.x = 128; // pixel per second
+	this.speed.x = options.player_speed;
 	this.bullet_offset = {x: this.w/2, y: 0};
 	this.bullet_double_x_offset = 20;
-	this.bullet_speed = {x:0, y:-300}; // pixel per second
+	this.bullet_speed = {x: 0, y: -options.bullet_speed};
 
 	this.sprite = new Sprite(sprite_info.player);
 
-	this.max_cooldown = 1;
-	this.rapid_cooldown = 0.3;
+	this.max_cooldown = options.player_cooldown;
+	this.rapid_cooldown = options.player_rapid_cooldown;
 	this.cooldown = 0;
 	this.off_time = -1;
 	this.collidable = true;
@@ -286,7 +287,7 @@ Player.prototype.apply_rapid_fire = function() {
 			this.cooldown = 0;
 		}
 	}
-	this.rapid_fire += 7;
+	this.rapid_fire += options.goodie_time;
 };
 
 
@@ -298,7 +299,7 @@ Player.prototype.apply_speed_up = function() {
 	if(this.speed_up === 0) {
 		this.speed.x *= 2;
 	}
-	this.speed_up += 7;
+	this.speed_up += options.goodie_time;
 };
 
 
@@ -307,7 +308,7 @@ Player.prototype.apply_speed_up = function() {
  * seconds.
  */
 Player.prototype.apply_invulnerability = function() {
-	this.invulnerable += 7;
+	this.invulnerable += options.goodie_time;
 	this.choose_sprite();
 };
 
@@ -317,14 +318,14 @@ Player.prototype.apply_invulnerability = function() {
  * seconds.
  */
 Player.prototype.apply_double_laser = function() {
-	this.double_laser += 7;
+	this.double_laser += options.goodie_time;
 	this.choose_sprite();
 };
 
 
 /**
- * <tt>Player.kill</tt> kills the player. One lives is subtracted and an
- * explosion is shown. The player will be disabled for two seconds.
+ * <tt>Player.kill</tt> kills the player. One live is subtracted and an
+ * explosion is shown. The player will be disabled for some seconds.
  *
  * @param {boolean} [force=false]
  * 		If <tt>true</tt>, the player is killed even if invulnerable.
@@ -334,8 +335,8 @@ Player.prototype.apply_double_laser = function() {
 Player.prototype.kill = function(force=false) {
 	if(!this.invulnerable || force) {
 		this.lives--;
-		this.off_time = 2;
-		this.cooldown = 2;
+		this.off_time = options.player_kill_time;
+		this.cooldown = options.player_kill_time;
 		this.collidable = false;
 		this.sprite = new Sprite(sprite_info.player_explode);
 	}
@@ -380,27 +381,27 @@ Player.prototype.resurrect = function() {
 function Enemy(x, y, type) {
 	Entity.call(this);
 	this.object = 'enemy';
-	this.speed = {x: 64, y: 64}; // pixel per second
-	this.bullet_speed = {x: 0, y: 300}; // pixel per second
-	this.goody_speed = {x: 0, y: 64};
+	this.speed = {x: options.enemy_speed, y: options.enemy_speed};
+	this.bullet_speed = {x: 0, y: options.bullet_speed};
+	this.goody_speed = {x: 0, y: options.goodie_speed};
 
 	switch(type) {
 		case 0: {
-			this.score_value = 30;
+			this.score_value = options.scores.enemy1;
 			this.sprite = new Sprite(sprite_info.enemy1);
 			this.w = sprite_info.enemy1.size.w;
 			this.h = sprite_info.enemy1.size.h;
 			break;
 		}
 		case 1: {
-			this.score_value = 20;
+			this.score_value = options.scores.enemy2;
 			this.sprite = new Sprite(sprite_info.enemy2);
 			this.w = sprite_info.enemy2.size.w;
 			this.h = sprite_info.enemy2.size.h;
 			break;
 		}
 		case 2: {
-			this.score_value = 10;
+			this.score_value = options.scores.enemy3;
 			this.sprite = new Sprite(sprite_info.enemy3);
 			this.w = sprite_info.enemy3.size.w;
 			this.h = sprite_info.enemy3.size.h;
@@ -416,7 +417,7 @@ function Enemy(x, y, type) {
 	this.x = Math.floor(x - this.w/2);
 	this.y = Math.floor(y - this.h/2);
 
-	this.max_cooldown = 2;
+	this.max_cooldown = options.enemy_cooldown;
 	this.cooldown = 0;
 }
 
@@ -430,7 +431,7 @@ function Enemy(x, y, type) {
  * @returns {Bullet[]}
  * 		An array of Bullet objects if the ship fired. The array may be empty.
  */
-Enemy.prototype.fire = function(chance=0.001) {
+Enemy.prototype.fire = function(chance=options.enemy_fire_prob) {
 	if(this.cooldown > 0 || Math.random() > chance) {
 		return [];
 	}
@@ -507,14 +508,14 @@ Enemy.prototype.kill = function() {
 	const new_w = sprite_info.enemy_explode.size.w;
 	this.x += Math.floor(this.w - new_w);
 	this.w = new_w;
-	this.off_time = 2;
-	this.cooldown = 2;
+	this.off_time = options.explosion_time;
+	this.cooldown = options.explosion_time;
 	this.collidable = false;
 	this.speed.x = 0;
 	this.speed.y = 0;
 	this.sprite = new Sprite(sprite_info.enemy_explode);
 
-	if(Math.random() < 0.333) {
+	if(Math.random() < options.drop_chance) {
 		const type = Math.floor(Math.random() * 7); // Random number: one of [0 .. 6]
 		return new Goody(
 			this.x + this.bullet_offset.x,
@@ -618,7 +619,7 @@ Bullet.prototype.update = function(dt, bounds) {
  * @returns {null} To conform with the other <tt>kill</tt> functions.
  */
 Bullet.prototype.kill = function() {
-	this.off_time = 2;
+	this.off_time = options.explosion_time;
 	this.speed = {x: 0, y: 0};
 	this.collidable = false;
 	this.sprite = new Sprite(sprite_info.bullet_explode);
@@ -641,18 +642,18 @@ function Mystery(from_left, bounds) {
 	Entity.call(this);
 	this.object = 'mystery';
 	// speed in pixel per second
-	this.score_value = 500;
+	this.score_value = options.scores.mystery;
 	this.sprite = new Sprite(sprite_info.mystery);
 	this.w = sprite_info.mystery.size.w;
 	this.h = sprite_info.mystery.size.h;
 
 	if(from_left) {
 		this.x = -this.w;
-		this.speed.x = 96;
+		this.speed.x = options.mystery_speed;
 	}
 	else {
 		this.x = bounds.right;
-		this.speed.x = -96;
+		this.speed.x = -options.mystery_speed;
 	}
 
 	// The mystery will follow a sine curve. speed.y will be interpreted as
@@ -694,7 +695,7 @@ Mystery.prototype.update = function(dt, bounds) {
  * @returns {null} To be compliant with other kill functions.
  */
 Mystery.prototype.kill = function() {
-	this.off_time = 2;
+	this.off_time = options.explosion_time;
 	this.collidable = false;
 	this.speed.x = 0;
 	this.sprite = new Sprite(sprite_info.enemy_explode);

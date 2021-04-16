@@ -5,9 +5,6 @@ import {GUI_Element} from './guielement.js';
 import {Text} from './text.js';
 
 
-// MAYBE: Allow name instead of date
-
-
 // The highscore is saved in the `localStorage`. This storage is only available
 // in browsers, so this little mock-up is used for testing in node.js.
 if(typeof window === 'undefined') {
