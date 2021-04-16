@@ -106,13 +106,13 @@ const sprite_info = {
 	},
 	keys1: {
 		url: 'keys.png',
-		size: {w: 399, h: 140},
+		size: {w: 399, h: 116},
 		offset: {x: 0, y: 0}
 	},
 	keys2: {
 		url: 'keys.png',
-		size: {w: 282, h: 140},
-		offset: {x: 0, y: 149}
+		size: {w: 299, h: 116},
+		offset: {x: 0, y: 118}
 	},
 	goodies: [
 		{

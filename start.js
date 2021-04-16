@@ -47,8 +47,8 @@ Start.prototype.setup = function() {
 
 	// Keys
 
-	this.keys.push(new GUI_Element(70, 445, 'keys1'));
-	this.keys.push(new GUI_Element(590, 445, 'keys2'));
+	this.keys.push(new GUI_Element(70, 469, 'keys1'));
+	this.keys.push(new GUI_Element(565, 469, 'keys2'));
 
 	// Enemies
 
@@ -207,10 +207,10 @@ Start.prototype.update_texts = function() {
 	this.texts.fixed.push(new Text(lang.right, 190, 520));
 	this.texts.fixed.push(new Text(lang.fire, 369, 520, Infinity, 'center'));
 
-	this.texts.fixed.push(new Text(lang.fire, 624, 485, Infinity, 'center'));
-	this.texts.fixed.push(new Text(lang.left, 738, 520, Infinity, 'right'));
-	this.texts.fixed.push(new Text(lang.fire, 774, 460, Infinity, 'center'));
-	this.texts.fixed.push(new Text(lang.right, 810, 520));
+	this.texts.fixed.push(new Text(lang.fire, 601, 485, Infinity, 'center'));
+	this.texts.fixed.push(new Text(lang.left, 739, 520, Infinity, 'right'));
+	this.texts.fixed.push(new Text(lang.fire, 773, 460, Infinity, 'center'));
+	this.texts.fixed.push(new Text(lang.right, 808, 520));
 };
 
 
