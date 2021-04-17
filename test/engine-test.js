@@ -105,7 +105,7 @@ QUnit.test('Engine setup', function(assert) {
 	assert.deepEqual(engine.texts.player_lives[0], new Text(3, 36, 30), 'GUI player lives');
 
 	assert.strictEqual(engine.texts.level.length, 2, 'GUI level length');
-	assert.deepEqual(engine.texts.level[0], new Text('Level ', 450, 30, Infinity, 'right'), 'GUI level 1');
+	assert.deepEqual(engine.texts.level[0], new Text('Level ', 450, 30, 'right'), 'GUI level 1');
 	assert.deepEqual(engine.texts.level[1], new Text(1, 450, 30), 'GUI level 2');
 
 	assert.deepEqual(engine.texts.floating, [], 'GUI floating');
@@ -160,14 +160,14 @@ QUnit.test('Engine advanced setup', function(assert) {
 
 	assert.strictEqual(engine.texts.player_scores.length, 2, 'GUI player scores length');
 	assert.deepEqual(engine.texts.player_scores[0], new Text('000000', 116, 30), 'GUI player scores 1');
-	assert.deepEqual(engine.texts.player_scores[1], new Text('000000', 800, 30, Infinity, 'right'), 'GUI player scores 2');
+	assert.deepEqual(engine.texts.player_scores[1], new Text('000000', 800, 30, 'right'), 'GUI player scores 2');
 
 	assert.strictEqual(engine.texts.player_lives.length, 2, 'GUI player lives length');
 	assert.deepEqual(engine.texts.player_lives[0], new Text(3, 36, 30), 'GUI player lives 1');
-	assert.deepEqual(engine.texts.player_lives[1], new Text(3, 864, 30, Infinity, 'right'), 'GUI player lives 2');
+	assert.deepEqual(engine.texts.player_lives[1], new Text(3, 864, 30, 'right'), 'GUI player lives 2');
 
 	assert.strictEqual(engine.texts.level.length, 2, 'GUI level length');
-	assert.deepEqual(engine.texts.level[0], new Text('Level ', 450, 30, Infinity, 'right'), 'GUI level 1');
+	assert.deepEqual(engine.texts.level[0], new Text('Level ', 450, 30, 'right'), 'GUI level 1');
 	assert.deepEqual(engine.texts.level[1], new Text(8, 450, 30), 'GUI level 2');
 
 	assert.deepEqual(engine.texts.floating, [], 'GUI floating');

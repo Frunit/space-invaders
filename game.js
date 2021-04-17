@@ -38,7 +38,7 @@ function Game(options, levels) {
 	this.options = options;
 	this.levels = levels;
 
-	this.version = 'v1.1.0';
+	this.version = 'v1.2.0';
 
 	this.last_time = 0;
 
@@ -47,10 +47,9 @@ function Game(options, levels) {
 	this.last_fps = 0;
 	this.frames = 0;
 	this.fps = new Text(
-		'', 2, this.options.total_size.h - 2,
-		Infinity, 'left', '#ffffff', 10
+		'', 2, this.options.total_size.h - 2, 'left', 10
 	);
-	this.show_fps = true;
+	this.show_fps = options.show_fps;
 
 	this.stage = null;
 	this.screen = null;

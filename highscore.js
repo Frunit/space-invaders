@@ -116,7 +116,7 @@ Highscore.prototype.setup = function() {
 			score.score,
 			this.window_size.w * 0.75,
 			150 + i*30,
-			Infinity, 'right'
+			'right'
 		));
 		this.texts.scores[i].set_score(score.score); // To ensure the same number of digits
 	}
@@ -126,14 +126,12 @@ Highscore.prototype.setup = function() {
 		lang.you_reached_a + this.level + lang.you_reached_b,
 		this.window_size.w / 2,
 		50,
-		Infinity,
 		'center'
 	));
 	this.texts.footer.push(new Text(
 		lang.fire_to_continue,
 		this.window_size.w / 2,
 		this.window_size.h - 50,
-		Infinity,
 		'center'
 	));
 

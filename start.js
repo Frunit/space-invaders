@@ -78,9 +78,7 @@ Start.prototype.setup = function() {
 		this.version,
 		this.window_size.w - 5, // x
 		15,                     // y
-		Infinity,               // duration
 		'right',                // alignment
-		'#ffffff',              // color
 		10                      // size
 	)];
 };
@@ -198,18 +196,18 @@ Start.prototype.update_texts = function() {
 		lang.lang,
 		this.window_size.w / 2 - this.selector.w / 2 - 13,
 		this.window_size.h / 2 - this.selector.h - 15,
-		Infinity, 'center'
+		'center'
 	));
 
 	// Keys
-	this.texts.fixed.push(new Text(lang.left, 125, 520, Infinity, 'right'));
-	this.texts.fixed.push(new Text(lang.fire, 154, 460, Infinity, 'center'));
+	this.texts.fixed.push(new Text(lang.left, 125, 520, 'right'));
+	this.texts.fixed.push(new Text(lang.fire, 154, 460, 'center'));
 	this.texts.fixed.push(new Text(lang.right, 190, 520));
-	this.texts.fixed.push(new Text(lang.fire, 369, 520, Infinity, 'center'));
+	this.texts.fixed.push(new Text(lang.fire, 369, 520, 'center'));
 
-	this.texts.fixed.push(new Text(lang.fire, 601, 485, Infinity, 'center'));
-	this.texts.fixed.push(new Text(lang.left, 739, 520, Infinity, 'right'));
-	this.texts.fixed.push(new Text(lang.fire, 773, 460, Infinity, 'center'));
+	this.texts.fixed.push(new Text(lang.fire, 601, 485, 'center'));
+	this.texts.fixed.push(new Text(lang.left, 739, 520, 'right'));
+	this.texts.fixed.push(new Text(lang.fire, 773, 460, 'center'));
 	this.texts.fixed.push(new Text(lang.right, 808, 520));
 };
 

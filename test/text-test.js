@@ -4,19 +4,19 @@ import {Text} from '../text.js';
 
 
 QUnit.test('Text parameters', function(assert) {
-	let text = new Text('', 100, 200, Infinity);
+	let text = new Text('', 100, 200);
 
 	assert.strictEqual(text.alignment, 'left', 'default value alignment');
 	assert.strictEqual(text.color, '#ffffff', 'default value color');
 	assert.strictEqual(text.size, 24, 'default value size');
 	assert.ok(text.active, 'text is active');
 
-	let text2 = new Text('', 100, 200, Infinity);
+	let text2 = new Text('', 100, 200);
 	text.update(10);
 
 	assert.deepEqual(text, text2, 'no change in infinitly lasting texts');
 
-	text = new Text('YEAH', 500, 1.234, 2);
+	text = new Text('YEAH', 500, 1.234, 'left', 24, '#ffffff', 2);
 	assert.ok(text.active, 'text is active 0s');
 	text.update(1);
 	assert.ok(text.active, 'text is active 1s');
@@ -26,7 +26,7 @@ QUnit.test('Text parameters', function(assert) {
 
 
 QUnit.test('Text score', function(assert) {
-	let text = new Text('123456', 100, 200, 2);
+	let text = new Text('123456', 100, 200);
 
 	assert.strictEqual(text.text, '123456', 'initial value');
 

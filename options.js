@@ -6,6 +6,7 @@ const options = {
 	num_players: 1,               // Default number of players
 	start_level: 0,               // Default start level
 	start_lives: 3,               // Default start lives
+	show_fps: true,               // Show current frames per second
 	drop_chance: 0.333,           // Goody drop chance
 	enemy_level_speedup: 0.333,   // Speedup of enemies when the levels loop
 	enemy_line_speedup: 0.05,     // Speedup of enemies each new line
@@ -94,6 +95,55 @@ const levels = [
 			"_0_00_0_",
 			"0______0",
 			"_0____0_"
+		]
+	},
+	{
+		fort: [
+			"X_X_X_X_X_X_X_X_X",
+			"_X_X_X_X_X_X_X_X_",
+			"X_X_X_X_X_X_X_X_X"
+		],
+		forts: 2,
+		enemies: [
+			"00121212100",
+			"01212_21210",
+			"1212___2121",
+			"212__0__212",
+			"12_______21",
+			"2_________2"
+		]
+	},
+	{
+		fort: [
+			"_XXXX_",
+			"XXXXXX",
+			"_XXXX_"
+		],
+		forts: 5,
+		enemies: [
+			"10000101",
+			"10111101",
+			"10110001",
+			"10111101",
+			"_100001_"
+		]
+	},
+	{
+		fort: [
+			"XXXXX",
+			"XXXXX",
+			"XXXXX",
+			"XXXXX",
+			"XXXXX",
+			"XXXXX"
+		],
+		forts: 10,
+		enemies: [
+			"01211210",
+			"12111121",
+			"22222222",
+			"12111121",
+			"01211210",
 		]
 	}
 ];

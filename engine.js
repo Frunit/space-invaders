@@ -203,7 +203,6 @@ Engine.prototype.setup_gui = function() {
 			this.players[1].lives,
 			this.outer_bounds.right - 10 - life_width,
 			this.outer_bounds.top + 30,
-			Infinity,
 			'right'
 		));
 
@@ -221,7 +220,6 @@ Engine.prototype.setup_gui = function() {
 			'',
 			this.outer_bounds.right - 100,
 			this.outer_bounds.top + 30,
-			Infinity,
 			'right'
 		));
 		this.texts.player_scores[1].set_score(this.players[1].score);
@@ -231,7 +229,6 @@ Engine.prototype.setup_gui = function() {
 		lang.level,
 		(this.outer_bounds.right + this.outer_bounds.left)/2,
 		this.outer_bounds.top + 30,
-		Infinity,
 		'right'
 	));
 	this.texts.level.push(new Text(
