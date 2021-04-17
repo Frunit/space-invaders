@@ -126,7 +126,7 @@ QUnit.test('Engine advanced setup', function(assert) {
 	engine.level_num = 7;
 	engine.setup(true);
 
-	assert.ok(Math.abs(engine.enemy_speed_factor - 1.99) < 0.00001, 'enemy speed factor');
+	assert.ok(Math.abs(engine.enemy_speed_factor - 1.999) < 0.00001, 'enemy speed factor');
 
 	assert.strictEqual(engine.enemies.length, 6, 'number of enemies');
 	assert.deepEqual(engine.enemies[0], new Enemy(390, 50, 0), 'Enemy 1');

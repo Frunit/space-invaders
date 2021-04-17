@@ -1,5 +1,6 @@
 'use strict';
 
+import {lang} from '../i18n.js';
 import {Highscore} from '../highscore.js';
 import {Text} from '../text.js';
 import {GUI_Element} from '../guielement.js';
@@ -13,7 +14,7 @@ resources.load([
 
 
 const date = new Date('2019-05-04T13:37:59');
-const formatted_date = date.toLocaleString('de-DE', {
+const formatted_date = date.toLocaleString(lang.locale, {
 	day: '2-digit',
 	month: 'short',
 	year: 'numeric',
@@ -53,7 +54,7 @@ QUnit.test('Highscore setup', function(assert) {
 	assert.deepEqual(hs.texts.scores[5], new Text('000000', 675, 300, Infinity, 'right'), 'table scores element 6');
 
 	assert.strictEqual(hs.texts.level.length, 1, 'table level length');
-	assert.deepEqual(hs.texts.level[0], new Text('You reached level 4', 450, 50, Infinity, 'center'), 'table level element');
+	assert.deepEqual(hs.texts.level[0], new Text('You reached level 4!', 450, 50, Infinity, 'center'), 'table level element');
 
 	assert.strictEqual(hs.texts.footer.length, 1, 'table footer length');
 	assert.deepEqual(hs.texts.footer[0], new Text('Fire to continue', 450, 550, Infinity, 'center'), 'table footer element');

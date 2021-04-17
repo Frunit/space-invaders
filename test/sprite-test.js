@@ -12,21 +12,30 @@ resources.load([
 
 
 QUnit.test('Sprite default values', function(assert) {
-	let sprite = new Sprite('sprites.png', {w: 64, h: 64});
-
+	let sprite = new Sprite({size: {w: 64, h: 64}, offset: {x: 0, y: 0}});
 	assert.strictEqual(sprite.pic.src, 'gfx/sprites.png', 'url existing');
 	assert.deepEqual(sprite.offset, {x: 0, y: 0}, 'default value offset');
 	assert.deepEqual(sprite.frames, [{x: 0, y: 0}], 'default value frames');
-	assert.strictEqual(sprite.delay, 1, 'default value delay');
+	assert.strictEqual(sprite.delay, 0, 'default value delay');
 	assert.ok(sprite.is_new_frame(), 'default value fresh');
 	assert.strictEqual(sprite.idx, 0, 'default value idx');
 
-	assert.throws(() => {new Sprite('asdf', {w: 64, h: 64});}, 'Should throw upon unknown url');
+	assert.throws(() => {new Sprite({
+		url: 'asdf',
+		size: {w: 64, h: 64},
+		offset: {x: 0, y: 0}
+	});}, 'Should throw upon unknown url');
 });
 
 
 QUnit.test('Sprite updates', function(assert) {
-	let sprite = new Sprite('sprites.png', {w: 5, h: 5}, 0.5, {x: 10, y: 400}, [{x: 0, y: 0}, {x: 5, y: 0}, {x: 10, y: 0}, {x: 0, y: 5}, {x: 5, y: 5}]);
+	let sprite = new Sprite({
+		url: 'sprites.png',
+		size: {w: 5, h: 5},
+		delay: 0.5,
+		offset: {x: 10, y: 400},
+		frames: [{x: 0, y: 0}, {x: 5, y: 0}, {x: 10, y: 0}, {x: 0, y: 5}, {x: 5, y: 5}]
+	});
 
 	assert.strictEqual(sprite.idx, 0, 'default value idx');
 	assert.ok(sprite.is_new_frame(), 'default value fresh');
@@ -78,14 +87,23 @@ QUnit.test('Sprite updates', function(assert) {
 	assert.strictEqual(renderinfo.y, 400 + 5, 'render y after 4.005 s');
 
 	sprite.reset();
-	let sprite2 = new Sprite('sprites.png', {w: 5, h: 5}, 0.5, {x: 10, y: 400}, [{x: 0, y: 0}, {x: 5, y: 0}, {x: 10, y: 0}, {x: 0, y: 5}, {x: 5, y: 5}]);
+	let sprite2 = new Sprite({
+		size: {w: 5, h: 5},
+		delay: 0.5,
+		offset: {x: 10, y: 400},
+		frames: [{x: 0, y: 0}, {x: 5, y: 0}, {x: 10, y: 0}, {x: 0, y: 5}, {x: 5, y: 5}]
+	});
 	assert.deepEqual(sprite, sprite2, 'reset');
 	assert.ok(sprite.is_new_frame(), 'fresh after reset');
 });
 
 
 QUnit.test('Sprite without delay', function(assert) {
-	let sprite = new Sprite('sprites.png', {w: 5, h: 5}, 0, {x: 10, y: 400}, [{x: 0, y: 0}, {x: 5, y: 0}, {x: 10, y: 0}, {x: 0, y: 5}, {x: 5, y: 5}]);
+	let sprite = new Sprite({
+		size: {w: 5, h: 5},
+		offset: {x: 10, y: 400},
+		frames: [{x: 0, y: 0}, {x: 5, y: 0}, {x: 10, y: 0}, {x: 0, y: 5}, {x: 5, y: 5}]
+	});
 
 	assert.strictEqual(sprite.idx, 0, 'default value idx');
 	assert.ok(sprite.is_new_frame(), 'default value fresh');

@@ -7,7 +7,7 @@ QUnit.test('Text parameters', function(assert) {
 	let text = new Text('', 100, 200, Infinity);
 
 	assert.strictEqual(text.alignment, 'left', 'default value alignment');
-	assert.strictEqual(text.color, '#000000', 'default value color');
+	assert.strictEqual(text.color, '#ffffff', 'default value color');
 	assert.strictEqual(text.size, 24, 'default value size');
 	assert.ok(text.active, 'text is active');
 

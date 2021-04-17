@@ -506,7 +506,7 @@ Enemy.prototype.update = function(dt, dx, dy, bounds) {
 Enemy.prototype.kill = function() {
 	// All enemies have the same explosion, so they have to be moved to center the explosion
 	const new_w = sprite_info.enemy_explode.size.w;
-	this.x += Math.floor(this.w - new_w);
+	this.x += Math.floor((this.w - new_w) / 2);
 	this.w = new_w;
 	this.off_time = options.explosion_time;
 	this.cooldown = options.explosion_time;
@@ -702,8 +702,8 @@ Mystery.prototype.kill = function() {
 
 	const new_w = sprite_info.enemy_explode.size.w;
 	const new_h = sprite_info.enemy_explode.size.h;
-	this.x += this.w - new_w
-	this.y += this.h - new_h
+	this.x += Math.floor((this.w - new_w) / 2);
+	this.y += Math.floor((new_h - this.h) / 2);
 	this.w = new_w;
 	this.h = new_h;
 

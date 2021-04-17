@@ -25,11 +25,10 @@ QUnit.test('Start setup', function(assert) {
 	assert.strictEqual(start.num_players, 1, 'num_players');
 	assert.strictEqual(start.enemy_direction, -1, 'enemy_direction');
 	assert.deepEqual(start.selector, new GUI_Element(380, 268, 'selector'), 'selector');
-	assert.strictEqual(start.texts.fixed.length, 3, 'num of texts');
+	assert.strictEqual(start.texts.fixed.length, 11, 'num of texts');
 	assert.deepEqual(start.texts.fixed[0], new Text('One player', 455, 300), 'text 1');
 	assert.deepEqual(start.texts.fixed[1], new Text('Two players', 455, 332), 'text 2');
-	assert.deepEqual(start.texts.fixed[2], new Text('VERSION', 895, 15, Infinity, 'right', '#000000', 10), 'text 2');
-	assert.strictEqual(start.keys.length, 2, 'num of keys');
+	assert.strictEqual(start.keys.length, 4, 'num of keys');
 	assert.strictEqual(start.enemies.length, 9, 'num of enemies');
 	assert.deepEqual(start.enemies[0], new Enemy(370, 50, 0), 'enemy 1');
 	assert.deepEqual(start.enemies[4], new Enemy(430, 100, 1), 'enemy 5');

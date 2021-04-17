@@ -250,7 +250,8 @@ Engine.prototype.setup_gui = function() {
 Engine.prototype.setup_enemies = function(enemies) {
 	const ib_right = this.inner_bounds.right;
 	const ib_left = this.inner_bounds.left;
-	const enemy_offset = ib_left + (ib_right - ib_left) / 2 - enemies[0].length / 2 * options.enemy_dx;
+	const enemy_offset = ib_left + (ib_right - ib_left) / 2 -
+		enemies[0].length / 2 * options.enemy_dx;
 	const enemy_upper = options.enemy_dy;
 
 	for(let y = 0; y < enemies.length; y++) {

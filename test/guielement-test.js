@@ -33,12 +33,12 @@ QUnit.test('GUI Element', function(assert) {
 	element = new GUI_Element(-9.71234, 1.542, 'keys1');
 
 	assert.strictEqual(element.w, 399, 'keys1 width');
-	assert.strictEqual(element.h, 140, 'keys1 height');
+	assert.strictEqual(element.h, 116, 'keys1 height');
 
 	element = new GUI_Element(-9.71234, 1.542, 'keys2');
 
-	assert.strictEqual(element.w, 282, 'keys2 width');
-	assert.strictEqual(element.h, 140, 'keys2 height');
+	assert.strictEqual(element.w, 299, 'keys2 width');
+	assert.strictEqual(element.h, 116, 'keys2 height');
 
 	element = new GUI_Element(-9.71234, 1.542, 'enemy1');
 

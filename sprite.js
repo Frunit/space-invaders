@@ -6,7 +6,7 @@
  * hence, animation.
  *
  * @constructor
- * @param {info} object - Information about the sprite
+ * @param {object} info - Information about the sprite
  * @param {string} [info.url='sprites.png'] - The filename of the sprite sheet without path
  * @param {object} info.size - The size of the sprite
  * @param {number} info.size.w - The width of the sprite in pixel
@@ -21,9 +21,9 @@
  * @param {number} [zoom=1] - Zoom factor for displaying the sprite
  */
 function Sprite(info, zoom=1) {
-	const url = info.hasOwnProperty('url') ? info.url : 'sprites.png';
-	const delay = info.hasOwnProperty('delay') ? info.delay : 1;
-	const frames = info.hasOwnProperty('frames') ? info.frames : [{x: 0, y: 0}];
+	const url = 'url' in info ? info.url : 'sprites.png';
+	const delay = 'delay' in info ? info.delay : 0;
+	const frames = 'frames' in info ? info.frames : [{x: 0, y: 0}];
 
 	// add standard path to graphics file name
 	this.pic = resources.get('gfx/' + url);

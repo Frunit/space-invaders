@@ -49,6 +49,14 @@ let lang_idx = langs.indexOf(current);
 let lang = all_strings[current];
 
 
+/**
+ * <tt>lang_change</tt> allows to change the language. If no argument is given,
+ * it tries to determine the language from Browser settings. With an argument,
+ * it goes through the list of supported languages, depending on the sign of the
+ * argument.
+ *
+ * @param {number} [dir=null] - Direction in which to go through the list
+ */
 function lang_change(dir) {
 	if(dir > 0) {
 		lang_idx++;
@@ -67,11 +75,16 @@ function lang_change(dir) {
 		current = langs[lang_idx];
 	}
 	else {
-		current = navigator.language || navigator.userLanguage;
-		current = current.substring(0, 2).toUpperCase();
-
-		if(!all_strings.hasOwnProperty(current)) {
+		if(typeof navigator === 'undefined') {
 			current = 'EN';
+		}
+		else {
+			current = navigator.language || navigator.userLanguage;
+			current = current.substring(0, 2).toUpperCase();
+
+			if(! (current in all_strings)) {
+				current = 'EN';
+			}
 		}
 	}
 
