@@ -41,6 +41,8 @@ dangerous fake goody that will kill you!
 
 The game needs a keyboard, so it will not work on touch-only devices!
 
+The background was generated using the [Space Background Generator](https://deep-fold.itch.io/space-background-generator) by [Deep-Fold](https://deep-fold.itch.io).
+
 
 Programmatic organisation
 -------------------------
