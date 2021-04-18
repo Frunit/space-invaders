@@ -6,7 +6,7 @@ const options = {
 	num_players: 1,               // Default number of players
 	start_level: 0,               // Default start level
 	start_lives: 3,               // Default start lives
-	show_fps: true,               // Show current frames per second
+	show_fps: false,              // Show current frames per second
 	drop_chance: 0.333,           // Goody drop chance
 	enemy_level_speedup: 0.333,   // Speedup of enemies when the levels loop
 	enemy_line_speedup: 0.05,     // Speedup of enemies each new line

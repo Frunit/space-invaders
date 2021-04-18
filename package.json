@@ -1,6 +1,6 @@
 {
   "name": "space-invaders",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Space Invaders in Javascript",
   "author": "Mathias Bockwoldt",
   "scripts": {

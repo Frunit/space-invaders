@@ -81,8 +81,10 @@ function lang_change(dir) {
 		else {
 			current = navigator.language || navigator.userLanguage;
 			current = current.substring(0, 2).toUpperCase();
-
-			if(! (current in all_strings)) {
+			if(current === 'NB') {
+				current = 'NO';
+			}
+			else if(! (current in all_strings)) {
 				current = 'EN';
 			}
 		}
