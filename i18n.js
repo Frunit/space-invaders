@@ -12,6 +12,7 @@ const all_strings = {
 		fire_to_continue: 'Fire to continue',
 		you_reached_a: 'You reached level ',
 		you_reached_b: '!',
+		no_focus: 'Click into the game window to continue',
 		locale: 'en-GB'
 	},
 	DE: {
@@ -25,6 +26,7 @@ const all_strings = {
 		fire_to_continue: 'Zum Fortsetzen schießen',
 		you_reached_a: 'Du hast es bis Level ',
 		you_reached_b: ' geschafft!',
+		no_focus: 'Klicke in das Fenster um weiter zu spielen',
 		locale: 'de-DE'
 	},
 	NO: {
@@ -38,6 +40,7 @@ const all_strings = {
 		fire_to_continue: 'Skyt for å fortsette',
 		you_reached_a: 'Du klarte det til level ',
 		you_reached_b: '!',
+		no_focus: 'Klikk i dette vinduet for å fortsette spillet',
 		locale: 'nb-NO'
 	}
 };

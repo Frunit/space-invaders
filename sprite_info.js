@@ -114,6 +114,11 @@ const sprite_info = {
 		size: {w: 299, h: 116},
 		offset: {x: 0, y: 118}
 	},
+	unfocused: {
+		url: 'white.png',
+		size: {w: 900, h: 100},
+		offset: {x: 0, y: 0}
+	},
 	goodies: [
 		{
 			size: {w: 46, h: 22},

@@ -79,6 +79,12 @@ function GUI_Element(x, y, type) {
 			this.h = sprite_info.enemy3.size.h;
 			break;
 		}
+		case 'unfocused': {
+			this.sprite = new Sprite(sprite_info.unfocused);
+			this.w = sprite_info.unfocused.size.w;
+			this.h = sprite_info.unfocused.size.h;
+			break;
+		}
 		default:
 			throw 'Unknown GUI_Element type: ' + type;
 	}

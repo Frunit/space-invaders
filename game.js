@@ -12,12 +12,14 @@
 
 // MAYBE: Increase shooting probability for enemies, when only few are left
 
+import {lang} from './i18n.js';
 import {Start} from './start.js';
 import {Engine} from './engine.js';
 import {Highscore} from './highscore.js';
 import {Text} from './text.js';
 import {Resources} from './resources.js';
 import {Input} from './input.js';
+import {GUI_Element} from './guielement.js';
 
 // Attention! No curly brackets. This uses the default export that is dependent
 // on whether this runs in a browser or not (for testing in node.js).
@@ -38,7 +40,7 @@ function Game(options, levels) {
 	this.options = options;
 	this.levels = levels;
 
-	this.version = 'v1.2.1';
+	this.version = 'v1.3.0';
 
 	this.last_time = 0;
 
@@ -60,26 +62,37 @@ function Game(options, levels) {
 	if(typeof window === 'undefined') {
 		global.resources = new Resources();
 		global.input = new Input();
+		this.has_focus = true;
 	}
 	else {
 		window.resources = new Resources();
 		window.input = new Input();
+		this.has_focus = document.hasFocus();
 
 		document.addEventListener('keydown', function(e) {
-			input.set_key(e.code || e.key, true);
+			const code = e.code || e.key;
+			if(['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'Space', ' '].includes(code)) {
+				event.preventDefault();
+			}
+			input.set_key(code, true);
 		});
 
 		document.addEventListener('keyup', function(e) {
 			input.set_key(e.code || e.key, false);
 		});
+
+		window.addEventListener('blur', this.blur.bind(this));
+
+		window.addEventListener('focus', this.focus.bind(this));
 	}
 
 	// And finally, the necessary graphics are loaded and the game is started as
 	// soon as the graphics were loaded.
-	resources.on_ready(() => {this.start();});
+	resources.on_ready(this.start.bind(this));
 	resources.load([
 		'gfx/sprites.png',
 		'gfx/keys.png',
+		'gfx/white.png',
 	]);
 }
 
@@ -102,18 +115,23 @@ Game.prototype.loop = function() {
 		dt = 0;
 	}
 
-	// Update the game and draw the newest state.
-	const next_stage = this.update(dt);
-	const texts = this.stage.get_texts();
-	texts.fps = [this.fps];
-	this.screen.render(this.stage.get_entities(), texts);
-	this.update_fps(now);
+	if(!this.has_focus) {
+		this.blur();
+	}
+	else {
+		// Update the game and draw the newest state.
+		const next_stage = this.update(dt);
+		const texts = this.stage.get_texts();
+		texts.fps = [this.fps];
+		this.screen.render(this.stage.get_entities(), texts);
+		this.update_fps(now);
 
-	this.last_time = now;
+		this.last_time = now;
 
-	// If the current stage has signalled finish, load the next stage.
-	if(next_stage !== null) {
-		this.next_stage(next_stage);
+		// If the current stage has signalled finish, load the next stage.
+		if(next_stage !== null) {
+			this.next_stage(next_stage);
+		}
 	}
 
 	// Ask Javascript to call this function again when suitable.
@@ -121,8 +139,53 @@ Game.prototype.loop = function() {
 	// the window is, for example, minimized.
 	// This will not loop in nodejs for testing purposes!
 	if(typeof window !== 'undefined') {
-		requestAnimationFrame(() => this.loop());
+		requestAnimationFrame(this.loop.bind(this));
 	}
+};
+
+
+/**
+ * <tt>Game.blur</tt> establishes an info overlay that the window is not in
+ * focus. This also pauses the game.
+ */
+Game.prototype.blur = function() {
+	const entities = this.stage.get_entities();
+	const new_entities = [];
+	for(let elem of entities) {
+		new_entities.push(elem);
+	}
+
+	const texts = this.stage.get_texts();
+	const new_texts = {};
+	for(let elem in texts) {
+		new_texts[elem] = texts[elem];
+	}
+
+	new_entities.push(new GUI_Element(
+		0,
+		this.options.total_size.h / 2 - 50,
+		'unfocused'
+	));
+
+	new_texts.blurred = [new Text(
+		lang.no_focus,
+		this.options.total_size.w / 2,
+		this.options.total_size.h / 2 + 14,
+		'center',
+		28,
+		'#a00000'
+	)];
+
+	this.screen.render(new_entities, new_texts);
+	this.has_focus = false;
+};
+
+
+/**
+ * <tt>Game.focus</tt> returns to a normal game state and restarts the loop.
+ */
+Game.prototype.focus = function() {
+	this.has_focus = true;
 };
 
 
